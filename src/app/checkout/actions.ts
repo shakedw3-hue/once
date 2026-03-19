@@ -1,0 +1,36 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createCheckoutSession } from "@/lib/stripe";
+
+export async function initiateCheckout() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  // Check if already paid
+  const { data: profile } = await supabase
+    .from("users")
+    .select("has_paid")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.has_paid) {
+    redirect("/dashboard");
+  }
+
+  const session = await createCheckoutSession(user.id, user.email!);
+
+  if (session.url) {
+    redirect(session.url);
+  }
+
+  return { error: "Failed to create checkout session" };
+}
