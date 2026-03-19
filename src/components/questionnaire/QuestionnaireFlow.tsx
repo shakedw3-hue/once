@@ -132,7 +132,7 @@ export default function QuestionnaireFlow() {
             {submitting
               ? "Analyzing..."
               : isLast
-                ? "See My Profile"
+                ? "See My Results"
                 : "Continue"}
           </Button>
         </div>

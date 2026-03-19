@@ -13,6 +13,9 @@ export default function PricingPage() {
       <h1 className="mb-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
         Pricing
       </h1>
+      <p className="mb-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+        Most people spend ₱5,000 to ₱20,000 on courses they never finish. Once costs less than one course and tells you exactly which path is right for you.
+      </p>
       <p className="mb-12 text-base leading-relaxed text-muted-foreground sm:text-lg">
         The assessment is free. If the results make sense and you want the full
         path, it&apos;s a one-time payment.
@@ -22,7 +25,8 @@ export default function PricingPage() {
       <div className="mb-12 grid gap-6 sm:grid-cols-2">
         {/* Once Core */}
         <div className="rounded-xl border bg-card p-6 sm:p-8">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once Core</p>
+          <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once Core</p>
+          <p className="mb-4 text-xs text-muted-foreground">Your path. Built for you.</p>
           <div className="mb-6 flex items-baseline gap-1">
             <span className="text-sm text-muted-foreground">₱</span>
             <span className="font-display text-5xl font-bold tracking-tight">649</span>
@@ -57,7 +61,8 @@ export default function PricingPage() {
 
         {/* Once Pro */}
         <div className="rounded-xl border-2 border-primary bg-card p-6 sm:p-8">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">Once Pro</p>
+          <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-primary">Once Pro</p>
+          <p className="mb-4 text-xs text-muted-foreground">Your path. Plus your first income.</p>
           <div className="mb-6 flex items-baseline gap-1">
             <span className="text-sm text-muted-foreground">₱</span>
             <span className="font-display text-5xl font-bold tracking-tight">999</span>

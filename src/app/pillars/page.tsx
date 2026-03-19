@@ -21,7 +21,7 @@ const pillars = [
       "Risk Thinking",
     ],
     description:
-      "Not get-rich-quick. Not crypto tips. This pillar is about understanding where your money actually goes, how to evaluate opportunities, and how to make financial decisions without guessing.",
+      "Built from what the world's most successful investors actually do.",
     whoNeeds:
       "You score high on Money if financial stress or lack of direction is the main thing holding you back. If you're earning but not growing, or not earning enough and don't know where to start, this is your path.",
   },
@@ -38,7 +38,7 @@ const pillars = [
       "Habit Architecture",
     ],
     description:
-      "Focus, stress, emotional control, habits. This is the operating system everything else runs on. If your mind isn't working well, nothing else will either, no matter how many courses you take.",
+      "Built from decades of neuroscience research on how high performers think, focus, and decide.",
     whoNeeds:
       "You score high on Mind if you're overwhelmed, can't focus, make impulsive decisions, or can't stick to things. If you know what to do but can't make yourself do it, this is your path.",
   },
@@ -55,7 +55,7 @@ const pillars = [
       "Movement & Mobility",
     ],
     description:
-      "Energy, training, nutrition, recovery, and daily movement. No complicated diets or gym programs. Practical habits that give you more energy and keep you consistent without requiring a lifestyle overhaul.",
+      "Built from the science of energy, sleep, and performance.",
     whoNeeds:
       "You score high on Body if you're tired all the time, can't stick to a workout routine, eat poorly, or your physical health is affecting everything else. If your body is working against you, this is your path.",
   },
@@ -72,7 +72,7 @@ const pillars = [
       "Inner Peace & Stillness",
     ],
     description:
-      "Purpose, values, reflection, inner calm. This is the pillar most people ignore until everything else stops working. It's not religious. It's about knowing why you're doing what you're doing.",
+      "Built from the philosophy of people who found meaning in the hardest circumstances.",
     whoNeeds:
       "You score high on Spirit if you feel lost, disconnected, or like you're going through the motions. If you're successful on paper but something feels empty, this is your path.",
   },

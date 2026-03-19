@@ -9,7 +9,7 @@ cross join (values
   ('Financial Direction', 'Understand where you stand financially and create a clear direction for growth.', 1),
   ('Opportunity Thinking', 'Learn to identify and evaluate opportunities that align with your financial goals.', 2),
   ('Decision Frameworks', 'Build structured frameworks for making better financial decisions under uncertainty.', 3),
-  ('Indicator Based Trading Foundations', 'Understand market indicators and build a foundation for informed trading decisions.', 4),
+  ('Smart Money Management', 'Learn practical money management strategies that help you build wealth steadily over time.', 4),
   ('Risk Thinking', 'Develop a healthy relationship with risk and learn to manage it across all financial decisions.', 5)
 ) as m(title, description, ord)
 where p.pillar = 'money';

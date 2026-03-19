@@ -3,124 +3,111 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SiteLayout from "@/components/landing/SiteLayout";
 
-export const metadata: Metadata = {
-  title: "How it works | Once",
-};
+export const metadata: Metadata = { title: "How it works" };
 
 export default function HowItWorksPage() {
   return (
     <SiteLayout>
-      <h1 className="mb-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        How it works
+      <h1 className="mb-4 text-display text-3xl sm:text-4xl">
+        How Once works
       </h1>
       <p className="mb-12 text-base leading-relaxed text-muted-foreground sm:text-lg">
-        Three steps. No account needed to start. The assessment is free.
+        Four steps. One path. The assessment is free.
       </p>
 
-      {/* Steps */}
-      <div className="mb-16 space-y-10">
-        <div>
-          <div className="mb-3 flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              1
-            </span>
-            <h2 className="text-lg font-semibold">Take the assessment</h2>
-          </div>
-          <div className="ml-11 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              10 questions about your goals, daily life, and what&apos;s frustrating
-              you. Each question has 4 options. Pick the one that fits best.
-            </p>
-            <p>
-              Behind the scenes, every answer adds weighted points to four
-              pillars: Money, Mind, Body, Spirit. When you&apos;re done, the system
-              calculates your score for each.
-            </p>
-            <p>
-              This takes about 3 minutes. You don&apos;t need to pay to do this part.
-            </p>
-          </div>
-        </div>
+      <div className="mb-16 space-y-12">
+        <Step n="1" title="Diagnose" sub="We find exactly where you are.">
+          <p>
+            10 questions about your goals, daily life, and frustrations. Each answer
+            adds weighted points to four pillars: Money, Mind, Body, Spirit. When you
+            finish, the system calculates your score for each.
+          </p>
+          <p>
+            This is not a personality quiz. It is a diagnostic. The same approach
+            therapists use before treatment, coaches use before training, and the
+            U.S. military uses before assigning support.
+          </p>
+          <p>Takes 3 minutes. You do not need to pay for this step.</p>
+        </Step>
 
-        <div>
-          <div className="mb-3 flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              2
-            </span>
-            <h2 className="text-lg font-semibold">See your Once profile</h2>
-          </div>
-          <div className="ml-11 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              You get a score for each pillar, for example: Money 78, Mind 54,
-              Body 41, Spirit 63. The highest becomes your primary path. Second
-              highest becomes your secondary.
-            </p>
-            <p>
-              You also see a preview of the modules in your path. The first
-              module is visible. The rest are locked until you pay.
-            </p>
-            <p>
-              This is where you decide: does this make sense for me? If yes,
-              continue. If not, you keep your scores and go.
-            </p>
-          </div>
-        </div>
+        <Step n="2" title="Match" sub="We build one path. Yours.">
+          <p>
+            Your highest scoring pillar becomes your primary path. You get a full
+            Once profile with scores, insights about what is holding you back, and
+            a preview of your modules.
+          </p>
+          <p>
+            This is where most platforms hand you a catalog. Once does the opposite:
+            the system picks what is right for you, based on your actual data. No
+            browsing. No guessing. No wasted modules.
+          </p>
+          <p>You see your profile before paying anything.</p>
+        </Step>
 
-        <div>
-          <div className="mb-3 flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              3
-            </span>
-            <h2 className="text-lg font-semibold">Work through your path</h2>
-          </div>
-          <div className="ml-11 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <p>
-              Pay ₱649 once and unlock your full path: 5 modules, each with
-              5–7 lessons. Every lesson is structured the same way:
-            </p>
-            <div className="rounded-lg border bg-card p-4">
-              <div className="space-y-2 text-xs">
-                <div>
-                  <span className="font-semibold text-foreground">Teaching section</span>
-                  <span className="text-muted-foreground">: the concept explained clearly, no fluff</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-foreground">Action step</span>
-                  <span className="text-muted-foreground">: one specific thing to do today</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-foreground">Reflection prompt</span>
-                  <span className="text-muted-foreground">: a question to help you think deeper</span>
-                </div>
-              </div>
+        <Step n="3" title="Learn" sub="Thousands of hours of research. In 10 minutes a day.">
+          <p>
+            Ray Dalio wrote 600 pages on principles. Andrew Huberman recorded 300
+            hours of neuroscience podcasts. James Clear spent years studying habit
+            formation. We took what matters for your specific situation and built each
+            insight into a 10-minute lesson you can act on today.
+          </p>
+          <p>Every lesson follows the same structure:</p>
+          <div className="rounded-lg border bg-card p-4">
+            <div className="space-y-2 text-xs">
+              <div><span className="font-semibold text-foreground">Teaching</span>: what the research says, explained simply</div>
+              <div><span className="font-semibold text-foreground">Action step</span>: one specific thing to do within 24 hours</div>
+              <div><span className="font-semibold text-foreground">Reflection</span>: a question that connects the insight to your life</div>
             </div>
-            <p>
-              No videos. No passive watching. You read, you do, you reflect.
-              Go at your own pace. There&apos;s no timer or deadline.
-            </p>
           </div>
-        </div>
+          <p>25 Core lessons. Each one sourced from a specific researcher or practitioner.</p>
+        </Step>
+
+        <Step n="4" title="Launch" sub="Your first real income. Step by step.">
+          <p>
+            Once Pro adds 100 additional lessons across four income tracks designed
+            for the Philippine market: social media management, Shopee/Lazada
+            e-commerce, freelancing, and building online side income.
+          </p>
+          <p>
+            These include real platforms (Canva, OnlineJobs.ph, Shopee Seller Center),
+            real numbers (₱5,000 to ₱15,000 per client), and step-by-step instructions
+            you can follow this week.
+          </p>
+          <p>Growing as a person is the foundation. Growing your income is the launch.</p>
+        </Step>
       </div>
 
       <div className="mb-8 flex justify-end">
         <Link href="/pillars" className="text-sm text-primary hover:underline">
-          Next: The 4 pillars &rarr;
+          Next: The 4 pillars →
         </Link>
       </div>
 
-      {/* CTA */}
       <div className="rounded-xl border bg-card p-6 text-center">
         <p className="mb-4 text-sm text-muted-foreground">
-          The assessment is free. See your scores first, then decide.
+          Step 1 is free. See your scores before deciding.
         </p>
-        <Button
-          render={<Link href="/auth/signup" />}
-          size="lg"
-          className="h-12 px-6 text-sm font-semibold"
-        >
-          Take the assessment
+        <Button render={<Link href="/auth/signup" />} size="lg" className="h-12 px-6 text-sm font-semibold">
+          Do It Once
         </Button>
       </div>
     </SiteLayout>
+  );
+}
+
+function Step({ n, title, sub, children }: { n: string; title: string; sub: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">{n}</span>
+        <div>
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <p className="text-xs text-primary">{sub}</p>
+        </div>
+      </div>
+      <div className="ml-[52px] space-y-3 text-sm leading-relaxed text-muted-foreground">
+        {children}
+      </div>
+    </div>
   );
 }
