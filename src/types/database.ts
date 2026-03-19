@@ -4,6 +4,8 @@ export type UserRole = "user" | "admin";
 
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
 
+export type Plan = "core" | "pro";
+
 export type MarketLevel =
   | "UNTESTED"
   | "OPEN"
@@ -18,6 +20,7 @@ export interface User {
   role: UserRole;
   primaryPath: Pillar | null;
   secondaryPath: Pillar | null;
+  plan: Plan | null;
   hasPaid: boolean;
   createdAt: string;
   updatedAt: string;

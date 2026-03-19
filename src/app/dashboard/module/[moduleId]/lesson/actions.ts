@@ -11,6 +11,15 @@ export async function completeLesson(lessonId: string, reflection: string | null
 
   if (!user) return { error: "Not authenticated" };
 
+  // Verify user has paid
+  const { data: profile } = await supabase
+    .from("users")
+    .select("has_paid")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.has_paid) return { error: "Payment required" };
+
   // Upsert progress
   const { error } = await supabase
     .from("user_progress")

@@ -11,37 +11,45 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-export const PRICE_AMOUNT = 64900; // ₱649 in centavos
-export const PRICE_CURRENCY = "php";
+export type Plan = "core" | "pro";
 
-/**
- * Creates a Stripe Checkout Session with GCash and Maya
- * as additional Philippine payment methods alongside card.
- */
-export async function createCheckoutSession(userId: string, userEmail: string) {
+export const PLANS: Record<Plan, { amount: number; name: string; description: string }> = {
+  core: {
+    amount: 64900,
+    name: "Once Core",
+    description: "Your personalized path across Money, Mind, Body, and Spirit. 25 lessons. Lifetime access.",
+  },
+  pro: {
+    amount: 99900,
+    name: "Once Pro",
+    description: "Everything in Core plus 100 income-track lessons: social media, e-commerce, freelancing, and online side income. Lifetime access.",
+  },
+};
+
+export async function createCheckoutSession(userId: string, userEmail: string, plan: Plan = "core") {
   const stripe = getStripe();
+  const planConfig = PLANS[plan];
 
   const session = await stripe.checkout.sessions.create({
     customer_email: userEmail,
     payment_method_types: ["card"],
-    payment_method_options: {},
     mode: "payment",
     line_items: [
       {
         price_data: {
-          currency: PRICE_CURRENCY,
+          currency: "php",
           product_data: {
-            name: "BetterLife — Full Access",
-            description:
-              "Lifetime access to your personalized path across Money, Mind, Body, and Spirit.",
+            name: planConfig.name,
+            description: planConfig.description,
           },
-          unit_amount: PRICE_AMOUNT,
+          unit_amount: planConfig.amount,
         },
         quantity: 1,
       },
     ],
     metadata: {
       user_id: userId,
+      plan: plan,
     },
     success_url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/profile`,

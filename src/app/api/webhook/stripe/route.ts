@@ -38,6 +38,7 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const userId = session.metadata?.user_id;
+    const plan = session.metadata?.plan ?? "core";
 
     if (userId && session.payment_status === "paid") {
       const supabaseAdmin = getSupabaseAdmin();
@@ -51,10 +52,10 @@ export async function POST(request: Request) {
         status: "completed",
       });
 
-      // Unlock user access
+      // Unlock user access with plan
       await supabaseAdmin
         .from("users")
-        .update({ has_paid: true, updated_at: new Date().toISOString() })
+        .update({ has_paid: true, plan, updated_at: new Date().toISOString() })
         .eq("id", userId);
 
       // Track analytics

@@ -1,21 +1,23 @@
-# BetterLife Product Specification
+# Once Product Specification
 
 ## Vision
 
-BetterLife is a personalized life-improvement platform for the Philippine market.
+Once is a personalized life-improvement platform for the Philippine market.
 
-The system generates a personalized life path for each user across four pillars:
+The system generates a personalized path for each user across four pillars:
 
-Money  
-Mind  
-Body  
+Money
+Mind
+Body
 Spirit
 
-Users complete a questionnaire and receive a BetterLife Profile.
+Users complete a diagnostic assessment and receive a Once Profile.
 
-The platform guides them through structured modules.
+The platform guides them through structured modules built from world-class research.
 
-Price: ₱649 one-time.
+Plans:
+- Once Core: ₱649 one-time
+- Once Pro: ₱999 one-time (includes income track)
 
 ---
 
@@ -25,20 +27,21 @@ Primary market: Philippines.
 
 Typical users:
 
-Age 20–40.
+Age 20-40.
 
 Motivations:
 
-Improve financial future  
-Support family  
-Self improvement  
-Life direction  
+Improve financial future
+Support family
+Self improvement
+Life direction
+Build side income
 
 Platform must feel:
 
-Trustworthy  
-Structured  
-Calm authority  
+Trustworthy
+Structured
+Calm authority
 Research based
 
 ---
@@ -49,11 +52,13 @@ Research based
 
 Modules:
 
-Financial Direction  
-Opportunity Thinking  
-Decision Frameworks  
-Indicator Based Trading Foundations  
+Financial Direction
+Opportunity Thinking
+Decision Frameworks
+Smart Money Management
 Risk Thinking
+
+Sources: Ray Dalio, Morgan Housel, Naval Ravikant
 
 ---
 
@@ -61,11 +66,13 @@ Risk Thinking
 
 Modules:
 
-Focus Reset  
-Stress Control  
-Emotional Resilience  
-Decision Clarity  
+Focus Reset
+Stress Control
+Emotional Resilience
+Decision Clarity
 Habit Architecture
+
+Sources: Andrew Huberman, James Clear, Cal Newport
 
 ---
 
@@ -73,10 +80,13 @@ Habit Architecture
 
 Modules:
 
-Energy Reset  
-Training Consistency  
-Nutrition Simplicity  
+Energy Reset
+Training Consistency
+Nutrition Simplicity
 Recovery
+Movement & Mobility
+
+Sources: Andrew Huberman, Matthew Walker, Peter Attia
 
 ---
 
@@ -84,33 +94,54 @@ Recovery
 
 Modules:
 
-Meaning and Direction  
-Gratitude Practice  
-Daily Reflection  
+Meaning & Direction
+Gratitude Practice
+Daily Reflection
 Values Alignment
+Inner Peace & Stillness
+
+Sources: Viktor Frankl, Ryan Holiday, Thich Nhat Hanh
+
+---
+
+## Pro Income Tracks (Once Pro only)
+
+### Social Media Management
+Modules: Getting Your First Client, Content Creation Systems, Platform Mastery, Analytics and Reporting, Scaling to 40K/Month
+
+### Shopee/Lazada E-Commerce
+Modules: Finding Winning Products, Setting Up Your Store, Listing Optimization, Order Fulfillment, Scaling with Ads
+
+### Freelancing & Client Acquisition
+Modules: Choosing Your Skill, Building a Portfolio in 7 Days, Finding Clients, Pricing and Negotiation, From Side Hustle to Full Income
+
+### Building Online Side Income
+Modules: Digital Products, Content Monetization, Affiliate Marketing in PH, Email List Building, Automating Your Income Stream
 
 ---
 
 ## Personalization Engine
 
-Users answer a questionnaire.
+Users answer a 10-question assessment.
 
 Scores calculated for:
 
-Money  
-Mind  
-Body  
+Money
+Mind
+Body
 Spirit
 
-Example:
-
-Money 78  
-Mind 54  
-Body 41  
-Spirit 63
-
-Primary Path = highest score  
+Primary Path = highest score
 Secondary Path = second highest
+
+---
+
+## 4-Step Framework
+
+1. Diagnose: We find exactly where you are.
+2. Match: We build one path. Yours.
+3. Learn: Thousands of hours of research. In 10 minutes a day.
+4. Launch: Your first real income. Step by step.
 
 ---
 
@@ -118,19 +149,15 @@ Secondary Path = second highest
 
 Landing Page
 
-CTA:
-
-Discover Your Path
+CTA: Do It Once
 
 Steps:
 
-Questionnaire  
-Path Analysis  
-BetterLife Profile  
-Path Preview  
+Assessment (free)
+Once Profile
+Path Preview
+Choose Plan (Core ₱649 / Pro ₱999)
 Unlock Full System
-
-Price ₱649
 
 ---
 
@@ -138,9 +165,9 @@ Price ₱649
 
 Each lesson contains:
 
-Title  
-Description  
-Action Step  
+Title
+Description (built from published research, source cited)
+Action Step (doable within 24 hours)
 Reflection Prompt
 
 ---
@@ -149,11 +176,14 @@ Reflection Prompt
 
 Each pillar includes:
 
-3 modules
+5 modules
 
 Each module includes:
 
-5–7 lessons
+5 lessons
+
+Core total: 100 lessons (4 pillars x 5 modules x 5 lessons)
+Pro total: 100 additional lessons (4 tracks x 5 modules x 5 lessons)
 
 ---
 
@@ -161,11 +191,12 @@ Each module includes:
 
 User dashboard displays:
 
-BetterLife Profile  
-Primary Path  
-Secondary Path  
-Next Lesson  
+Once Profile
+Primary Path
+Secondary Path
+Next Lesson
 Progress Tracker
+Plan indicator (Core/Pro)
 
 ---
 
@@ -173,16 +204,16 @@ Progress Tracker
 
 Admin dashboard features:
 
-User database  
-Revenue tracking  
-Lesson completion tracking  
-Analytics
+User database
+Revenue tracking
+Lesson completion tracking
+Analytics with funnel
 
 Admin capabilities:
 
-Add modules  
-Edit lessons  
-View users  
+Add modules
+Edit lessons
+View users
 View payments
 
 ---
@@ -191,9 +222,9 @@ View payments
 
 Frontend:
 
-Next.js  
-Tailwind  
-ShadCN  
+Next.js 16
+Tailwind v4
+ShadCN/ui v4
 Framer Motion
 
 Backend:
@@ -202,8 +233,16 @@ Supabase
 
 Authentication:
 
-Email / Password
+Email/Password with password reset
 
 Payments:
 
-Stripe
+Stripe (GCash, Maya, Card)
+
+---
+
+## Legal
+
+Terms of Service (Philippine law)
+Privacy Policy (RA 10173 compliant)
+Refund Policy (7-day window)

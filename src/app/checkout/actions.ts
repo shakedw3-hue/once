@@ -2,9 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createCheckoutSession } from "@/lib/stripe";
+import { createCheckoutSession, type Plan } from "@/lib/stripe";
 
-export async function initiateCheckout() {
+export async function initiateCheckout(plan: Plan = "core") {
   const supabase = await createClient();
 
   const {
@@ -15,7 +15,6 @@ export async function initiateCheckout() {
     redirect("/auth/login");
   }
 
-  // Check if already paid
   const { data: profile } = await supabase
     .from("users")
     .select("has_paid")
@@ -26,7 +25,8 @@ export async function initiateCheckout() {
     redirect("/dashboard");
   }
 
-  const session = await createCheckoutSession(user.id, user.email!);
+  const validPlan: Plan = plan === "pro" ? "pro" : "core";
+  const session = await createCheckoutSession(user.id, user.email!, validPlan);
 
   if (session.url) {
     redirect(session.url);
