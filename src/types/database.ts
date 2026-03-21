@@ -22,8 +22,20 @@ export interface User {
   secondaryPath: Pillar | null;
   plan: Plan | null;
   hasPaid: boolean;
+  recommendationPlan: Plan | null;
+  recommendationTrack: string | null;
+  incomeTarget: number | null;
+  digitalComfort: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Recommendation {
+  plan: Plan;
+  track: string;
+  why: string;
+  skills: string[];
+  earning: string;
 }
 
 export interface QuestionnaireAnswer {

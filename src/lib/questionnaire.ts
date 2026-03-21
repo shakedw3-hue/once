@@ -1,4 +1,4 @@
-import type { Pillar, PillarScores } from "@/types/database";
+import type { Pillar, PillarScores, Plan, Recommendation } from "@/types/database";
 
 export interface QuestionOption {
   label: string;
@@ -227,5 +227,156 @@ export function normalizeScores(scores: PillarScores): PillarScores {
     mind: Math.round((scores.mind / total) * 100),
     body: Math.round((scores.body / total) * 100),
     spirit: Math.round((scores.spirit / total) * 100),
+  };
+}
+
+// ─── Smart Recommendation Engine ───
+
+const TRACK_DATA: Record<string, { skills: string[]; earning: string }> = {
+  "AI Business Services": {
+    skills: [
+      "Build AI chatbots for local businesses",
+      "Automate customer service with AI",
+      "Create AI-powered quotes and proposals",
+      "Set up AI follow-up systems",
+      "Land your first AI consulting client",
+    ],
+    earning: "₱20,000–₱50,000 per project",
+  },
+  "AI Web & No-Code": {
+    skills: [
+      "Build professional websites with AI in 48 hours",
+      "Create dashboards and web apps without coding",
+      "Use AI to write and debug code for you",
+      "Deploy and host sites for clients",
+      "Price and sell web development services",
+    ],
+    earning: "₱15,000–₱40,000 per project",
+  },
+  "AI Content & Design": {
+    skills: [
+      "Create logos and brand identities with AI",
+      "Design social media content in minutes",
+      "Build marketing materials clients pay for",
+      "Master AI image and video tools",
+      "Package and price creative services",
+    ],
+    earning: "₱8,000–₱25,000 per month",
+  },
+  "Social Media Management": {
+    skills: [
+      "Manage Facebook and Instagram for businesses",
+      "Create content calendars that drive engagement",
+      "Run and optimize paid ad campaigns",
+      "Build analytics reports clients understand",
+      "Scale to 3–5 clients at ₱5,000–₱8,000 each",
+    ],
+    earning: "₱15,000–₱40,000 per month",
+  },
+  "Shopee/Lazada E-Commerce": {
+    skills: [
+      "Find winning products Filipino buyers want",
+      "Set up and optimize your Shopee/Lazada store",
+      "Write listings that convert browsers to buyers",
+      "Master dropship and warehouse fulfillment",
+      "Scale with Shopee Ads and flash sales",
+    ],
+    earning: "₱10,000–₱50,000 per month",
+  },
+  "Freelancing": {
+    skills: [
+      "Choose your highest-value freelance skill",
+      "Build a portfolio in 7 days with real samples",
+      "Land clients on Upwork and OnlineJobs.ph",
+      "Price your work at market rate (not below)",
+      "Turn side gigs into full replacement income",
+    ],
+    earning: "₱15,000–₱60,000 per month",
+  },
+};
+
+export function determineRecommendation(
+  answers: Record<string, number>,
+  primaryPath: Pillar
+): { plan: Plan; track: string } {
+  const incomeTarget = answers["income_target"] ?? 0;
+  const digitalComfort = answers["digital_skills"] ?? 1;
+
+  // Q12 option 2 (₱50K+) = high income ambition
+  if (incomeTarget === 2) {
+    if (digitalComfort === 0) {
+      return { plan: "ai", track: "AI Business Services" };
+    }
+    if (digitalComfort === 1) {
+      return { plan: "ai", track: "AI Web & No-Code" };
+    }
+    // digitalComfort 2 or 3 (nervous/not sure)
+    return { plan: "pro", track: "Social Media Management" };
+  }
+
+  // Q12 option 3 (I just want stability) → Core
+  if (incomeTarget === 3) {
+    return { plan: "core", track: "" };
+  }
+
+  // Q12 option 0 or 1 (₱5K-15K or job replacement) → Pro, track by pillar
+  if (primaryPath === "money") {
+    return { plan: "pro", track: "Shopee/Lazada E-Commerce" };
+  }
+  if (primaryPath === "mind") {
+    return { plan: "pro", track: "Social Media Management" };
+  }
+  // body or spirit
+  return { plan: "pro", track: "Freelancing" };
+}
+
+export function buildRecommendation(
+  plan: Plan,
+  track: string,
+  answers: Record<string, number>,
+  primaryPath: Pillar
+): Recommendation {
+  const trackInfo = TRACK_DATA[track];
+
+  if (plan === "core" || !trackInfo) {
+    return {
+      plan: "core",
+      track: "",
+      why: `Your focus right now is building a strong ${primaryPath} foundation. Core gives you the structured path to get there.`,
+      skills: [
+        "Full 4-pillar assessment and personalized profile",
+        `5 structured ${primaryPath} modules`,
+        "25 actionable lessons with daily exercises",
+        "Progress tracking and reflections",
+        "Lifetime access to your path",
+      ],
+      earning: "",
+    };
+  }
+
+  // Build the "why" sentence connecting their answers
+  const incomeTarget = answers["income_target"] ?? 0;
+  let why = "";
+
+  if (plan === "ai") {
+    if (incomeTarget === 2) {
+      why = `You want ₱50,000+ per month and you're comfortable with digital tools. ${track} is the fastest path to that income level with AI doing the heavy lifting.`;
+    } else {
+      why = `Your ambition and digital comfort point to AI-powered skills. ${track} lets you earn premium rates while AI handles the complexity.`;
+    }
+  } else {
+    // Pro
+    const incomePhrase = incomeTarget === 0
+      ? "You want extra income on the side"
+      : "You want to replace your current income";
+    why = `${incomePhrase}, and your ${primaryPath} profile matches perfectly with ${track}. This is the most direct path to real earnings.`;
+  }
+
+  return {
+    plan,
+    track,
+    why,
+    skills: trackInfo.skills,
+    earning: trackInfo.earning,
   };
 }

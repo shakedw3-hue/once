@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { calculateScores, determinePaths } from "@/lib/questionnaire";
+import { calculateScores, determinePaths, determineRecommendation } from "@/lib/questionnaire";
 
 export async function submitQuestionnaire(answers: Record<string, number>) {
   const supabase = await createClient();
@@ -18,6 +18,9 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
   const scores = calculateScores(answers);
   const paths = determinePaths(scores);
 
+  // Smart recommendation engine
+  const recommendation = determineRecommendation(answers, paths.primary);
+
   // Save questionnaire answers
   const { error: insertError } = await supabase
     .from("questionnaire_answers")
@@ -31,12 +34,16 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
     return { error: insertError.message };
   }
 
-  // Update user profile with paths
+  // Update user profile with paths + recommendation
   const { error: updateError } = await supabase
     .from("users")
     .update({
       primary_path: paths.primary,
       secondary_path: paths.secondary,
+      recommendation_plan: recommendation.plan,
+      recommendation_track: recommendation.track || null,
+      income_target: answers["income_target"] ?? null,
+      digital_comfort: answers["digital_skills"] ?? null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", user.id);
