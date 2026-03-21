@@ -6,6 +6,8 @@ import Hero from "@/components/landing/Hero";
 import AssessmentDemo from "@/components/landing/AssessmentDemo";
 import Timeline from "@/components/landing/Timeline";
 import Testimonials from "@/components/landing/Testimonials";
+import StickyCTA from "@/components/landing/StickyCTA";
+import { IconMoney, IconMind, IconBody, IconSpirit, IconCompass, IconMatch, IconLearn, IconRocket } from "@/components/ui/icons";
 
 export default function Home() {
   return (
@@ -28,6 +30,7 @@ export default function Home() {
           <p className="text-sm font-medium">
             Thousands of hours of research. One path. Built for you.
           </p>
+          <p className="mt-6 once-signature">Once.</p>
         </Section>
 
         {/* How Once works */}
@@ -40,14 +43,14 @@ export default function Home() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               {[
-                { step: "1", title: "Diagnose", desc: "We find exactly where you are. 15 questions across Money, Mind, Body, and Spirit. No assumptions." },
-                { step: "2", title: "Match", desc: "We build one path. Yours. Based on your actual scores, not a catalog of courses." },
-                { step: "3", title: "Learn", desc: "Thousands of hours of research. In 10 minutes a day. Every lesson is built from what the best minds already proved." },
-                { step: "4", title: "Launch", desc: "Your first real income. Step by step. Pro members get practical skills for the Philippine market." },
+                { title: "Diagnose", icon: <IconCompass size="sm" />, desc: "We find exactly where you are. 15 questions across Money, Mind, Body, and Spirit. No assumptions." },
+                { title: "Match", icon: <IconMatch size="sm" />, desc: "We build one path. Yours. Based on your actual scores, not a catalog of courses." },
+                { title: "Learn", icon: <IconLearn size="sm" />, desc: "Thousands of hours of research. In 10 minutes a day. Every lesson is built from what the best minds already proved." },
+                { title: "Launch", icon: <IconRocket size="sm" />, desc: "Your first real income. Step by step. Pro members get practical skills for the Philippine market." },
               ].map((item) => (
                 <div key={item.title} className="rounded-xl border bg-card p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{item.step}</span>
+                    {item.icon}
                     <h3 className="text-sm font-semibold">{item.title}</h3>
                   </div>
                   <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
@@ -58,6 +61,7 @@ export default function Home() {
             <p className="mt-6 text-xs text-muted-foreground">
               <Link href="/how-it-works" className="text-primary hover:underline">See the full breakdown →</Link>
             </p>
+            <p className="mt-4 text-center once-signature">This is how change happens. Once.</p>
           </div>
         </Section>
 
@@ -71,25 +75,25 @@ export default function Home() {
             {[
               {
                 name: "Money", color: "#F59E0B", bg: "bg-amber-50", border: "border-amber-200",
-                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+                icon: <IconMoney size="sm" />,
                 desc: "Built from what the world's most successful investors actually do.",
                 names: "Warren Buffett · Ray Dalio · Robert Kiyosaki · Elon Musk",
               },
               {
                 name: "Mind", color: "#A78BFA", bg: "bg-violet-50", border: "border-violet-200",
-                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 3 2 5.5 4 7l3 3 3-3c2-1.5 4-4 4-7a7 7 0 0 0-7-7z"/></svg>,
+                icon: <IconMind size="sm" />,
                 desc: "Built from decades of neuroscience research on how high performers think and decide.",
                 names: "Andrew Huberman · Kobe Bryant · James Clear · Cal Newport",
               },
               {
                 name: "Body", color: "#34D399", bg: "bg-emerald-50", border: "border-emerald-200",
-                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+                icon: <IconBody size="sm" />,
                 desc: "Built from the science of energy, sleep, and performance.",
                 names: "LeBron James · Cristiano Ronaldo · Matthew Walker · Peter Attia",
               },
               {
                 name: "Spirit", color: "#60A5FA", bg: "bg-blue-50", border: "border-blue-200",
-                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
+                icon: <IconSpirit size="sm" />,
                 desc: "Built from the philosophy of people who found meaning in the hardest circumstances.",
                 names: "Dalai Lama · Oprah Winfrey · Viktor Frankl · Ryan Holiday",
               },
@@ -124,7 +128,7 @@ export default function Home() {
         <Section>
           <h2 className="mb-2 text-section text-xl sm:text-2xl">Your journey with Once</h2>
           <p className="mb-8 text-sm text-muted-foreground">
-            From first question to real results. Here is every step.
+            Simple. Personal. Life-changing.
           </p>
           <Timeline />
         </Section>
@@ -157,7 +161,7 @@ export default function Home() {
             </div>
 
             <div className="relative rounded-2xl border-2 border-primary/20 bg-primary/[0.03] p-5 card-elevated">
-              <div className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground">Popular</div>
+              <div className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground">Most Popular</div>
               <p className="mb-1 text-label text-primary">Once Pro</p>
               <p className="mb-1 text-xs text-muted-foreground">Your first side income. ₱15,000 to ₱40,000/month.</p>
               <div className="mb-4 flex items-baseline gap-1">
@@ -171,19 +175,19 @@ export default function Home() {
             </div>
 
             <div className="relative rounded-2xl border-2 border-blue-400/20 bg-blue-50 p-5">
-              <div className="absolute -top-3 right-4 rounded-full bg-blue-500 px-3 py-1 text-[10px] font-semibold text-white">⚡ AI Careers</div>
+              <div className="absolute -top-3 right-4 rounded-full bg-blue-500 px-3 py-1 text-[10px] font-semibold text-white">Best Investment</div>
               <p className="mb-1 text-label text-blue-600">Once AI Careers</p>
-              <p className="mb-1 text-xs text-muted-foreground">Skills of the future. ₱20,000+ per project.</p>
+              <p className="mb-1 text-xs text-muted-foreground">No experience needed. AI does the work.</p>
               <div className="mb-4 flex items-baseline gap-1">
                 <span className="text-sm text-muted-foreground">₱</span>
                 <span className="text-display text-3xl">3,950</span>
               </div>
-              <div className="mb-5 space-y-2">
+              <div className="mb-5 space-y-2.5">
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Everything in Pro, plus 3 AI tracks:</p>
-                <div className="rounded-lg border bg-card p-3 space-y-2">
-                  <div className="flex items-start gap-2 text-xs"><span>🤖</span><div><span className="font-semibold">AI Business Services</span><br/><span className="text-muted-foreground">Build chatbots and automations. ₱20,000 to ₱50,000/project</span></div></div>
-                  <div className="flex items-start gap-2 text-xs"><span>🎨</span><div><span className="font-semibold">AI Content & Design</span><br/><span className="text-muted-foreground">Create content and brand identities with AI. ₱8,000 to ₱25,000/month</span></div></div>
-                  <div className="flex items-start gap-2 text-xs"><span>💻</span><div><span className="font-semibold">AI Web & No-Code</span><br/><span className="text-muted-foreground">Build websites and dashboards for SMEs. ₱15,000 to ₱40,000/project</span></div></div>
+                <div className="rounded-lg border bg-card p-3 space-y-3">
+                  <div className="text-xs"><div className="flex items-center gap-1.5 font-semibold"><span>🤖</span>AI Business Services</div><p className="mt-0.5 text-muted-foreground">&ldquo;You ask AI. AI does the work. You get paid.&rdquo;</p><p className="mt-0.5 font-semibold text-blue-600">Earn: ₱20,000–₱50,000/project</p></div>
+                  <div className="text-xs"><div className="flex items-center gap-1.5 font-semibold"><span>🎨</span>AI Content & Design</div><p className="mt-0.5 text-muted-foreground">&ldquo;You describe it. AI creates it. You deliver it.&rdquo;</p><p className="mt-0.5 font-semibold text-blue-600">Earn: ₱8,000–₱25,000/month</p></div>
+                  <div className="text-xs"><div className="flex items-center gap-1.5 font-semibold"><span>💻</span>AI Web & No-Code</div><p className="mt-0.5 text-muted-foreground">&ldquo;Build a real website in 48 hours. Zero coding.&rdquo;</p><p className="mt-0.5 font-semibold text-blue-600">Earn: ₱15,000–₱40,000/project</p></div>
                 </div>
               </div>
               <Button render={<Link href="/auth/signup" />} className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white">Do It Once</Button>
@@ -193,6 +197,7 @@ export default function Home() {
           <p className="mt-4 text-center text-xs text-muted-foreground">
             GCash and Maya accepted. No subscription. No upsells. Make your money back on your first client.
           </p>
+          <p className="mt-4 text-center once-signature">One investment. One path. Once.</p>
         </Section>
 
         {/* Comparison */}
@@ -261,7 +266,7 @@ export default function Home() {
               One decision.
             </h2>
             <p className="mb-2 text-sm text-muted-foreground">
-              You don&apos;t need another course. You need the right one. Once.
+              You don&apos;t need another course. You need the right one.
             </p>
             <p className="mb-6 text-xs text-muted-foreground">
               Free assessment. 10 minutes. You keep your results either way.
@@ -269,14 +274,16 @@ export default function Home() {
             <Button
               render={<Link href="/auth/signup" />}
               size="lg"
-              className="h-13 px-8 text-base font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02]"
+              className="h-14 w-full sm:w-auto px-8 text-base font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02]"
             >
               Do It Once
             </Button>
+            <p className="mt-6 once-signature">Once.</p>
           </div>
         </section>
       </main>
       <Footer />
+      <StickyCTA />
     </>
   );
 }

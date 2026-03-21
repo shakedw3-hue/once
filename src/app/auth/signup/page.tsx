@@ -28,7 +28,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
+    <div className="flex min-h-screen items-center justify-center px-5">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -36,14 +36,18 @@ export default function SignupPage() {
         className="w-full max-w-md"
       >
         <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold tracking-tight text-foreground">
-            Once
+          <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
+            <span className="text-foreground">Once</span>
+            <span className="text-primary">.</span>
           </Link>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground/60">
+            The decision that changes everything.
+          </p>
+          <p className="mt-3 text-muted-foreground">
             Create your account
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Free assessment. No payment required to see your results
+            Free assessment. No payment required.
           </p>
         </div>
 
@@ -99,7 +103,7 @@ export default function SignupPage() {
                 className="w-full font-semibold"
                 disabled={loading}
               >
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? "Creating account..." : "Begin Once"}
               </Button>
             </form>
 

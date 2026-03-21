@@ -1,9 +1,12 @@
 export default function QuestionnaireLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center bg-foreground">
       <div className="text-center">
-        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="text-sm text-muted-foreground">Preparing your questionnaire...</p>
+        <p className="font-display text-3xl font-semibold tracking-[-0.04em]">
+          <span className="text-background">Once</span>
+          <span className="text-primary">.</span>
+        </p>
+        <p className="mt-3 text-sm text-background/40">Ten minutes. Honest answers.</p>
       </div>
     </div>
   );

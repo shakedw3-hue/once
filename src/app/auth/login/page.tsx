@@ -28,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
+    <div className="flex min-h-screen items-center justify-center px-5">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -36,10 +36,14 @@ export default function LoginPage() {
         className="w-full max-w-md"
       >
         <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold tracking-tight text-foreground">
-            Once
+          <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
+            <span className="text-foreground">Once</span>
+            <span className="text-primary">.</span>
           </Link>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground/60">
+            The decision that changes everything.
+          </p>
+          <p className="mt-3 text-muted-foreground">
             Welcome back
           </p>
         </div>

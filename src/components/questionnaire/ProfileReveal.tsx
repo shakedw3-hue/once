@@ -126,7 +126,7 @@ export default function ProfileReveal({
           className="mb-8"
         >
           <h1 className="mb-2 text-display text-2xl sm:text-3xl">
-            {firstName}, we see you.
+            This is you. {firstName}.
           </h1>
           <p className="text-base leading-relaxed text-muted-foreground">
             Based on your answers, here is what we found. Take a moment to read
@@ -335,7 +335,7 @@ export default function ProfileReveal({
                 <CardContent className="p-5">
                   <div className="mb-1 flex items-center gap-2">
                     <p className="text-label text-primary">Once Pro</p>
-                    <Badge className="text-[9px]">Recommended</Badge>
+                    <Badge className="text-[9px]">Most Popular</Badge>
                   </div>
                   <div className="mb-3 flex items-baseline gap-1">
                     <span className="text-xs text-muted-foreground">₱</span>
@@ -373,7 +373,7 @@ export default function ProfileReveal({
                 <CardContent className="p-5">
                   <div className="mb-1 flex items-center gap-2">
                     <p className="text-label text-blue-600">Once AI Careers</p>
-                    <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[8px] font-bold text-white">⚡</span>
+                    <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[8px] font-bold text-white">Best Investment</span>
                   </div>
                   <div className="mb-3 flex items-baseline gap-1">
                     <span className="text-xs text-muted-foreground">₱</span>
@@ -383,10 +383,10 @@ export default function ProfileReveal({
                   <ul className="mb-4 space-y-1.5">
                     {[
                       "Everything in Pro",
-                      "AI Business Services",
-                      "AI Content & Design",
-                      "AI Web & No-Code",
-                      "₱20,000+ per project potential",
+                      "🤖 AI Business — \"Ask AI. It works. You get paid.\"",
+                      "🎨 AI Content — \"Describe it. AI creates it.\"",
+                      "💻 AI Web — \"Build sites in 48hrs. Zero coding.\"",
+                      "Earn ₱20,000+ per project",
                     ].map((item) => (
                       <li key={item} className="flex items-start gap-2 text-xs text-muted-foreground">
                         <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -409,6 +409,7 @@ export default function ProfileReveal({
             <p className="mt-4 text-center text-xs text-muted-foreground">
               GCash and Maya accepted. No subscription. No upsells. One payment, lifetime access.
             </p>
+            <p className="mt-6 text-center once-signature">One investment. One path. Once.</p>
           </motion.div>
         ) : (
           <motion.div
@@ -421,7 +422,7 @@ export default function ProfileReveal({
               size="lg"
               className="w-full h-12 font-semibold"
             >
-              Go to Your Dashboard
+              Continue Your Path
             </Button>
           </motion.div>
         )}

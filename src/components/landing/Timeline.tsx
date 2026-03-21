@@ -1,56 +1,57 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  IconTarget,
+  IconPerson,
+  IconCards,
+  IconBookSpark,
+  IconCoinsUp,
+  IconChartUp,
+} from "@/components/ui/icons";
 
 const stages = [
   {
     step: "1",
-    title: "Assessment",
-    time: "10 min",
-    desc: "Answer 15 questions about where you are right now",
-    color: "#4F46E5",
+    title: "Find Out Where You Stand",
+    time: "10 minutes",
+    desc: "Answer 15 honest questions. Once maps exactly where you are in Money, Mind, Body, and Spirit.",
+    icon: <IconTarget size="md" />,
   },
   {
     step: "2",
-    title: "Your Profile",
+    title: "Get Your Personal Profile",
     time: "Instant",
-    desc: "See your scores across Money, Mind, Body, Spirit",
-    color: "#4F46E5",
+    desc: "See your scores. Understand what\u2019s holding you back. Get your path \u2014 built for you alone.",
+    icon: <IconPerson size="md" />,
   },
   {
     step: "3",
-    title: "Choose Your Plan",
-    time: "1 min",
-    desc: "Core ₱1,499, Pro ₱2,350, or AI Careers ₱3,950, all one-time",
-    color: "#4F46E5",
+    title: "Choose How Far You Want to Go",
+    time: "1 minute",
+    desc: "Core \u20B11,499 \u2014 Fix the foundation. Pro \u20B12,350 \u2014 Build your first income. AI Careers \u20B13,950 \u2014 Learn the skills of the future.",
+    icon: <IconCards size="md" />,
   },
   {
     step: "4",
-    title: "Module 1",
-    time: "Week 1–2",
-    desc: "5–7 lessons with daily action steps",
-    color: "#F59E0B",
+    title: "Learn What Actually Works",
+    time: "10 min/day",
+    desc: "Short, practical lessons. Each one built from the world\u2019s most successful people. Each one actionable today.",
+    icon: <IconBookSpark size="md" />,
   },
   {
     step: "5",
-    title: "Modules 2–3",
-    time: "Week 3–6",
-    desc: "Building on what you learned, going deeper",
-    color: "#A78BFA",
+    title: "Start Earning on the Side",
+    time: "Week 3 onwards",
+    desc: "Pro and AI Careers users get real income skills \u2014 not theory. Real tools. Real clients. Real money.",
+    icon: <IconCoinsUp size="md" />,
   },
   {
     step: "6",
-    title: "Modules 4–5",
-    time: "Week 7–10",
-    desc: "Advanced skills + reflection on your growth",
-    color: "#34D399",
-  },
-  {
-    step: "✓",
-    title: "Path Complete",
-    time: "",
-    desc: "Retake the assessment. See how your scores shifted",
-    color: "#4F46E5",
+    title: "See Yourself Change",
+    time: "Week 10",
+    desc: "Retake the assessment. See exactly how far you\u2019ve come. Once shows you the proof.",
+    icon: <IconChartUp size="md" />,
   },
 ];
 
@@ -58,48 +59,41 @@ export default function Timeline() {
   return (
     <div className="relative">
       {/* Vertical line */}
-      <div className="absolute left-[19px] top-4 bottom-4 w-px bg-border sm:left-[23px]" />
+      <div className="absolute left-5 top-6 bottom-6 w-px bg-border sm:left-6" />
 
-      <div className="space-y-0">
+      <div className="space-y-1">
         {stages.map((stage, i) => (
           <motion.div
             key={stage.step}
             initial={{ opacity: 0, x: -15 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="relative flex gap-4 pb-6 last:pb-0 sm:gap-5"
           >
-            {/* Node */}
-            <div className="relative z-10 flex flex-col items-center">
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-background text-xs font-bold sm:h-12 sm:w-12 sm:text-sm"
-                style={{
-                  borderColor: stage.color,
-                  color: stage.color,
-                }}
-              >
-                {stage.step}
-              </div>
+            {/* Icon node */}
+            <div className="relative z-10">
+              {stage.icon}
             </div>
 
             {/* Content */}
-            <div className="flex-1 pt-1.5 sm:pt-2.5">
-              <div className="flex items-baseline gap-2">
+            <div className="flex-1 pt-1 sm:pt-2">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                 <h3 className="text-sm font-semibold sm:text-base">{stage.title}</h3>
-                {stage.time && (
-                  <span className="text-[10px] font-medium text-muted-foreground sm:text-xs">
-                    {stage.time}
-                  </span>
-                )}
+                <span className="text-[10px] font-medium text-primary sm:text-xs">
+                  {stage.time}
+                </span>
               </div>
-              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
                 {stage.desc}
               </p>
             </div>
           </motion.div>
         ))}
       </div>
+
+      {/* Promise signature */}
+      <p className="mt-6 text-center once-signature">Once.</p>
     </div>
   );
 }

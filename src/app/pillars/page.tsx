@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { IconMoney, IconMind, IconBody, IconSpirit } from "@/components/ui/icons";
 import SiteLayout from "@/components/landing/SiteLayout";
+
+const pillarIcons: Record<string, React.ReactNode> = {
+  Money: <IconMoney size="md" />,
+  Mind: <IconMind size="md" />,
+  Body: <IconBody size="md" />,
+  Spirit: <IconSpirit size="md" />,
+};
 
 export const metadata: Metadata = {
   title: "The 4 Pillars | Once",
@@ -97,7 +105,7 @@ export default function PillarsPage() {
             className={`rounded-xl border ${pillar.borderColor} ${pillar.bgTint} p-5 sm:p-6`}
           >
             <div className="mb-4 flex items-center gap-3">
-              <div className={`h-3 w-3 rounded-full ${pillar.color}`} />
+              {pillarIcons[pillar.name]}
               <h2 className="text-lg font-semibold">{pillar.name}</h2>
             </div>
 
@@ -140,6 +148,8 @@ export default function PillarsPage() {
         </p>
       </div>
 
+      <p className="mt-8 text-center once-signature">Once.</p>
+
       <div className="mb-8 flex justify-end">
         <Link href="/method" className="text-sm text-primary hover:underline">
           Next: The method behind Once &rarr;
@@ -154,9 +164,9 @@ export default function PillarsPage() {
         <Button
           render={<Link href="/auth/signup" />}
           size="lg"
-          className="h-12 px-6 text-sm font-semibold"
+          className="h-14 w-full px-8 text-base font-semibold sm:w-auto"
         >
-          Take the free assessment
+          Do It Once
         </Button>
       </div>
     </SiteLayout>

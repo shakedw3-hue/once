@@ -144,6 +144,8 @@ export default function MethodPage() {
         </div>
       </section>
 
+        <p className="mt-6 text-center once-signature">Once.</p>
+
       <div className="mb-8 flex justify-end">
         <Link href="/pricing" className="text-sm text-primary hover:underline">
           Next: See pricing →
@@ -154,7 +156,7 @@ export default function MethodPage() {
         <p className="mb-4 text-sm text-muted-foreground">
           Try the method yourself. The assessment is free.
         </p>
-        <Button render={<Link href="/auth/signup" />} size="lg" className="h-12 px-6 text-sm font-semibold">
+        <Button render={<Link href="/auth/signup" />} size="lg" className="h-14 w-full px-8 text-base font-semibold sm:w-auto">
           Do It Once
         </Button>
       </div>

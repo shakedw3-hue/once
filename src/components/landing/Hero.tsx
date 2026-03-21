@@ -39,12 +39,12 @@ export default function Hero() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center"
+              className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               <Button
                 render={<Link href="/auth/signup" />}
                 size="lg"
-                className="h-13 px-8 text-base font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02]"
+                className="h-14 w-full px-8 text-base font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02] sm:w-auto"
               >
                 Do It Once
               </Button>

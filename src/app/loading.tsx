@@ -1,10 +1,10 @@
 export default function Loading() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="text-lg font-bold tracking-tight text-foreground">
-          Once
+      <div className="animate-fade-in text-center">
+        <p className="font-display text-3xl font-semibold tracking-[-0.04em]">
+          <span className="text-foreground">Once</span>
+          <span className="text-primary">.</span>
         </p>
       </div>
     </div>

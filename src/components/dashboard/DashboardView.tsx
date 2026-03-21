@@ -65,9 +65,7 @@ export default function DashboardView({
       {/* Top nav */}
       <header className="relative z-10 border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-          <Link href="/dashboard" className="text-xl font-bold tracking-tight text-foreground">
-            Once
-          </Link>
+          <Link href="/dashboard" className="font-display text-xl font-semibold tracking-[-0.04em]"><span className="text-foreground">Once</span><span className="text-primary">.</span></Link>
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-muted-foreground sm:block">
               {fullName}
@@ -89,11 +87,12 @@ export default function DashboardView({
         >
           {/* Greeting & overall progress */}
           <motion.div variants={fadeUp} className="mb-10">
-            <h1 className="mb-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Welcome back, {firstName}
+            <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              Welcome back, {firstName}.
             </h1>
             <p className="text-muted-foreground">
-              Your {primary.title} path. Keep going.
+              Your path is waiting.{" "}
+              <span className="once-signature">Once.</span>
             </p>
           </motion.div>
 
@@ -181,7 +180,7 @@ export default function DashboardView({
                     }
                     className="shrink-0"
                   >
-                    Continue
+                    Continue Once
                   </Button>
                 </CardContent>
               </Card>

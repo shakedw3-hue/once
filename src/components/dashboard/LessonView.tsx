@@ -187,17 +187,20 @@ export default function LessonView({
 
             {!completed ? (
               <Button onClick={handleComplete} disabled={saving} className="font-semibold">
-                {saving ? "Saving..." : "Mark Complete"}
+                {saving ? "Saving..." : "Complete This Step"}
               </Button>
             ) : (
-              <Button onClick={handleNext} className="font-semibold">
-                {nextLessonId ? "Next Lesson" : "Back to Module"}
-                {nextLessonId && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 18l6-6-6-6" />
-                  </svg>
-                )}
-              </Button>
+              <div className="flex flex-col items-end gap-2">
+                <p className="once-signature">One more step. Once.</p>
+                <Button onClick={handleNext} className="font-semibold">
+                  {nextLessonId ? "Next Lesson" : "Back to Module"}
+                  {nextLessonId && (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  )}
+                </Button>
+              </div>
             )}
           </div>
         </motion.article>

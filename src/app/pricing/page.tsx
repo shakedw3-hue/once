@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { IconPath, IconGrowth, IconCircuitBrain } from "@/components/ui/icons";
 import SiteLayout from "@/components/landing/SiteLayout";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function PricingPage() {
       <div className="mb-12 grid gap-6 sm:grid-cols-3">
         {/* Once Core */}
         <div className="rounded-xl border bg-card p-6 sm:p-8">
+          <div className="mb-3"><IconPath size="md" /></div>
           <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once Core</p>
           <p className="mb-4 text-xs text-muted-foreground">Your path. Built for you.</p>
           <div className="mb-6 flex items-baseline gap-1">
@@ -60,7 +62,9 @@ export default function PricingPage() {
         </div>
 
         {/* Once Pro */}
-        <div className="rounded-xl border-2 border-primary bg-card p-6 sm:p-8">
+        <div className="relative rounded-xl border-2 border-primary bg-card p-6 sm:p-8">
+          <div className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground">Most Popular</div>
+          <div className="mb-3"><IconGrowth size="md" /></div>
           <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-primary">Once Pro</p>
           <p className="mb-4 text-xs text-muted-foreground">Your path. Plus your first income.</p>
           <div className="mb-6 flex items-baseline gap-1">
@@ -97,9 +101,11 @@ export default function PricingPage() {
         </div>
 
         {/* Once AI Careers */}
-        <div className="rounded-xl border bg-card p-6 sm:p-8">
-          <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once AI Careers</p>
-          <p className="mb-4 text-xs text-muted-foreground">Your path. Plus AI-powered income skills.</p>
+        <div className="relative rounded-xl border-2 border-blue-400/20 bg-blue-50 p-6 sm:p-8">
+          <div className="absolute -top-3 right-4 rounded-full bg-blue-500 px-3 py-1 text-[10px] font-semibold text-white">Best Investment</div>
+          <div className="mb-3"><IconCircuitBrain size="md" color="#3B82F6" /></div>
+          <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-blue-600">Once AI Careers</p>
+          <p className="mb-4 text-xs text-muted-foreground">No experience needed. AI does the work.</p>
           <div className="mb-6 flex items-baseline gap-1">
             <span className="text-sm text-muted-foreground">₱</span>
             <span className="font-display text-5xl font-bold tracking-tight">3,950</span>
@@ -108,12 +114,10 @@ export default function PricingPage() {
 
           <ul className="mb-6 space-y-2.5">
             {[
-              "Everything in Pro",
-              "AI Business Services — earn ₱15K–₱50K/mo",
-              "AI Content & Design — earn ₱10K–₱40K/mo",
-              "AI Web & No-Code — earn ₱20K–₱60K/mo",
-              "Real AI tools and workflows",
-              "Priority updates + new AI modules",
+              "Everything in Pro, plus:",
+              "🤖 AI Business Services — \"You ask AI. AI does the work. You get paid.\" Earn: ₱20K–₱50K/project",
+              "🎨 AI Content & Design — \"You describe it. AI creates it. You deliver it.\" Earn: ₱8K–₱25K/month",
+              "💻 AI Web & No-Code — \"Build a real website in 48 hours. Zero coding.\" Earn: ₱15K–₱40K/project",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground">
                 <svg className="mt-0.5 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -129,7 +133,7 @@ export default function PricingPage() {
             size="lg"
             className="h-12 w-full text-sm font-semibold"
           >
-            Go AI
+            Do It Once
           </Button>
         </div>
       </div>
@@ -257,15 +261,16 @@ export default function PricingPage() {
       {/* Bottom CTA */}
       <div className="rounded-xl border bg-card p-6 text-center">
         <p className="mb-4 text-sm text-muted-foreground">
-          Start with the free assessment. Pay later if it makes sense.
+          Start with the free assessment. Pay only if it makes sense.
         </p>
         <Button
           render={<Link href="/auth/signup" />}
           size="lg"
-          className="h-12 px-6 text-sm font-semibold"
+          className="h-14 w-full sm:w-auto px-6 text-sm font-semibold"
         >
-          Take the assessment
+          Do It Once
         </Button>
+        <p className="mt-6 text-center once-signature">One investment. One path. Once.</p>
       </div>
     </SiteLayout>
   );

@@ -112,6 +112,14 @@ export default function QuestionnaireFlow() {
               </motion.p>
             )}
           </AnimatePresence>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.0 }}
+            className="mt-8 once-signature"
+          >
+            Ten minutes. Honest answers. Once.
+          </motion.p>
         </motion.div>
       </div>
     );
@@ -165,6 +173,14 @@ export default function QuestionnaireFlow() {
             className="mt-8 text-sm text-background/40"
           >
             Your path is ready.
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3.0 }}
+            className="mt-4 once-signature text-background"
+          >
+            Once.
           </motion.p>
         </motion.div>
       </div>
