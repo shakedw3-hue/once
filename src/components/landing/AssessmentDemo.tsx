@@ -161,7 +161,7 @@ export default function AssessmentDemo() {
                 Your top pillar: {topPillar.label}
               </p>
               <p className="mb-5 text-xs text-muted-foreground">
-                That was 2 questions. The full assessment has 10 and gives you
+                That was 2 questions. The full assessment has 15 and gives you
                 a complete profile with a personalized path.
               </p>
               <Button

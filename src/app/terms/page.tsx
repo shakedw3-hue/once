@@ -59,8 +59,9 @@ export default function TermsPage() {
             subscriptions, recurring charges, or hidden fees. Current pricing:
           </p>
           <ul className="ml-5 list-disc space-y-1">
-            <li>Once Core: ₱649 (one-time payment)</li>
-            <li>Once Pro: ₱999 (one-time payment)</li>
+            <li>Once Core: ₱1,499 (one-time payment)</li>
+            <li>Once Pro: ₱2,350 (one-time payment)</li>
+            <li>Once AI Careers: ₱3,950 (one-time payment)</li>
           </ul>
           <p>
             Payments are accepted via GCash, Maya, credit card, and debit card. All transactions

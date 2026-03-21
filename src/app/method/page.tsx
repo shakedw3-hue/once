@@ -55,60 +55,29 @@ export default function MethodPage() {
           </p>
         </div>
 
-        <div className="my-6 space-y-4">
+        <div className="my-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {[
-            {
-              pillar: "Money",
-              color: "#F59E0B",
-              minds: [
-                { name: "Ray Dalio", work: "Principles. 600 pages on decision-making and building systems that compound. We take his framework and build it into lessons about financial clarity and risk thinking." },
-                { name: "Morgan Housel", work: "The Psychology of Money. Why financial behavior matters more than financial knowledge. His insights shape our lessons on spending awareness and long-term thinking." },
-                { name: "Naval Ravikant", work: "How to get rich without getting lucky. Specific, leverage-based wealth creation. We apply his principles to the Filipino context." },
-              ],
-            },
-            {
-              pillar: "Mind",
-              color: "#A78BFA",
-              minds: [
-                { name: "Andrew Huberman", work: "Stanford neuroscience. Protocols for focus, dopamine regulation, and stress management backed by peer-reviewed research." },
-                { name: "James Clear", work: "Atomic Habits. The science of small behavior change. His 1% improvement framework shapes every habit lesson." },
-                { name: "Cal Newport", work: "Deep Work. How to focus in a distracted world. His time-blocking and attention management techniques are in the Mind path." },
-              ],
-            },
-            {
-              pillar: "Body",
-              color: "#34D399",
-              minds: [
-                { name: "Andrew Huberman", work: "Science-backed protocols for sleep, exercise timing, cold exposure, and energy optimization." },
-                { name: "Matthew Walker", work: "Why We Sleep. The research on how sleep affects every system in your body. His findings shape our Energy Reset module." },
-                { name: "Peter Attia", work: "Outlive. Longevity science made practical. Nutrition, movement, and recovery insights built for daily use." },
-              ],
-            },
-            {
-              pillar: "Spirit",
-              color: "#60A5FA",
-              minds: [
-                { name: "Viktor Frankl", work: "Man's Search for Meaning. Finding purpose even in suffering. His logotherapy principles anchor the Meaning and Direction module." },
-                { name: "Ryan Holiday", work: "The Daily Stoic. Ancient philosophy made practical. Stoic principles for daily decision-making and inner calm." },
-                { name: "Thich Nhat Hanh", work: "The Miracle of Mindfulness. Simple, grounded practices for presence and peace that take 5 minutes, not 5 hours." },
-              ],
-            },
-          ].map((pillar) => (
-            <div key={pillar.pillar} className="rounded-xl border bg-card p-5">
-              <div className="mb-3 flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: pillar.color }} />
-                <h3 className="text-sm font-semibold">{pillar.pillar} Pillar</h3>
+            { name: "Warren Buffett", desc: "The world's most successful investor", pillar: "Money", color: "#F59E0B" },
+            { name: "Elon Musk", desc: "Entrepreneur who changed multiple industries", pillar: "Money + Mind", color: "#F59E0B" },
+            { name: "Kobe Bryant", desc: "The standard for mental toughness", pillar: "Mind + Body", color: "#A78BFA" },
+            { name: "Andrew Huberman", desc: "Stanford neuroscientist on focus and performance", pillar: "Mind", color: "#A78BFA" },
+            { name: "James Clear", desc: "Behavioral scientist on habits", pillar: "Mind", color: "#A78BFA" },
+            { name: "LeBron James", desc: "The most prepared athlete of his generation", pillar: "Body", color: "#34D399" },
+            { name: "Matthew Walker", desc: "World's leading sleep researcher", pillar: "Body", color: "#34D399" },
+            { name: "Dalai Lama", desc: "Global authority on inner peace", pillar: "Spirit", color: "#60A5FA" },
+            { name: "Oprah Winfrey", desc: "From nothing to global influence", pillar: "Spirit", color: "#60A5FA" },
+            { name: "Viktor Frankl", desc: "Found meaning in the worst conditions", pillar: "Spirit", color: "#60A5FA" },
+          ].map((person) => (
+            <div key={person.name} className="rounded-xl border bg-card p-3 text-center">
+              <div
+                className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white"
+                style={{ backgroundColor: person.color }}
+              >
+                {person.name.split(" ").map(n => n[0]).join("")}
               </div>
-              <div className="space-y-3">
-                {pillar.minds.map((mind) => (
-                  <div key={mind.name}>
-                    <p className="text-xs">
-                      <span className="font-semibold text-foreground">{mind.name}</span>
-                      <span className="text-muted-foreground"> : {mind.work}</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs font-semibold">{person.name}</p>
+              <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">{person.desc}</p>
+              <p className="mt-1.5 text-[9px] font-medium" style={{ color: person.color }}>{person.pillar}</p>
             </div>
           ))}
         </div>
@@ -158,7 +127,9 @@ export default function MethodPage() {
           <p>
             Core builds your foundation across Money, Mind, Body, and Spirit.
             Pro takes the next step: 100 additional lessons that teach you
-            practical income skills for the Philippine market.
+            practical income skills for the Philippine market. AI Careers goes
+            even further with three AI-powered tracks: AI Business Services,
+            AI Content &amp; Design, and AI Web &amp; No-Code.
           </p>
           <p>
             Social media management for local businesses. Selling on Shopee

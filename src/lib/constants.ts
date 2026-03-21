@@ -1,7 +1,8 @@
 import type { Pillar } from "@/types/database";
 
-export const PRICE_CORE_PHP = 649;
-export const PRICE_PRO_PHP = 999;
+export const PRICE_CORE_PHP = 1499;
+export const PRICE_PRO_PHP = 2350;
+export const PRICE_AI_PHP = 3950;
 export const CURRENCY = "PHP";
 
 export const PILLARS: Record<

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     default: "Once: The decision that changes everything",
   },
   description:
-    "One assessment. One personalized path across Money, Mind, Body, and Spirit. Once Core ₱649. Once Pro ₱999. One decision.",
+    "One assessment. One personalized path across Money, Mind, Body, and Spirit. Once Core ₱1,499. Once Pro ₱2,350. Once AI Careers ₱3,950. One decision.",
   metadataBase: new URL("https://once.ph"),
   openGraph: {
     title: "Once: The decision that changes everything",

@@ -39,7 +39,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="flex flex-col gap-4 sm:flex-row sm:items-center"
+              className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center"
             >
               <Button
                 render={<Link href="/auth/signup" />}
@@ -49,8 +49,53 @@ export default function Hero() {
                 Do It Once
               </Button>
               <span className="text-xs text-muted-foreground">
-                Free assessment. 3 minutes.
+                Free assessment. 10 minutes.
               </span>
+            </motion.div>
+
+            {/* Credibility line */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+              className="mb-4 max-w-md text-xs leading-relaxed text-muted-foreground"
+            >
+              Built from the principles of Warren Buffett, Kobe Bryant, Elon
+              Musk, the Dalai Lama, and hundreds of the world&apos;s most
+              successful people.
+            </motion.p>
+
+            {/* Trust strip with logos */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+            >
+              <p className="mb-3 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
+                Research sources include
+              </p>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {/* Harvard */}
+                <svg className="h-5 text-muted-foreground/35" viewBox="0 0 120 24" fill="currentColor">
+                  <text x="0" y="18" fontFamily="Georgia, serif" fontSize="16" fontWeight="700" letterSpacing="-0.5">HARVARD</text>
+                </svg>
+                {/* WHO */}
+                <svg className="h-5 text-muted-foreground/35" viewBox="0 0 60 24" fill="currentColor">
+                  <text x="0" y="18" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="700" letterSpacing="1">WHO</text>
+                </svg>
+                {/* McKinsey */}
+                <svg className="h-5 text-muted-foreground/35" viewBox="0 0 130 24" fill="currentColor">
+                  <text x="0" y="18" fontFamily="Georgia, serif" fontSize="14" fontWeight="400" letterSpacing="0">McKinsey</text>
+                </svg>
+                {/* MIT */}
+                <svg className="h-5 text-muted-foreground/35" viewBox="0 0 50 24" fill="currentColor">
+                  <text x="0" y="18" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="700" letterSpacing="1">MIT</text>
+                </svg>
+                {/* Forbes */}
+                <svg className="h-5 text-muted-foreground/35" viewBox="0 0 100 24" fill="currentColor">
+                  <text x="0" y="18" fontFamily="Georgia, serif" fontSize="16" fontWeight="700" fontStyle="italic" letterSpacing="-0.5">Forbes</text>
+                </svg>
+              </div>
             </motion.div>
           </div>
 

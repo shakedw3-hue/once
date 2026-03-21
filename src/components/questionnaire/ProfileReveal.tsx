@@ -293,14 +293,14 @@ export default function ProfileReveal({
               Now choose how deep you want to go.
             </p>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               {/* Core */}
               <Card>
                 <CardContent className="p-5">
                   <p className="mb-1 text-label text-muted-foreground">Once Core</p>
                   <div className="mb-3 flex items-baseline gap-1">
                     <span className="text-xs text-muted-foreground">₱</span>
-                    <span className="text-display text-3xl">649</span>
+                    <span className="text-display text-3xl">1,499</span>
                     <span className="ml-1 text-xs text-muted-foreground">one-time</span>
                   </div>
                   <ul className="mb-4 space-y-1.5">
@@ -325,7 +325,7 @@ export default function ProfileReveal({
                     variant="outline"
                     className="w-full"
                   >
-                    Start Once: ₱649
+                    Start Once: ₱1,499
                   </Button>
                 </CardContent>
               </Card>
@@ -339,7 +339,7 @@ export default function ProfileReveal({
                   </div>
                   <div className="mb-3 flex items-baseline gap-1">
                     <span className="text-xs text-muted-foreground">₱</span>
-                    <span className="text-display text-3xl">999</span>
+                    <span className="text-display text-3xl">2,350</span>
                     <span className="ml-1 text-xs text-muted-foreground">one-time</span>
                   </div>
                   <ul className="mb-4 space-y-1.5">
@@ -363,7 +363,44 @@ export default function ProfileReveal({
                     render={<Link href="/checkout?plan=pro" />}
                     className="w-full font-semibold shadow-sm shadow-primary/10"
                   >
-                    Do It Once: ₱999
+                    Do It Once: ₱2,350
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* AI Careers */}
+              <Card className="border-blue-400/20 bg-blue-50">
+                <CardContent className="p-5">
+                  <div className="mb-1 flex items-center gap-2">
+                    <p className="text-label text-blue-600">Once AI Careers</p>
+                    <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[8px] font-bold text-white">⚡</span>
+                  </div>
+                  <div className="mb-3 flex items-baseline gap-1">
+                    <span className="text-xs text-muted-foreground">₱</span>
+                    <span className="text-display text-3xl">3,950</span>
+                    <span className="ml-1 text-xs text-muted-foreground">one-time</span>
+                  </div>
+                  <ul className="mb-4 space-y-1.5">
+                    {[
+                      "Everything in Pro",
+                      "AI Business Services",
+                      "AI Content & Design",
+                      "AI Web & No-Code",
+                      "₱20,000+ per project potential",
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    render={<Link href="/checkout?plan=ai" />}
+                    className="w-full font-semibold bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Do It Once: ₱3,950
                   </Button>
                 </CardContent>
               </Card>

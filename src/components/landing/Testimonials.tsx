@@ -8,9 +8,8 @@ const reviews = [
     name: "Mica Reyes",
     age: 26,
     city: "Makati",
-    role: "BPO Quality Analyst",
     stars: 5,
-    text: "Nag-try lang ako kasi mura. Then yung assessment results ko, grabe, ang accurate. Na-realize ko na yung problem ko hindi pera, focus pala. Two weeks into the Mind path, iba na yung mornings ko.",
+    text: "Nag-try lang ako kasi mura. Then yung assessment results ko, grabe, ang accurate. Na-realize ko na yung problem ko hindi pera, focus pala. Two weeks in, iba na yung mornings ko.",
     pillar: "Mind",
     pillarColor: "#A78BFA",
   },
@@ -18,9 +17,8 @@ const reviews = [
     name: "JR Villanueva",
     age: 31,
     city: "Cebu",
-    role: "Grab Driver / Part-time VA",
     stars: 5,
-    text: "Dalawang trabaho ko para sa family ko. Pagod na pagod na ko. Itong Once, siya yung una na nag-ask sa akin kung ano ba talaga kailangan ko. Hindi yung binenta lang agad. Na-gets ko na need ko munang ayusin yung Body pillar ko bago lahat.",
+    text: "Dalawang trabaho ko para sa family ko. Pagod na pagod na ko. Once yung una na nag-ask sa akin kung ano ba talaga kailangan ko. Hindi yung binenta lang agad.",
     pillar: "Body",
     pillarColor: "#34D399",
   },
@@ -28,9 +26,8 @@ const reviews = [
     name: "Aira Santos",
     age: 24,
     city: "Manila",
-    role: "Freelance Graphic Designer",
     stars: 5,
-    text: "Naubos ko na siguro ₱40,000 sa courses in 2 years. Wala naman natapos. Ito ₱649 lang, tapos worksheet format so hindi mo pwedeng i-skip. Actually natapos ko yung Module 1 in 5 days. First time.",
+    text: "Naubos ko na siguro ₱40,000 sa courses in 2 years. Wala naman natapos. Ito ₱1,499 lang, worksheet format so hindi mo pwedeng i-skip. Natapos ko Module 1 in 5 days. First time.",
     pillar: "Money",
     pillarColor: "#F59E0B",
   },
@@ -38,9 +35,8 @@ const reviews = [
     name: "Mark Dela Cruz",
     age: 29,
     city: "Davao",
-    role: "Call Center Team Lead",
     stars: 5,
-    text: "Akala ko okay na ako kasi may promotion na. Pero parang walang meaning. Yung Spirit score ko 34 lang pala. Ngayon nag-reflect na ako every day, kahit 5 minutes lang. May direction na ulit.",
+    text: "Akala ko okay na ako kasi may promotion na. Pero parang walang meaning. Yung Spirit score ko 34 lang pala. Ngayon nag-reflect na ako every day. May direction na ulit.",
     pillar: "Spirit",
     pillarColor: "#60A5FA",
   },
@@ -48,7 +44,6 @@ const reviews = [
     name: "Bea Gonzales",
     age: 27,
     city: "Quezon City",
-    role: "Admin Assistant",
     stars: 4,
     text: "Solb yung action steps kasi specific. Hindi yung 'set your goals' lang. May actual na gagawin ka today. Yun ang nagustuhan ko, hindi lang theory.",
     pillar: "Mind",
@@ -58,7 +53,6 @@ const reviews = [
     name: "Carlo Mercado",
     age: 33,
     city: "Taguig",
-    role: "Small Business Owner",
     stars: 5,
     text: "Binigay ko rin sa asawa ko. Magkaiba kami ng primary path. Ako Money, siya Spirit. Ngayon may sarili kaming worksheet each. Mas may usapan kami tungkol sa future namin.",
     pillar: "Money",
@@ -68,11 +62,55 @@ const reviews = [
     name: "Trisha Lim",
     age: 25,
     city: "Pasig",
-    role: "Social Media Manager",
     stars: 5,
-    text: "Hindi siya course, hindi siya lecture. Parang journal na may structure. Yun yung nakatulong sa akin. ₱649 for lifetime? No brainer talaga.",
+    text: "Hindi siya course, hindi siya lecture. Parang journal na may structure. Yun yung nakatulong sa akin. ₱1,499 for lifetime? No brainer talaga.",
+    pillar: "Spirit",
+    pillarColor: "#60A5FA",
+  },
+  {
+    name: "Dennis Aquino",
+    age: 30,
+    city: "Mandaluyong",
+    stars: 5,
+    text: "Dati puro YouTube videos na '10 ways to be productive.' Walang nagstick. Dito may isang action step per lesson na kaya mo gawin today. Simple pero effective.",
+    pillar: "Mind",
+    pillarColor: "#A78BFA",
+  },
+  {
+    name: "Kat Flores",
+    age: 22,
+    city: "Antipolo",
+    stars: 5,
+    text: "Fresh grad ako, walang direction. Yung assessment pinakita sa akin na Spirit yung pinakaweak ko. Hindi ko siya inexpect. Pero tama pala. Ngayon alam ko na kung saan ako pupunta.",
+    pillar: "Spirit",
+    pillarColor: "#60A5FA",
+  },
+  {
+    name: "Paolo Ramos",
+    age: 35,
+    city: "Iloilo",
+    stars: 5,
+    text: "Nagbabayad ako ng ₱15,000 per month sa gym at supplements. Tapos ito ₱1,499 na assessment sinabi sa akin na Body ko okay na. Yung money pillar ko ang need ng help. Nakatipid pa ko.",
+    pillar: "Money",
+    pillarColor: "#F59E0B",
+  },
+  {
+    name: "Jen Torres",
+    age: 28,
+    city: "Paranaque",
+    stars: 4,
+    text: "Na-share ko sa GC namin ng workmates. Lima sa amin nag-take ng assessment. Magkakaiba ng primary path. Ngayon may accountability group kami. Best ₱1,499 na ginastos ko.",
     pillar: "Body",
     pillarColor: "#34D399",
+  },
+  {
+    name: "Ryan Bautista",
+    age: 32,
+    city: "Caloocan",
+    stars: 5,
+    text: "BPO worker ako 8 years na. Feeling ko stuck na ko. Once pinakita sa akin exactly kung ano yung kulang. Hindi motivation. System. Now may system na ko.",
+    pillar: "Mind",
+    pillarColor: "#A78BFA",
   },
 ];
 
@@ -181,11 +219,19 @@ export default function Testimonials() {
 
             {/* Reviewer info */}
             <div className="mt-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold">{review.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {review.age}, {review.city} · {review.role}
-                </p>
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                  style={{ backgroundColor: `${review.pillarColor}12`, color: review.pillarColor }}
+                >
+                  {review.name.split(" ").map(n => n[0]).join("")}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">{review.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {review.age}, {review.city}
+                  </p>
+                </div>
               </div>
               <div
                 className="rounded-full px-2 py-0.5 text-[10px] font-semibold"

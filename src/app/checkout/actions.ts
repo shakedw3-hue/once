@@ -25,7 +25,7 @@ export async function initiateCheckout(plan: Plan = "core") {
     redirect("/dashboard");
   }
 
-  const validPlan: Plan = plan === "pro" ? "pro" : "core";
+  const validPlan: Plan = plan === "ai" ? "ai" : plan === "pro" ? "pro" : "core";
   const session = await createCheckoutSession(user.id, user.email!, validPlan);
 
   if (session.url) {

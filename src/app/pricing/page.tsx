@@ -22,14 +22,14 @@ export default function PricingPage() {
       </p>
 
       {/* Price cards */}
-      <div className="mb-12 grid gap-6 sm:grid-cols-2">
+      <div className="mb-12 grid gap-6 sm:grid-cols-3">
         {/* Once Core */}
         <div className="rounded-xl border bg-card p-6 sm:p-8">
           <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once Core</p>
           <p className="mb-4 text-xs text-muted-foreground">Your path. Built for you.</p>
           <div className="mb-6 flex items-baseline gap-1">
             <span className="text-sm text-muted-foreground">₱</span>
-            <span className="font-display text-5xl font-bold tracking-tight">649</span>
+            <span className="font-display text-5xl font-bold tracking-tight">1,499</span>
             <span className="ml-2 text-sm text-muted-foreground">one-time</span>
           </div>
 
@@ -65,7 +65,7 @@ export default function PricingPage() {
           <p className="mb-4 text-xs text-muted-foreground">Your path. Plus your first income.</p>
           <div className="mb-6 flex items-baseline gap-1">
             <span className="text-sm text-muted-foreground">₱</span>
-            <span className="font-display text-5xl font-bold tracking-tight">999</span>
+            <span className="font-display text-5xl font-bold tracking-tight">2,350</span>
             <span className="ml-2 text-sm text-muted-foreground">one-time</span>
           </div>
 
@@ -95,6 +95,43 @@ export default function PricingPage() {
             Do It Once
           </Button>
         </div>
+
+        {/* Once AI Careers */}
+        <div className="rounded-xl border bg-card p-6 sm:p-8">
+          <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Once AI Careers</p>
+          <p className="mb-4 text-xs text-muted-foreground">Your path. Plus AI-powered income skills.</p>
+          <div className="mb-6 flex items-baseline gap-1">
+            <span className="text-sm text-muted-foreground">₱</span>
+            <span className="font-display text-5xl font-bold tracking-tight">3,950</span>
+            <span className="ml-2 text-sm text-muted-foreground">one-time</span>
+          </div>
+
+          <ul className="mb-6 space-y-2.5">
+            {[
+              "Everything in Pro",
+              "AI Business Services — earn ₱15K–₱50K/mo",
+              "AI Content & Design — earn ₱10K–₱40K/mo",
+              "AI Web & No-Code — earn ₱20K–₱60K/mo",
+              "Real AI tools and workflows",
+              "Priority updates + new AI modules",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <svg className="mt-0.5 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <Button
+            render={<Link href="/auth/signup" />}
+            size="lg"
+            className="h-12 w-full text-sm font-semibold"
+          >
+            Go AI
+          </Button>
+        </div>
       </div>
 
       {/* Comparison table */}
@@ -115,7 +152,7 @@ export default function PricingPage() {
             <tbody className="divide-y">
               <tr>
                 <td className="px-4 py-3 font-medium">Price</td>
-                <td className="px-4 py-3 font-semibold text-primary">₱649–999</td>
+                <td className="px-4 py-3 font-semibold text-primary">₱1,499–3,950</td>
                 <td className="px-4 py-3 text-muted-foreground">₱2,000–₱8,000</td>
                 <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">₱3,000–₱15,000/mo</td>
               </tr>
@@ -194,7 +231,7 @@ export default function PricingPage() {
             },
             {
               q: "Why is it so cheap?",
-              a: "The content is text-based worksheets, so there's no video production, no hosting costs, no support team. We pass those savings to you. We'd rather 10,000 people use it at ₱649 than 100 people pay ₱6,490.",
+              a: "The content is text-based worksheets, so there's no video production, no hosting costs, no support team. We pass those savings to you. We'd rather 10,000 people use it at ₱1,499 than 100 people pay ₱14,990.",
             },
             {
               q: "Is there a refund?",
@@ -202,11 +239,11 @@ export default function PricingPage() {
             },
             {
               q: "What's the difference between Core and Pro?",
-              a: "Core gives you the full assessment, personalized profile, and 5 modules with lessons and action steps. Pro includes everything in Core plus practical income skills: social media management, Shopee/Lazada e-commerce, freelancing, and building an online side income, plus priority updates.",
+              a: "Core gives you the full assessment, personalized profile, and 5 modules with lessons and action steps. Pro includes everything in Core plus practical income skills: social media management, Shopee/Lazada e-commerce, freelancing, and building an online side income, plus priority updates. AI Careers includes everything in Pro plus three AI-powered career tracks: AI Business Services, AI Content & Design, and AI Web & No-Code.",
             },
             {
               q: "Will there be upsells after I pay?",
-              a: "No. You pick Core or Pro and that's it. No hidden fees, no add-ons, no \"exclusive masterclass\" behind another paywall.",
+              a: "No. You pick Core, Pro, or AI Careers and that's it. No hidden fees, no add-ons, no \"exclusive masterclass\" behind another paywall.",
             },
           ].map((faq) => (
             <div key={faq.q}>

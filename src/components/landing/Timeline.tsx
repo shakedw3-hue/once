@@ -6,8 +6,8 @@ const stages = [
   {
     step: "1",
     title: "Assessment",
-    time: "3 min",
-    desc: "Answer 10 questions about where you are right now",
+    time: "10 min",
+    desc: "Answer 15 questions about where you are right now",
     color: "#4F46E5",
   },
   {
@@ -21,7 +21,7 @@ const stages = [
     step: "3",
     title: "Choose Your Plan",
     time: "1 min",
-    desc: "Core (₱649) or Pro (₱999), both one-time",
+    desc: "Core ₱1,499, Pro ₱2,350, or AI Careers ₱3,950, all one-time",
     color: "#4F46E5",
   },
   {

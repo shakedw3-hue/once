@@ -4,7 +4,7 @@ export type UserRole = "user" | "admin";
 
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
 
-export type Plan = "core" | "pro";
+export type Plan = "core" | "pro" | "ai";
 
 export type MarketLevel =
   | "UNTESTED"

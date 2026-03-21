@@ -11,18 +11,26 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-export type Plan = "core" | "pro";
+export type Plan = "core" | "pro" | "ai";
 
-export const PLANS: Record<Plan, { amount: number; name: string; description: string }> = {
+export const PLANS: Record<Plan, { amount: number; name: string; description: string; color: string }> = {
   core: {
-    amount: 64900,
+    amount: 149900,
     name: "Once Core",
     description: "Your personalized path across Money, Mind, Body, and Spirit. 25 lessons. Lifetime access.",
+    color: "#4F46E5",
   },
   pro: {
-    amount: 99900,
+    amount: 235000,
     name: "Once Pro",
     description: "Everything in Core plus 100 income-track lessons: social media, e-commerce, freelancing, and online side income. Lifetime access.",
+    color: "#4F46E5",
+  },
+  ai: {
+    amount: 395000,
+    name: "Once AI Careers",
+    description: "Everything in Pro plus 3 AI career tracks: AI Business Services, AI Content & Design, AI Web & No-Code. Lifetime access.",
+    color: "#3B82F6",
   },
 };
 

@@ -2,118 +2,184 @@ import type { Pillar, PillarScores } from "@/types/database";
 
 export interface QuestionOption {
   label: string;
+  emoji?: string;
   weights: Partial<Record<Pillar, number>>;
+  response: string;
 }
 
 export interface Question {
   id: string;
-  text: string;
-  subtitle?: string;
+  phase: "hook" | "deep" | "future";
+  prompt: string;
   options: QuestionOption[];
 }
 
 export const QUESTIONS: Question[] = [
+  // PHASE 1 — THE HOOK (Q1-3)
   {
-    id: "primary_goal",
-    text: "What's the #1 thing you want to improve right now?",
-    subtitle: "Pick the one that feels most urgent.",
+    id: "battery",
+    phase: "hook",
+    prompt: "If your life was a phone, what would the battery look like right now?",
     options: [
-      { label: "My financial situation", weights: { money: 5, mind: 1 } },
-      { label: "My mental clarity and focus", weights: { mind: 5, spirit: 1 } },
-      { label: "My energy and physical health", weights: { body: 5, mind: 1 } },
-      { label: "My sense of purpose and peace", weights: { spirit: 5, mind: 1 } },
+      { label: "Almost dead (5%)", emoji: "🔴", weights: { body: 3, mind: 3, spirit: 2 }, response: "That took courage to admit. Let's figure out why." },
+      { label: "Low, barely getting through", emoji: "🟡", weights: { body: 2, mind: 2, spirit: 1 }, response: "You're not stuck. You're just not moving yet." },
+      { label: "Okay, not great not bad", emoji: "🟢", weights: { mind: 1, spirit: 1 }, response: "Okay is the most dangerous place to be." },
+      { label: "Charged, just need direction", emoji: "⚡", weights: { money: 2, spirit: 3 }, response: "Direction is exactly what Once is built for." },
     ],
   },
   {
-    id: "daily_struggle",
-    text: "What frustrates you most on a daily basis?",
+    id: "proud",
+    phase: "hook",
+    prompt: "When was the last time you felt genuinely proud of yourself?",
     options: [
-      { label: "Not having enough money for my goals", weights: { money: 4, mind: 2 } },
-      { label: "Feeling overwhelmed or anxious", weights: { mind: 4, body: 1, spirit: 1 } },
-      { label: "Low energy or feeling unhealthy", weights: { body: 4, mind: 2 } },
-      { label: "Feeling lost or disconnected from meaning", weights: { spirit: 4, mind: 2 } },
+      { label: "This week", weights: { mind: 1, spirit: 1 }, response: "Hold onto that. We're going to build more of it." },
+      { label: "This month", weights: { mind: 2, spirit: 1 }, response: "Good. There's momentum. Let's use it." },
+      { label: "I can't remember", weights: { mind: 3, spirit: 3 }, response: "That's more common than you think." },
+      { label: "I'm not sure I ever have", weights: { spirit: 5, mind: 2 }, response: "That answer is the beginning of something important." },
     ],
   },
   {
-    id: "morning_wish",
-    text: "When you wake up, what do you wish was different?",
+    id: "one_change",
+    phase: "hook",
+    prompt: "What's the one area that, if it changed, would change everything?",
     options: [
-      { label: "A stable income or side hustle", weights: { money: 5 } },
-      { label: "A clearer, calmer mind", weights: { mind: 5 } },
-      { label: "More energy to get through the day", weights: { body: 5 } },
-      { label: "A stronger sense of direction in life", weights: { spirit: 5 } },
+      { label: "Money. Tired of never having enough.", emoji: "💰", weights: { money: 5, mind: 1 }, response: "Money isn't everything. But not having it affects everything." },
+      { label: "Mind. My thoughts work against me.", emoji: "🧠", weights: { mind: 5, spirit: 1 }, response: "The mind is the operating system. Fix that, fix everything." },
+      { label: "Body. I have no energy.", emoji: "💪", weights: { body: 5, mind: 1 }, response: "Energy is the currency of life. You can't outperform a tired body." },
+      { label: "Spirit. I don't know what I'm doing this for.", emoji: "🌿", weights: { spirit: 5, mind: 1 }, response: "Purpose is the anchor that holds everything else together." },
     ],
   },
+  // PHASE 2 — DEEP DIVE (Q4-10)
+  {
+    id: "two_years",
+    phase: "deep",
+    prompt: "When you imagine life 2 years from now, what do you see?",
+    options: [
+      { label: "Completely different. I need a full reset.", weights: { spirit: 3, money: 2, mind: 1 }, response: "A reset isn't starting over. It's starting right." },
+      { label: "Better, but I'm not sure how to get there.", weights: { mind: 3, money: 2 }, response: "The gap between here and there is just a plan." },
+      { label: "Similar, but more stable.", weights: { money: 2, body: 1 }, response: "Stability is underrated. Let's build it." },
+      { label: "I try not to think about it.", weights: { spirit: 4, mind: 2 }, response: "Avoiding the future means someone else decides it for you." },
+    ],
+  },
+  {
+    id: "follow_through",
+    phase: "deep",
+    prompt: "What usually stops you from following through?",
+    options: [
+      { label: "Lose motivation after a few days", weights: { mind: 3, spirit: 2 }, response: "Motivation fades. Systems don't." },
+      { label: "Don't know where to start", weights: { mind: 2, money: 2 }, response: "Clarity is what Once gives you first." },
+      { label: "Get distracted by other things", weights: { mind: 4, body: 1 }, response: "Distraction is the enemy of direction." },
+      { label: "Afraid it won't work", weights: { spirit: 3, mind: 2 }, response: "Fear of failure is just fear of trying." },
+    ],
+  },
+  {
+    id: "income",
+    phase: "deep",
+    prompt: "How do you feel about your income right now?",
+    options: [
+      { label: "Not enough, and I don't see how to change it", weights: { money: 5, spirit: 1 }, response: "Seeing the path is the first step to walking it." },
+      { label: "Covers basics but nothing more", weights: { money: 3, mind: 1 }, response: "Survival mode is real. Let's get you past it." },
+      { label: "Okay, but I want more", weights: { money: 2 }, response: "Wanting more isn't greed. It's growth." },
+      { label: "Money isn't my main concern right now", weights: { mind: 1, spirit: 2 }, response: "Good. That means we can focus on what actually matters to you." },
+    ],
+  },
+  {
+    id: "sleep",
+    phase: "deep",
+    prompt: "How many hours of real sleep do you get most nights?",
+    options: [
+      { label: "Less than 5", weights: { body: 5, mind: 2 }, response: "Under 5 hours, your decision-making drops to near-impaired levels. This matters." },
+      { label: "5 to 6 hours", weights: { body: 3, mind: 1 }, response: "You're functioning but not thriving. There's a difference." },
+      { label: "6 to 7 hours", weights: { body: 1 }, response: "Close to good. Small adjustments make a big difference here." },
+      { label: "7 to 8 or more", weights: {}, response: "Your body is getting what it needs. That's a real advantage." },
+    ],
+  },
+  {
+    id: "reaction",
+    phase: "deep",
+    prompt: "When things go wrong, what's your first reaction?",
+    options: [
+      { label: "I blame myself", weights: { mind: 3, spirit: 2 }, response: "Self-blame is heavy. Let's trade it for self-awareness." },
+      { label: "I blame the situation or others", weights: { mind: 2, spirit: 1 }, response: "External blame protects you. But it also traps you." },
+      { label: "I shut down and go quiet", weights: { spirit: 3, mind: 2 }, response: "Silence can be a shield. Once helps you find your voice." },
+      { label: "I try to find a solution immediately", weights: { money: 1 }, response: "Problem-solver instinct. That's a strength worth building on." },
+    ],
+  },
+  {
+    id: "values",
+    phase: "deep",
+    prompt: "Do you have a clear sense of what you stand for?",
+    options: [
+      { label: "Yes, completely", weights: { spirit: -1 }, response: "That clarity is rare. Let's put it to work." },
+      { label: "Somewhat. Ideas but nothing clear.", weights: { spirit: 2, mind: 1 }, response: "Vague values create vague results. Let's sharpen them." },
+      { label: "Not really, I live day to day", weights: { spirit: 4, mind: 1 }, response: "Day to day is surviving. Once helps you start living." },
+      { label: "I've never thought about it", weights: { spirit: 5 }, response: "That's not a flaw. It's just unfinished business." },
+    ],
+  },
+  {
+    id: "habits",
+    phase: "deep",
+    prompt: "How consistent are you with habits that matter to you?",
+    options: [
+      { label: "Very consistent", weights: {}, response: "Consistency is rare. You already have the hardest part." },
+      { label: "Try but fall off after 1 to 2 weeks", weights: { mind: 3, body: 1 }, response: "The 2-week wall is real. The right system breaks through it." },
+      { label: "Start strong then disappear", weights: { mind: 4, spirit: 1 }, response: "Starting is easy. Finishing is what Once is built for." },
+      { label: "I don't have consistent habits yet", weights: { mind: 3, body: 2, spirit: 1 }, response: "No habits yet means no bad habits to undo. Fresh start." },
+    ],
+  },
+  // PHASE 3 — FUTURE FOCUS (Q11-15)
   {
     id: "free_time",
-    text: "If you had 2 extra hours a day, what would you do?",
+    phase: "future",
+    prompt: "If money wasn't a concern, what would you spend your time doing?",
     options: [
-      { label: "Learn about investing or business", weights: { money: 4, mind: 1 } },
-      { label: "Read, meditate, or journal", weights: { mind: 3, spirit: 3 } },
-      { label: "Work out or prepare healthy meals", weights: { body: 5 } },
-      { label: "Reflect, pray, or spend time in nature", weights: { spirit: 4, body: 1 } },
+      { label: "Building something of my own", weights: { money: 3, mind: 1 }, response: "Builders think differently. Once builds with you." },
+      { label: "Helping my family and community", weights: { spirit: 3, money: 1 }, response: "Service is the deepest kind of purpose." },
+      { label: "Learning and growing constantly", weights: { mind: 3, spirit: 1 }, response: "Growth for its own sake. That's a powerful drive." },
+      { label: "Experiencing life. Travel, freedom, adventure.", weights: { spirit: 2, body: 1 }, response: "Freedom requires a foundation. Let's build it." },
     ],
   },
   {
-    id: "biggest_fear",
-    text: "What worries you most about the next 5 years?",
+    id: "income_target",
+    phase: "future",
+    prompt: "What kind of income would actually change your life?",
     options: [
-      { label: "Still being broke or financially stuck", weights: { money: 5, mind: 1 } },
-      { label: "Burnout, anxiety, or mental breakdown", weights: { mind: 5, body: 1 } },
-      { label: "Health problems or low quality of life", weights: { body: 5, spirit: 1 } },
-      { label: "Looking back and feeling like life had no purpose", weights: { spirit: 5, mind: 1 } },
+      { label: "An extra ₱5,000 to ₱15,000/month", weights: { money: 2 }, response: "Achievable within 30 to 60 days with the right skills." },
+      { label: "A full replacement of my current job", weights: { money: 4, spirit: 1 }, response: "That's not a dream. It's a 6 to 12 month plan." },
+      { label: "₱50,000+/month. Real financial freedom.", weights: { money: 5 }, response: "Big goals need big systems. Once gives you both." },
+      { label: "I just want stability first", weights: { money: 1, spirit: 1 }, response: "Stability first. Everything else follows." },
     ],
   },
   {
-    id: "family_role",
-    text: "How do you see your role in your family?",
-    subtitle: "Think about what drives your responsibility.",
+    id: "digital_skills",
+    phase: "future",
+    prompt: "How comfortable are you learning new digital skills?",
     options: [
-      { label: "Provider — I need to earn more for them", weights: { money: 4, spirit: 2 } },
-      { label: "Anchor — I need to stay mentally strong", weights: { mind: 4, spirit: 2 } },
-      { label: "Example — I want to model healthy living", weights: { body: 4, spirit: 1 } },
-      { label: "Guide — I want to lead with values and wisdom", weights: { spirit: 4, mind: 2 } },
+      { label: "Very. I pick things up fast.", weights: { money: 1 }, response: "Speed is an advantage. Let's point it in the right direction." },
+      { label: "I need clear steps but I can do it", weights: { money: 1, mind: 1 }, response: "Clear steps is exactly what Once delivers." },
+      { label: "Nervous but willing", weights: { mind: 2, money: 1 }, response: "Willing is enough. Once handles the rest." },
+      { label: "Not sure if I can", weights: { mind: 3, spirit: 1 }, response: "Every skill you have now was once new." },
     ],
   },
   {
-    id: "stress_response",
-    text: "When you're stressed, what do you usually do?",
+    id: "success_def",
+    phase: "future",
+    prompt: "What does success look like to you, personally?",
     options: [
-      { label: "Scroll my phone or online shop", weights: { money: 2, mind: 3, spirit: 1 } },
-      { label: "Overthink and lose sleep", weights: { mind: 5, body: 1 } },
-      { label: "Eat junk food or skip workouts", weights: { body: 4, mind: 2 } },
-      { label: "Withdraw and feel empty", weights: { spirit: 4, mind: 2 } },
-    ],
-  },
-  {
-    id: "learning_interest",
-    text: "What kind of content do you usually watch or read?",
-    options: [
-      { label: "Business, investing, money tips", weights: { money: 5 } },
-      { label: "Productivity, psychology, self-help", weights: { mind: 5 } },
-      { label: "Fitness, nutrition, health", weights: { body: 5 } },
-      { label: "Motivation, spirituality, philosophy", weights: { spirit: 5 } },
-    ],
-  },
-  {
-    id: "ideal_self",
-    text: "In your ideal life, what kind of person are you?",
-    options: [
-      { label: "Financially free and providing for my family", weights: { money: 4, spirit: 2 } },
-      { label: "Focused, disciplined, and in control", weights: { mind: 4, body: 1 } },
-      { label: "Fit, energetic, and healthy", weights: { body: 4, mind: 1 } },
-      { label: "At peace, grateful, and living with purpose", weights: { spirit: 5 } },
+      { label: "Financial freedom for my family", weights: { money: 3, spirit: 2 }, response: "Family-driven ambition. The strongest kind." },
+      { label: "Work that actually means something", weights: { spirit: 4, mind: 1 }, response: "Meaningful work changes more than your income." },
+      { label: "Time and energy for the people I love", weights: { body: 2, spirit: 2 }, response: "Time is the real currency. Let's earn more of it." },
+      { label: "Being someone I'm proud of", weights: { spirit: 3, mind: 2 }, response: "That's the deepest definition of success there is." },
     ],
   },
   {
     id: "commitment",
-    text: "How ready are you to work on yourself daily?",
-    subtitle: "Be honest — there's no wrong answer.",
+    phase: "future",
+    prompt: "Last question. The most important one. Are you willing to commit to one path and actually finish it?",
     options: [
-      { label: "Very ready — I just need a clear plan", weights: { money: 2, mind: 2, body: 1, spirit: 1 } },
-      { label: "Ready but I struggle with consistency", weights: { mind: 3, body: 2, spirit: 1 } },
-      { label: "I want to but I'm overwhelmed right now", weights: { mind: 2, spirit: 3, body: 1 } },
-      { label: "I need motivation and direction first", weights: { spirit: 3, mind: 2, money: 1 } },
+      { label: "Yes. I'm done starting things I don't finish.", weights: { mind: 1, spirit: 1 }, response: "That's all Once needs to hear." },
+      { label: "I want to be. I just need the right support.", weights: { spirit: 1, mind: 1 }, response: "That's enough. Wanting to is where it starts." },
+      { label: "I'm not sure yet.", weights: { spirit: 2 }, response: "Honesty is the first step. Once will meet you where you are." },
     ],
   },
 ];
@@ -153,17 +219,13 @@ export function determinePaths(scores: PillarScores): {
 }
 
 export function normalizeScores(scores: PillarScores): PillarScores {
-  const maxPossible = QUESTIONS.reduce((sum, q) => {
-    const maxWeight = Math.max(
-      ...q.options.flatMap((o) => Object.values(o.weights))
-    );
-    return sum + maxWeight;
-  }, 0);
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  if (total === 0) return { money: 25, mind: 25, body: 25, spirit: 25 };
 
   return {
-    money: Math.round((scores.money / maxPossible) * 100),
-    mind: Math.round((scores.mind / maxPossible) * 100),
-    body: Math.round((scores.body / maxPossible) * 100),
-    spirit: Math.round((scores.spirit / maxPossible) * 100),
+    money: Math.round((scores.money / total) * 100),
+    mind: Math.round((scores.mind / total) * 100),
+    body: Math.round((scores.body / total) * 100),
+    spirit: Math.round((scores.spirit / total) * 100),
   };
 }

@@ -14,7 +14,7 @@ export default function RefundPage() {
       <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
         <p>
           We want you to feel confident about your purchase. This Refund Policy explains how
-          refunds work for Once Core (₱649) and Once Pro (₱999).
+          refunds work for Once Core (₱1,499), Once Pro (₱2,350), and Once AI Careers (₱3,950).
         </p>
       </div>
 
@@ -33,7 +33,7 @@ export default function RefundPage() {
         <h2 className="mt-8 mb-3 text-section text-lg">2. Paid Access</h2>
         <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
           <p>
-            When you purchase Once Core or Once Pro, you receive immediate, full access to all
+            When you purchase Once Core, Once Pro, or Once AI Careers, you receive immediate, full access to all
             modules and lessons included in your plan. This is a one-time payment. There are no
             subscriptions or recurring charges.
           </p>
