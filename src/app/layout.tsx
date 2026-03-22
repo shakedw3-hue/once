@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: "One assessment. One personalized path. One decision that changes everything.",
     url: "https://once.ph",
     siteName: "Once",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Once" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Once" }],
     locale: "en_PH",
     type: "website",
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Once: The decision that changes everything",
     description: "One assessment. One personalized path. One decision.",
-    images: ["/og-image.png"],
+    images: ["/opengraph-image"],
   },
   other: { "theme-color": "#FAFAFF" },
 };

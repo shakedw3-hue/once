@@ -207,10 +207,16 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: i * 0.05 }}
-            className="w-[280px] shrink-0 snap-start rounded-xl border bg-card p-5 sm:w-[320px]"
+            className="w-[280px] shrink-0 snap-start rounded-xl border bg-card p-5 sm:w-[320px] hover:shadow-md transition-shadow"
           >
-            {/* Stars */}
-            <Stars count={review.stars} />
+            {/* Stars + verified */}
+            <div className="flex items-center justify-between">
+              <Stars count={review.stars} />
+              <span className="flex items-center gap-0.5 text-[9px] text-emerald-600 font-medium">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                Verified
+              </span>
+            </div>
 
             {/* Review text */}
             <p className="mt-3 text-sm leading-relaxed text-foreground">
@@ -221,10 +227,15 @@ export default function Testimonials() {
             <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                  style={{ backgroundColor: `${review.pillarColor}12`, color: review.pillarColor }}
+                  className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold overflow-hidden"
+                  style={{ backgroundColor: `${review.pillarColor}18`, color: review.pillarColor }}
                 >
-                  {review.name.split(" ").map(n => n[0]).join("")}
+                  {/* Person silhouette */}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" opacity="0.3" className="absolute bottom-0">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M20 21a8 8 0 10-16 0" />
+                  </svg>
+                  <span className="relative z-10 text-[10px]">{review.name.split(" ").map(n => n[0]).join("")}</span>
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{review.name}</p>

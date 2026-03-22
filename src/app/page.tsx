@@ -7,6 +7,10 @@ import AssessmentDemo from "@/components/landing/AssessmentDemo";
 import Timeline from "@/components/landing/Timeline";
 import Testimonials from "@/components/landing/Testimonials";
 import StickyCTA from "@/components/landing/StickyCTA";
+import TrustBadges from "@/components/landing/TrustBadges";
+import SocialProofStrip from "@/components/landing/SocialProofStrip";
+import CredibilityStrip from "@/components/landing/CredibilityStrip";
+import PhoneMockup from "@/components/landing/PhoneMockup";
 import { IconMoney, IconMind, IconBody, IconSpirit, IconCompass, IconMatch, IconLearn, IconRocket } from "@/components/ui/icons";
 
 export default function Home() {
@@ -15,6 +19,11 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+
+        {/* Credibility strip — below hero */}
+        <section className="mx-auto max-w-3xl px-5 -mt-8 mb-8 sm:-mt-12 sm:mb-12">
+          <CredibilityStrip />
+        </section>
 
         {/* The problem */}
         <Section>
@@ -131,6 +140,25 @@ export default function Home() {
             Simple. Personal. Life-changing.
           </p>
           <Timeline />
+        </Section>
+
+        {/* What you get — phone mockup */}
+        <Section>
+          <h2 className="mb-2 text-section text-xl sm:text-2xl">Your personal dashboard</h2>
+          <p className="mb-8 text-sm text-muted-foreground">
+            Everything you need. One screen. Built around your scores.
+          </p>
+          <PhoneMockup />
+        </Section>
+
+        {/* Social proof strip */}
+        <Section>
+          <SocialProofStrip />
+        </Section>
+
+        {/* Trust badges */}
+        <Section>
+          <TrustBadges />
         </Section>
 
         {/* Pricing */}
