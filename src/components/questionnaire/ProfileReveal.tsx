@@ -93,7 +93,9 @@ export default function ProfileReveal({
   hasPaid,
   recommendation,
 }: ProfileRevealProps) {
-  const normalized = normalizeScores(scores);
+  const defaultScores: PillarScores = { money: 50, mind: 50, body: 50, spirit: 50 };
+  const safeScores = scores && typeof scores === "object" ? scores : defaultScores;
+  const normalized = normalizeScores(safeScores);
   const primary = PILLARS[primaryPath];
   const firstName = fullName.split(" ")[0] || "there";
   const insight = pillarInsights[primaryPath];
@@ -102,9 +104,21 @@ export default function ProfileReveal({
   const sorted = PILLAR_ORDER.map((p) => ({ pillar: p, score: normalized[p] })).sort((a, b) => a.score - b.score);
   const lowest = sorted[0];
 
-  const recPlanName = recommendation.plan === "ai" ? "Once AI Careers" : recommendation.plan === "pro" ? "Once Pro" : "Once Core";
-  const recPrice = recommendation.plan === "ai" ? "3,950" : recommendation.plan === "pro" ? "2,350" : "1,499";
-  const recCheckoutPlan = recommendation.plan === "ai" ? "ai" : recommendation.plan === "pro" ? "pro" : "core";
+  // Safe recommendation defaults
+  const safeRecommendation: Recommendation = recommendation ?? {
+    plan: "core" as Plan,
+    why: "Based on your assessment, we recommend starting with the foundation.",
+    skills: [],
+  };
+
+  const recPlanName = safeRecommendation.plan === "ai" ? "Once AI Careers" : safeRecommendation.plan === "pro" ? "Once Pro" : "Once Core";
+  const recPrice = safeRecommendation.plan === "ai" ? "3,950" : safeRecommendation.plan === "pro" ? "2,350" : "1,499";
+  const recCheckoutPlan = safeRecommendation.plan === "ai" ? "ai" : safeRecommendation.plan === "pro" ? "pro" : "core";
+
+  // If primary and secondary are the same, pick a different color for the gradient end
+  const gradientSecondary = secondaryPath === primaryPath
+    ? PILLAR_ORDER.find((p) => p !== primaryPath) ?? secondaryPath
+    : secondaryPath;
 
   return (
     <div className="min-h-screen px-5 py-10 sm:py-14">
@@ -147,7 +161,7 @@ export default function ProfileReveal({
             <div
               className="h-2"
               style={{
-                background: `linear-gradient(to right, ${theme.pillar[primaryPath].color}, ${theme.pillar[secondaryPath].color})`,
+                background: `linear-gradient(to right, ${theme.pillar[primaryPath].color}, ${theme.pillar[gradientSecondary].color})`,
               }}
             />
             <CardContent className="p-5 sm:p-6">
@@ -220,24 +234,24 @@ export default function ProfileReveal({
 
                   <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <h2 className="text-display text-2xl sm:text-3xl">{recPlanName}</h2>
-                    {recommendation.track && (
-                      <Badge variant="secondary" className="text-xs">{recommendation.track}</Badge>
+                    {safeRecommendation.track && (
+                      <Badge variant="secondary" className="text-xs">{safeRecommendation.track}</Badge>
                     )}
                   </div>
 
                   {/* Why this recommendation */}
                   <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
-                    {recommendation.why}
+                    {safeRecommendation.why}
                   </p>
 
                   {/* Skills they'll learn */}
-                  {recommendation.skills.length > 0 && (
+                  {safeRecommendation.skills && safeRecommendation.skills.length > 0 && (
                     <div className="mb-5">
                       <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         What you will learn
                       </p>
                       <ul className="space-y-2">
-                        {recommendation.skills.map((skill) => (
+                        {safeRecommendation.skills.map((skill) => (
                           <li key={skill} className="flex items-start gap-2.5 text-sm text-foreground">
                             <svg className="mt-0.5 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                               <polyline points="20 6 9 17 4 12" />
@@ -250,10 +264,10 @@ export default function ProfileReveal({
                   )}
 
                   {/* Earning potential */}
-                  {recommendation.earning && (
+                  {safeRecommendation.earning && (
                     <div className="mb-6 rounded-lg bg-primary/[0.06] px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-wider text-primary">Earning potential</p>
-                      <p className="mt-0.5 text-lg font-bold text-foreground">{recommendation.earning}</p>
+                      <p className="mt-0.5 text-lg font-bold text-foreground">{safeRecommendation.earning}</p>
                     </div>
                   )}
 
@@ -274,6 +288,9 @@ export default function ProfileReveal({
 
                   <p className="mt-3 text-center text-[11px] text-muted-foreground">
                     GCash and Maya accepted. One payment. Lifetime access.
+                  </p>
+                  <p className="mt-1.5 text-center text-[11px] text-muted-foreground/70">
+                    7-day money-back guarantee. No questions asked.
                   </p>
                 </CardContent>
               </Card>
@@ -296,7 +313,7 @@ export default function ProfileReveal({
 
               <div className="grid gap-3 sm:grid-cols-2">
                 {/* Show the two plans that AREN'T the recommendation */}
-                {recommendation.plan !== "core" && (
+                {safeRecommendation.plan !== "core" && (
                   <Card>
                     <CardContent className="p-4">
                       <p className="mb-1 text-label text-muted-foreground">Once Core</p>
@@ -318,12 +335,12 @@ export default function ProfileReveal({
                   </Card>
                 )}
 
-                {recommendation.plan !== "pro" && (
-                  <Card className={recommendation.plan === "core" ? "border-primary/20" : ""}>
+                {safeRecommendation.plan !== "pro" && (
+                  <Card className={safeRecommendation.plan === "core" ? "border-primary/20" : ""}>
                     <CardContent className="p-4">
                       <div className="mb-1 flex items-center gap-2">
                         <p className="text-label text-primary">Once Pro</p>
-                        {recommendation.plan === "core" && <Badge className="text-[8px]">Most Popular</Badge>}
+                        {safeRecommendation.plan === "core" && <Badge className="text-[8px]">Most Popular</Badge>}
                       </div>
                       <div className="mb-2 flex items-baseline gap-1">
                         <span className="text-xs text-muted-foreground">₱</span>
@@ -334,7 +351,7 @@ export default function ProfileReveal({
                       </p>
                       <Button
                         render={<Link href="/checkout?plan=pro" />}
-                        variant={recommendation.plan === "core" ? "default" : "outline"}
+                        variant={safeRecommendation.plan === "core" ? "default" : "outline"}
                         className="w-full text-xs"
                       >
                         Do It Once — ₱2,350
@@ -343,7 +360,7 @@ export default function ProfileReveal({
                   </Card>
                 )}
 
-                {recommendation.plan !== "ai" && (
+                {safeRecommendation.plan !== "ai" && (
                   <Card className="border-blue-400/20 bg-blue-50/50">
                     <CardContent className="p-4">
                       <div className="mb-1 flex items-center gap-2">

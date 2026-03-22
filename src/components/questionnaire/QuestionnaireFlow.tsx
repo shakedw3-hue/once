@@ -44,11 +44,12 @@ export default function QuestionnaireFlow() {
   const [idleMsg, setIdleMsg] = useState(false);
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
-  const question = QUESTIONS[currentStep];
   const totalSteps = QUESTIONS.length;
-  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const safeStep = currentStep >= totalSteps ? totalSteps - 1 : currentStep;
+  const question = QUESTIONS[safeStep];
+  const progress = ((safeStep + 1) / totalSteps) * 100;
 
-  // Check for saved progress on mount
+  // Check for saved progress on mount — show prompt instead of silently loading
   useEffect(() => {
     const saved = loadProgress();
     if (saved && saved.step > 0 && saved.step < totalSteps) {
@@ -105,11 +106,11 @@ export default function QuestionnaireFlow() {
         setPhase("analyzing");
         doSubmit(newAnswers);
       }
-    }, 1800);
+    }, 800);
   }
 
   async function doSubmit(finalAnswers: Record<string, number>) {
-    await new Promise((r) => setTimeout(r, 3500));
+    await new Promise((r) => setTimeout(r, 1500));
     await submitQuestionnaire(finalAnswers);
   }
 

@@ -122,10 +122,11 @@ export default function DashboardView({
 }: DashboardViewProps) {
   const primary = PILLARS[primaryPath];
   const firstName = fullName.split(" ")[0] || "there";
-  const isPro = plan === "pro" || plan === "ai";
-  const isAI = plan === "ai";
-  const t = PLAN_THEMES[plan as keyof typeof PLAN_THEMES] || PLAN_THEMES.core;
-  const isDark = plan === "pro" || plan === "ai";
+  const safePlan = (plan && plan in PLAN_THEMES) ? plan as keyof typeof PLAN_THEMES : "core";
+  const isPro = safePlan === "pro" || safePlan === "ai";
+  const isAI = safePlan === "ai";
+  const t = PLAN_THEMES[safePlan];
+  const isDark = safePlan === "pro" || safePlan === "ai";
 
   const primaryData = pathData.find((p) => p.pillar === primaryPath);
   const secondaryData = pathData.find((p) => p.pillar === secondaryPath);

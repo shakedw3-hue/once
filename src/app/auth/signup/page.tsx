@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +14,8 @@ export default function SignupPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const result = await signup(formData);
@@ -29,12 +28,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="mb-8 text-center">
           <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
             <span className="text-foreground">Once</span>
@@ -62,7 +56,6 @@ export default function SignupPage() {
                   type="text"
                   placeholder="Juan Dela Cruz"
                   required
-                  className=""
                 />
               </div>
 
@@ -74,7 +67,6 @@ export default function SignupPage() {
                   type="email"
                   placeholder="you@example.com"
                   required
-                  className=""
                 />
               </div>
 
@@ -87,7 +79,6 @@ export default function SignupPage() {
                   placeholder="At least 6 characters"
                   minLength={6}
                   required
-                  className=""
                 />
               </div>
 
@@ -115,7 +106,7 @@ export default function SignupPage() {
             </p>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

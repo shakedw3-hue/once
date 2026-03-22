@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,11 +42,7 @@ export default function ModuleView({ module: mod, lessons }: ModuleViewProps) {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="animate-fade-in">
           {/* Module header */}
           <div className="mb-8">
             <Badge variant="secondary" className="mb-3">
@@ -65,17 +60,30 @@ export default function ModuleView({ module: mod, lessons }: ModuleViewProps) {
             </div>
           </div>
 
+          {/* Empty state */}
+          {lessons.length === 0 && (
+            <div className="rounded-xl border border-dashed p-10 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-foreground">No lessons available yet</p>
+              <p className="mt-1 text-xs text-muted-foreground">Lessons for this module are being prepared. Check back soon.</p>
+            </div>
+          )}
+
           {/* Lessons list */}
           <div className="space-y-3">
             {lessons.map((lesson, i) => {
               const isNext = nextLesson?.id === lesson.id;
 
               return (
-                <motion.div
+                <div
                   key={lesson.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <Link
                     href={`/dashboard/module/${mod.id}/lesson/${lesson.id}`}
@@ -142,12 +150,29 @@ export default function ModuleView({ module: mod, lessons }: ModuleViewProps) {
                       </CardContent>
                     </Card>
                   </Link>
-                </motion.div>
+                </div>
               );
             })}
           </div>
-        </motion.div>
+        </div>
       </main>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out;
+        }
+        .animate-slide-up {
+          animation: slideUp 0.3s ease-out both;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,29 +11,37 @@ import { login } from "../actions";
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setError(null);
+
+    if (attempts >= 5) {
+      setError("Too many login attempts. Please wait a moment before trying again.");
+      setLoading(false);
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const result = await login(formData);
 
     if (result?.error) {
       setError(result.error);
+      setAttempts((prev) => prev + 1);
       setLoading(false);
+      // Clear password field on error for security
+      if (passwordRef.current) {
+        passwordRef.current.value = "";
+      }
     }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="mb-8 text-center">
           <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
             <span className="text-foreground">Once</span>
@@ -59,19 +66,18 @@ export default function LoginPage() {
                   type="email"
                   placeholder="you@example.com"
                   required
-                  className=""
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-muted-foreground">Password</Label>
                 <Input
+                  ref={passwordRef}
                   id="password"
                   name="password"
                   type="password"
                   placeholder="Your password"
                   required
-                  className=""
                 />
               </div>
 
@@ -85,10 +91,16 @@ export default function LoginPage() {
                 <p className="text-sm text-destructive">{error}</p>
               )}
 
+              {attempts >= 3 && attempts < 5 && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Multiple failed attempts detected. Please double-check your credentials.
+                </p>
+              )}
+
               <Button
                 type="submit"
                 className="w-full font-semibold"
-                disabled={loading}
+                disabled={loading || attempts >= 5}
               >
                 {loading ? "Logging in..." : "Log In"}
               </Button>
@@ -102,7 +114,7 @@ export default function LoginPage() {
             </p>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

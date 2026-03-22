@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +15,8 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const result = await forgotPassword(formData);
@@ -32,15 +31,11 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="mb-8 text-center">
           <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
-            Once<span className="text-primary">.</span>
+            <span className="text-foreground">Once</span>
+            <span className="text-primary">.</span>
           </Link>
           <p className="mt-1 text-xs text-muted-foreground/60">
             The decision that changes everything.
@@ -54,7 +49,7 @@ export default function ForgotPasswordPage() {
               <div className="text-center py-4">
                 <p className="mb-2 text-sm font-semibold">Check your email</p>
                 <p className="text-sm text-muted-foreground">
-                  We sent a password reset link to your email. Click the link to set a new password.
+                  If this email is registered, you&apos;ll receive a reset link. Check your spam folder.
                 </p>
                 <Link href="/auth/login" className="mt-4 inline-block text-sm text-primary hover:underline">
                   Back to login
@@ -88,7 +83,7 @@ export default function ForgotPasswordPage() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

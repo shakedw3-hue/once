@@ -15,7 +15,17 @@ export default function ProfileForm({ name }: { name: string }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
     const fd = new FormData(e.currentTarget);
+
+    // Validate age on client side
+    const ageValue = Number(fd.get("age"));
+    if (!ageValue || ageValue < 16 || ageValue > 80) {
+      setError("Please enter a valid age between 16 and 80.");
+      setLoading(false);
+      return;
+    }
+
     const result = await saveProfileDetails(fd);
     if (result?.error) {
       setError(result.error);
@@ -62,12 +72,12 @@ export default function ProfileForm({ name }: { name: string }) {
               <div>
                 <Label>Have you bought online courses before?</Label>
                 <div className="mt-2 flex gap-3">
-                  <label className="flex items-center gap-2 rounded-lg border px-4 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors">
-                    <input type="radio" name="boughtBefore" value="yes" className="text-primary" />
+                  <label className="flex items-center gap-2.5 rounded-lg border px-4 py-2.5 cursor-pointer hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors">
+                    <input type="radio" name="boughtBefore" value="yes" className="accent-primary h-4 w-4" />
                     <span className="text-sm">Yes</span>
                   </label>
-                  <label className="flex items-center gap-2 rounded-lg border px-4 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors">
-                    <input type="radio" name="boughtBefore" value="no" defaultChecked className="text-primary" />
+                  <label className="flex items-center gap-2.5 rounded-lg border px-4 py-2.5 cursor-pointer hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors">
+                    <input type="radio" name="boughtBefore" value="no" defaultChecked className="accent-primary h-4 w-4" />
                     <span className="text-sm">No, this is my first</span>
                   </label>
                 </div>

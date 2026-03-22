@@ -152,6 +152,21 @@
     color: #4F46E5 !important;
   }
 
+  /* Auth card fade-in animation */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out both;
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Mobile-first button sizing */
   .btn-mobile {
     min-height: 56px;

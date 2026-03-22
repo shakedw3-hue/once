@@ -31,7 +31,8 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
     });
 
   if (insertError) {
-    return { error: insertError.message };
+    console.error("Questionnaire insert error:", insertError.message);
+    return { error: "Something went wrong saving your answers. Please try again." };
   }
 
   // Update user profile with paths + recommendation
@@ -49,7 +50,8 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
     .eq("id", user.id);
 
   if (updateError) {
-    return { error: updateError.message };
+    console.error("Profile update error:", updateError.message);
+    return { error: "Something went wrong updating your profile. Please try again." };
   }
 
   redirect("/profile/complete");
@@ -73,7 +75,10 @@ export async function devSkipPayment(plan: "core" | "pro" | "ai") {
     })
     .eq("id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("Dev skip payment error:", error.message);
+    return { error: "Something went wrong. Please try again." };
+  }
 
   redirect("/dashboard");
 }

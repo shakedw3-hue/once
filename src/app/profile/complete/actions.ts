@@ -29,7 +29,10 @@ export async function saveProfileDetails(formData: FormData) {
     })
     .eq("id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("Profile save error:", error.message);
+    return { error: "Something went wrong saving your profile. Please try again." };
+  }
 
   redirect("/profile");
 }

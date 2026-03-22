@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -72,6 +71,17 @@ export default function LessonView({
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
   const [insightSaved, setInsightSaved] = useState(false);
 
+  // Load bookmark state from localStorage once on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(BOOKMARK_KEY) || "[]");
+      if (saved.includes(keyInsight)) {
+        setInsightSaved(true);
+      }
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Derived content
   const hook = generateHook(lesson.title, lesson.description);
   const sourceInfo = extractSourceInfo(lesson.description);
@@ -102,9 +112,12 @@ export default function LessonView({
 
   async function handleComplete() {
     setSaving(true);
-    const result = await completeLesson(lesson.id, reflection.trim() || null);
-    if (result.success) setCompleted(true);
-    setSaving(false);
+    try {
+      const result = await completeLesson(lesson.id, reflection.trim() || null);
+      if (result.success) setCompleted(true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleNext() {
@@ -135,9 +148,9 @@ export default function LessonView({
       </header>
 
       <main className="mx-auto max-w-3xl px-5 py-6 sm:py-10">
-        <motion.article initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+        <article className="animate-fade-in">
 
-          {/* ═══ LESSON HEADER ═══ */}
+          {/* LESSON HEADER */}
           <div className="mb-6">
             <p className="mb-2 text-xs font-medium text-primary uppercase tracking-wider">
               {mod.title} · Lesson {lesson.order}
@@ -150,7 +163,7 @@ export default function LessonView({
             )}
           </div>
 
-          {/* ═══ MODULE OPENER ═══ */}
+          {/* MODULE OPENER */}
           {isOpener && (
             <div className="mb-6 rounded-xl border border-primary/15 bg-primary/[0.03] p-5">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Starting: {mod.title}</p>
@@ -158,7 +171,7 @@ export default function LessonView({
               <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                  3–5 days
+                  3-5 days
                 </span>
                 <span className="flex items-center gap-1">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
@@ -172,7 +185,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ THE HOOK ═══ */}
+          {/* THE HOOK */}
           <div className="mb-6 overflow-hidden rounded-xl border">
             <div className="h-1 bg-gradient-to-r from-primary via-primary/60 to-transparent" />
             <div className="p-5">
@@ -180,7 +193,7 @@ export default function LessonView({
             </div>
           </div>
 
-          {/* ═══ STAT BOX (if available) ═══ */}
+          {/* STAT BOX (if available) */}
           {stat && (
             <div className="mb-6 flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200/50 p-4">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
@@ -193,7 +206,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ WHAT YOU'LL LEARN (takeaways) ═══ */}
+          {/* WHAT YOU'LL LEARN (takeaways) */}
           {takeaways.length > 0 && (
             <div className="mb-6 rounded-xl border bg-muted/30 p-5">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">What You Will Learn</p>
@@ -210,7 +223,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ LESSON CONTENT ═══ */}
+          {/* LESSON CONTENT */}
           <div className="mb-6">
             <Card>
               <CardContent className="p-5 sm:p-6">
@@ -232,7 +245,7 @@ export default function LessonView({
             </Card>
           </div>
 
-          {/* ═══ EXPERT QUOTE ═══ */}
+          {/* EXPERT QUOTE */}
           {quote && sourceInfo && (
             <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/[0.06] to-primary/[0.02] border border-primary/10 p-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary/20 mb-2">
@@ -253,7 +266,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ KEY INSIGHT (bookmarkable) ═══ */}
+          {/* KEY INSIGHT (bookmarkable) */}
           <div className="mb-6 flex items-start gap-0 rounded-xl border border-primary/20 bg-primary/[0.04] overflow-hidden">
             <div className="w-1.5 shrink-0 self-stretch bg-primary" />
             <div className="flex-1 p-4 sm:p-5">
@@ -273,7 +286,7 @@ export default function LessonView({
             </div>
           </div>
 
-          {/* ═══ SOURCE ATTRIBUTION ═══ */}
+          {/* SOURCE ATTRIBUTION */}
           {sourceInfo && !quote && (
             <div className="mb-6 flex items-center gap-3 rounded-lg bg-muted/50 px-4 py-3">
               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
@@ -285,7 +298,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ TOOL SPOTLIGHT (Pro/AI) ═══ */}
+          {/* TOOL SPOTLIGHT (Pro/AI) */}
           {tools && tools.length > 0 && (
             <div className="mb-6">
               <Card className="border-amber-200/50 bg-amber-50/50">
@@ -303,7 +316,7 @@ export default function LessonView({
                           <p className="mt-0.5 text-[11px] font-medium text-amber-700">{tool.cost}</p>
                         </div>
                         <a href={tool.url} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">
-                          Open →
+                          Open
                         </a>
                       </div>
                     ))}
@@ -313,7 +326,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ REAL NUMBERS (Pro/AI) ═══ */}
+          {/* REAL NUMBERS (Pro/AI) */}
           {realNumbers && (
             <div className="mb-6 rounded-xl border border-emerald-200/50 bg-emerald-50/50 p-5">
               <div className="flex items-start gap-3">
@@ -328,7 +341,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ ACTION STEPS ═══ */}
+          {/* ACTION STEPS */}
           {lesson.action_step && (
             <div className="mb-6">
               <Card className="border-primary/15 bg-primary/[0.04]">
@@ -363,7 +376,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ REFLECTION ═══ */}
+          {/* REFLECTION */}
           {lesson.reflection_prompt && (
             <div className="mb-6">
               <Card>
@@ -390,7 +403,7 @@ export default function LessonView({
             </div>
           )}
 
-          {/* ═══ BOTTOM ACTIONS ═══ */}
+          {/* BOTTOM ACTIONS */}
           <div className="border-t pt-6">
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
               {prevLessonId ? (
@@ -408,14 +421,24 @@ export default function LessonView({
                 <div className="flex flex-col items-center gap-3 w-full sm:items-end sm:w-auto">
                   <p className="once-signature">One more step<span style={{color:"#4F46E5"}}>.</span> Once<span style={{color:"#4F46E5"}}>.</span></p>
                   <Button onClick={handleNext} size="lg" className="h-12 font-semibold w-full sm:w-auto">
-                    {nextLessonId ? "Next Lesson →" : "Back to Dashboard"}
+                    {nextLessonId ? "Next Lesson" : "Back to Dashboard"}
                   </Button>
                 </div>
               )}
             </div>
           </div>
-        </motion.article>
+        </article>
       </main>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.4s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

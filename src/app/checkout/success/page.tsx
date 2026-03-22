@@ -1,40 +1,31 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+const PLAN_DISPLAY: Record<string, { name: string; price: string }> = {
+  core: { name: "Once Core", price: "1,499" },
+  pro: { name: "Once Pro", price: "2,350" },
+  ai: { name: "Once AI Careers", price: "3,950" },
+};
+
 export default function CheckoutSuccessPage() {
+  const searchParams = useSearchParams();
+  const planKey = searchParams.get("plan") || "core";
+  const planInfo = PLAN_DISPLAY[planKey] || PLAN_DISPLAY.core;
+
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="w-full max-w-md text-center"
-      >
+      <div className="w-full max-w-md text-center animate-fade-in">
         {/* Brand moment */}
-        <motion.p
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8 font-display text-2xl font-semibold tracking-[-0.04em] sm:text-3xl"
-        >
+        <p className="mb-8 font-display text-2xl font-semibold tracking-[-0.04em] sm:text-3xl animate-scale-in">
           You made the decision.{" "}
           <span className="once-signature">Once<span style={{color:"#4F46E5"}}>.</span></span>
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", delay: 1.0, stiffness: 200 }}
-            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50"
-          >
+        <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 animate-pop" style={{ animationDelay: "0.6s" }}>
             <svg
               className="h-8 w-8 text-emerald-600"
               viewBox="0 0 24 24"
@@ -46,11 +37,17 @@ export default function CheckoutSuccessPage() {
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>
-          </motion.div>
+          </div>
 
-          <p className="mb-2 text-lg font-semibold text-foreground">Your path is unlocked.</p>
-          <p className="mb-8 text-sm text-muted-foreground">
+          <p className="mb-1 text-lg font-semibold text-foreground">Your path is unlocked.</p>
+          <p className="mb-2 text-sm font-medium text-foreground">
+            You purchased {planInfo.name} for &#8369;{planInfo.price}
+          </p>
+          <p className="mb-2 text-sm text-muted-foreground">
             All modules and lessons are ready. Your journey starts now.
+          </p>
+          <p className="mb-8 text-xs text-muted-foreground">
+            Check your email for your receipt.
           </p>
 
           <Button
@@ -58,10 +55,42 @@ export default function CheckoutSuccessPage() {
             size="lg"
             className="h-14 w-full px-8 text-base font-semibold"
           >
-            Start Your Path
+            Start Your First Lesson
           </Button>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pop {
+          from { transform: scale(0); }
+          50% { transform: scale(1.1); }
+          to { transform: scale(1); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.8s ease-out;
+        }
+        .animate-scale-in {
+          animation: scaleIn 0.6s ease-out 0.2s both;
+        }
+        .animate-slide-up {
+          animation: slideUp 0.5s ease-out both;
+        }
+        .animate-pop {
+          animation: pop 0.4s ease-out both;
+        }
+      `}</style>
     </div>
   );
 }

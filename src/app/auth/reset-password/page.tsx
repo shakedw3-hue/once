@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +14,8 @@ export default function ResetPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
@@ -37,15 +36,11 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md animate-fade-in-up">
         <div className="mb-8 text-center">
           <Link href="/" className="font-display text-2xl font-semibold tracking-[-0.04em]">
-            Once<span className="text-primary">.</span>
+            <span className="text-foreground">Once</span>
+            <span className="text-primary">.</span>
           </Link>
           <p className="mt-1 text-xs text-muted-foreground/60">
             The decision that changes everything.
@@ -88,7 +83,7 @@ export default function ResetPasswordPage() {
             </form>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }
