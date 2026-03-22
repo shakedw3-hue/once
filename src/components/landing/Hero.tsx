@@ -191,80 +191,90 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* ── Credibility — two rows: people + institutions ── */}
+          {/* ── Credibility — single unified block ── */}
           <motion.div
-            className="mt-16 sm:mt-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 2.4 }}
+            className="mt-14 sm:mt-20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2.2 }}
           >
-            {/* Row 1: People */}
-            <p
-              className="mb-3 text-[9px] font-semibold tracking-[0.25em] uppercase"
-              style={{ color: "rgba(255,255,255,0.15)" }}
+            <div
+              className="rounded-2xl p-6 sm:p-8"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                backdropFilter: "blur(8px)",
+              }}
             >
-              Built from the principles of
-            </p>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {["Warren Buffett", "Kobe Bryant", "Elon Musk", "Dalai Lama"].map((name, i) => (
-                <span
-                  key={name}
-                  className="text-[13px] font-medium tracking-tight sm:text-sm"
-                  style={{
-                    color: "rgba(255,255,255,0.25)",
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {name}
-                  {i < 3 && (
-                    <span className="ml-5 inline-block text-[8px]" style={{ color: "rgba(255,255,255,0.1)" }}>◆</span>
-                  )}
-                </span>
-              ))}
-              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.12)" }}>
-                & hundreds more
-              </span>
-            </div>
-
-            {/* Thin divider */}
-            <div className="my-6 h-px w-40" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.25), transparent)" }} />
-
-            {/* Row 2: Institutions — styled as research logos */}
-            <p
-              className="mb-4 text-[9px] font-semibold tracking-[0.25em] uppercase"
-              style={{ color: "rgba(255,255,255,0.2)" }}
-            >
-              Research sourced from
-            </p>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3 sm:gap-x-7">
-              {[
-                { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.85rem" },
-                { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "0.9rem" },
-                { name: "WHO", font: "Arial, sans-serif", weight: 800, spacing: "0.12em", size: "0.85rem" },
-                { name: "McKinsey", font: "Georgia, serif", weight: 400, spacing: "0.02em", size: "0.95rem", italic: true },
-                { name: "Forbes", font: "Georgia, serif", weight: 700, spacing: "-0.01em", size: "0.95rem", italic: true },
-              ].map((inst, i) => (
-                <span key={inst.name} className="flex items-center">
-                  <span
-                    className="select-none transition-colors duration-300 hover:text-white/50"
-                    style={{
-                      fontFamily: inst.font,
-                      fontWeight: inst.weight,
-                      letterSpacing: inst.spacing,
-                      fontSize: inst.size,
-                      fontStyle: inst.italic ? "italic" : "normal",
-                      color: "rgba(255,255,255,0.3)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {inst.name}
+              {/* Main statement */}
+              <p
+                className="mb-5 text-base font-medium leading-relaxed sm:text-lg"
+                style={{ color: "rgba(255,255,255,0.7)" }}
+              >
+                Built from the principles of{" "}
+                {["Warren Buffett", "Kobe Bryant", "Elon Musk", "the Dalai Lama"].map((name, i) => (
+                  <span key={name}>
+                    <span
+                      style={{
+                        color: "#fff",
+                        fontFamily: "'Playfair Display', Georgia, serif",
+                        fontStyle: "italic",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {name}
+                    </span>
+                    {i < 3 && (
+                      <span style={{ color: "rgba(255,255,255,0.3)" }}>
+                        {i < 2 ? ", " : " & "}
+                      </span>
+                    )}
                   </span>
-                  {i < 4 && (
-                    <span className="ml-5 sm:ml-7 inline-block h-3 w-px" style={{ background: "rgba(99,102,241,0.2)" }} />
-                  )}
+                ))}
+                <span style={{ color: "rgba(255,255,255,0.4)" }}>
+                  {" "}— and hundreds more.
                 </span>
-              ))}
+              </p>
+
+              {/* Divider */}
+              <div className="mb-5 h-px" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.2), rgba(99,102,241,0.05), transparent)" }} />
+
+              {/* Institutions row */}
+              <p
+                className="mb-4 text-[9px] font-semibold tracking-[0.25em] uppercase"
+                style={{ color: "rgba(255,255,255,0.25)" }}
+              >
+                Research sourced from
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-7">
+                {[
+                  { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.95rem" },
+                  { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "1rem" },
+                  { name: "WHO", font: "Arial, sans-serif", weight: 800, spacing: "0.12em", size: "0.95rem" },
+                  { name: "McKinsey", font: "Georgia, serif", weight: 400, spacing: "0.02em", size: "1.05rem", italic: true },
+                  { name: "Forbes", font: "Georgia, serif", weight: 700, spacing: "-0.01em", size: "1.05rem", italic: true },
+                ].map((inst, i) => (
+                  <span key={inst.name} className="flex items-center">
+                    <span
+                      className="select-none"
+                      style={{
+                        fontFamily: inst.font,
+                        fontWeight: inst.weight,
+                        letterSpacing: inst.spacing,
+                        fontSize: inst.size,
+                        fontStyle: inst.italic ? "italic" : "normal",
+                        color: "rgba(255,255,255,0.45)",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {inst.name}
+                    </span>
+                    {i < 4 && (
+                      <span className="ml-4 sm:ml-7 inline-block h-4 w-px" style={{ background: "rgba(99,102,241,0.15)" }} />
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
