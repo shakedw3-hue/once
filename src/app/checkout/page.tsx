@@ -24,7 +24,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   if (profile?.has_paid) redirect("/dashboard");
 
-  const selectedPlan = plan === "pro" ? "pro" : "core";
+  const selectedPlan = plan === "ai" ? "ai" : plan === "pro" ? "pro" : "core";
 
   return <CheckoutRedirect plan={selectedPlan} />;
 }
