@@ -4,7 +4,6 @@ import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
 import AssessmentDemo from "@/components/landing/AssessmentDemo";
-import Timeline from "@/components/landing/Timeline";
 import Testimonials from "@/components/landing/Testimonials";
 import StickyCTA from "@/components/landing/StickyCTA";
 import TrustBadges from "@/components/landing/TrustBadges";
@@ -18,160 +17,157 @@ export default function Home() {
     <>
       <Header />
       <main>
+        {/* ━━━ 1. HERO — Hook + CTA ━━━ */}
         <Hero />
 
-        {/* Credibility strip — below hero */}
-        <section className="mx-auto max-w-3xl px-5 -mt-8 mb-8 sm:-mt-12 sm:mb-12">
+        {/* ━━━ 2. CREDIBILITY — Immediate trust ━━━ */}
+        <section className="mx-auto max-w-3xl px-5 -mt-8 mb-4 sm:-mt-12 sm:mb-8">
           <CredibilityStrip />
         </section>
 
-        {/* The problem */}
-        <Section>
-          <h2 className="mb-3 text-section text-xl sm:text-2xl">
-            Most people spend years trying things that don&apos;t work.
-          </h2>
-          <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
-            Wrong courses. Wrong timing. Wrong order. Once starts differently.
-            We studied what actually works and built a system that tells you
-            exactly what you need, right now, based on where you actually are
-            in life.
-          </p>
-          <p className="text-sm font-medium">
-            Thousands of hours of research. One path. Built for you.
-          </p>
-          <p className="mt-6 once-signature">Once<span style={{color:"#4F46E5"}}>.</span></p>
+        {/* ━━━ 3. SOCIAL PROOF — Big numbers early ━━━ */}
+        <Section tight>
+          <SocialProofStrip />
         </Section>
 
-        {/* How Once works */}
+        {/* ━━━ 4. PROBLEM — Agitate ━━━ */}
         <Section>
-          <div className="rounded-2xl border bg-primary/[0.03] border-primary/10 p-6 sm:p-10">
-            <p className="mb-2 text-label text-primary">How Once works</p>
-            <h2 className="mb-8 text-section text-xl sm:text-2xl">
-              Four steps. One path.
-            </h2>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { title: "Diagnose", icon: <IconCompass size="sm" />, desc: "We find exactly where you are. 15 questions across Money, Mind, Body, and Spirit. No assumptions." },
-                { title: "Match", icon: <IconMatch size="sm" />, desc: "We build one path. Yours. Based on your actual scores, not a catalog of courses." },
-                { title: "Learn", icon: <IconLearn size="sm" />, desc: "Thousands of hours of research. In 10 minutes a day. Every lesson is built from what the best minds already proved." },
-                { title: "Launch", icon: <IconRocket size="sm" />, desc: "Your first real income. Step by step. Pro members get practical skills for the Philippine market." },
-              ].map((item) => (
-                <div key={item.title} className="rounded-xl border bg-card p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    {item.icon}
-                    <h3 className="text-sm font-semibold">{item.title}</h3>
-                  </div>
-                  <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="mt-6 text-xs text-muted-foreground">
-              <Link href="/how-it-works" className="text-primary hover:underline">See the full breakdown →</Link>
-            </p>
-            <p className="mt-4 text-center once-signature">This is how change happens. Once<span style={{color:"#4F46E5"}}>.</span></p>
+          <h2 className="mb-3 text-section text-xl sm:text-2xl">
+            You&apos;ve tried courses. You&apos;ve watched videos.
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+            And nothing stuck. Not because you&apos;re lazy — because none of it
+            was built for where <span className="font-medium text-foreground">you</span> actually are.
+            Once is different. We start with your real scores, then build one
+            path. Yours.
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[
+              { label: "Wrong courses", icon: "✗", sub: "Generic content" },
+              { label: "Wrong order", icon: "✗", sub: "Random modules" },
+              { label: "No action", icon: "✗", sub: "Just theory" },
+              { label: "No results", icon: "✗", sub: "Money wasted" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-lg border border-red-100 bg-red-50/50 p-3 text-center">
+                <p className="text-lg text-red-400">{item.icon}</p>
+                <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                <p className="text-[10px] text-muted-foreground">{item.sub}</p>
+              </div>
+            ))}
           </div>
         </Section>
 
-        {/* The 4 pillars */}
+        {/* ━━━ 5. DEMO — Engagement hook (try before buy) ━━━ */}
+        <Section>
+          <div className="rounded-2xl border bg-primary/[0.03] border-primary/10 p-5 sm:p-8">
+            <p className="mb-1 text-label text-primary">Try it now — free</p>
+            <h2 className="mb-2 text-section text-xl sm:text-2xl">See your real scores</h2>
+            <p className="mb-5 text-sm text-muted-foreground">
+              Answer 2 questions. Watch your pillar scores shift in real time.
+            </p>
+            <AssessmentDemo />
+            <div className="mt-5 text-center">
+              <Button
+                render={<Link href="/auth/signup" />}
+                size="lg"
+                className="h-12 px-8 text-sm font-semibold shadow-lg shadow-primary/10"
+              >
+                Take the Full Assessment — Free
+              </Button>
+              <p className="mt-2 text-[10px] text-muted-foreground">15 questions. 10 minutes. Keep your results.</p>
+            </div>
+          </div>
+        </Section>
+
+        {/* ━━━ 6. TESTIMONIALS — Proof right after they tried ━━━ */}
+        <Section>
+          <Testimonials />
+        </Section>
+
+        {/* ━━━ 7. HOW IT WORKS + PRODUCT — Solution ━━━ */}
+        <Section>
+          <p className="mb-2 text-label text-primary">How Once works</p>
+          <h2 className="mb-8 text-section text-xl sm:text-2xl">
+            Four steps. One path.
+          </h2>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { title: "Diagnose", icon: <IconCompass size="sm" />, desc: "15 questions across Money, Mind, Body, and Spirit. We find exactly where you are." },
+              { title: "Match", icon: <IconMatch size="sm" />, desc: "We build one path based on your scores. Not a catalog — your path." },
+              { title: "Learn", icon: <IconLearn size="sm" />, desc: "10 minutes a day. Every lesson is built from what the world's best minds already proved." },
+              { title: "Launch", icon: <IconRocket size="sm" />, desc: "Pro members get practical income skills for the Philippine market. Real pesos." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-xl border bg-card p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  {item.icon}
+                  <h3 className="text-sm font-semibold">{item.title}</h3>
+                </div>
+                <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* ━━━ 8. PHONE MOCKUP — Show the product ━━━ */}
+        <Section>
+          <h2 className="mb-2 text-center text-section text-xl sm:text-2xl">Your personal dashboard</h2>
+          <p className="mb-8 text-center text-sm text-muted-foreground">
+            Track your scores, streaks, and lessons — all in one place.
+          </p>
+          <PhoneMockup />
+        </Section>
+
+        {/* ━━━ 9. THE 4 PILLARS — Detail ━━━ */}
         <Section>
           <h2 className="mb-2 text-section text-xl sm:text-2xl">The 4 pillars</h2>
           <p className="mb-6 text-sm text-muted-foreground">
             Weakness in one quietly drains the others.
           </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
             {[
               {
                 name: "Money", color: "#F59E0B", bg: "bg-amber-50", border: "border-amber-200",
                 icon: <IconMoney size="sm" />,
-                desc: "Built from what the world's most successful investors actually do.",
-                names: "Warren Buffett · Ray Dalio · Robert Kiyosaki · Elon Musk",
+                names: "Buffett · Dalio · Kiyosaki",
               },
               {
                 name: "Mind", color: "#A78BFA", bg: "bg-violet-50", border: "border-violet-200",
                 icon: <IconMind size="sm" />,
-                desc: "Built from decades of neuroscience research on how high performers think and decide.",
-                names: "Andrew Huberman · Kobe Bryant · James Clear · Cal Newport",
+                names: "Huberman · Clear · Newport",
               },
               {
                 name: "Body", color: "#34D399", bg: "bg-emerald-50", border: "border-emerald-200",
                 icon: <IconBody size="sm" />,
-                desc: "Built from the science of energy, sleep, and performance.",
-                names: "LeBron James · Cristiano Ronaldo · Matthew Walker · Peter Attia",
+                names: "Walker · Attia · LeBron",
               },
               {
                 name: "Spirit", color: "#60A5FA", bg: "bg-blue-50", border: "border-blue-200",
                 icon: <IconSpirit size="sm" />,
-                desc: "Built from the philosophy of people who found meaning in the hardest circumstances.",
-                names: "Dalai Lama · Oprah Winfrey · Viktor Frankl · Ryan Holiday",
+                names: "Dalai Lama · Frankl · Holiday",
               },
             ].map((p) => (
-              <div key={p.name} className={`rounded-xl border ${p.border} ${p.bg} p-4`}>
-                <div className="mb-2 flex items-center gap-2.5">
+              <div key={p.name} className={`rounded-xl border ${p.border} ${p.bg} p-3 sm:p-4`}>
+                <div className="mb-1.5 flex items-center gap-2">
                   {p.icon}
                   <span className="text-sm font-semibold">{p.name}</span>
                 </div>
-                <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
-                <p className="text-[10px] text-muted-foreground/60">
-                  Inspired by {p.names}
-                </p>
+                <p className="text-[10px] text-muted-foreground/70">{p.names}</p>
               </div>
             ))}
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
+          <p className="mt-3 text-xs text-muted-foreground">
             <Link href="/pillars" className="text-primary hover:underline">See all pillars and modules →</Link>
           </p>
         </Section>
 
-        {/* Interactive demo */}
-        <Section>
-          <h2 className="mb-2 text-section text-xl sm:text-2xl">Try it right now</h2>
-          <p className="mb-5 text-sm text-muted-foreground">
-            Answer 2 questions. Watch your scores shift in real time.
-          </p>
-          <AssessmentDemo />
-        </Section>
-
-        {/* Your journey */}
-        <Section>
-          <h2 className="mb-2 text-section text-xl sm:text-2xl">Your journey with Once</h2>
-          <p className="mb-8 text-sm text-muted-foreground">
-            Simple. Personal. Life-changing.
-          </p>
-          <Timeline />
-        </Section>
-
-        {/* What you get — phone mockup */}
-        <Section>
-          <h2 className="mb-2 text-section text-xl sm:text-2xl">Your personal dashboard</h2>
-          <p className="mb-8 text-sm text-muted-foreground">
-            Everything you need. One screen. Built around your scores.
-          </p>
-          <PhoneMockup />
-        </Section>
-
-        {/* Social proof strip */}
-        <Section>
-          <SocialProofStrip />
-        </Section>
-
-        {/* Trust badges */}
-        <Section>
-          <TrustBadges />
-        </Section>
-
-        {/* Pricing */}
+        {/* ━━━ 10. PRICING + TRUST — Decision moment ━━━ */}
         <Section id="pricing">
           <h2 className="mb-2 text-section text-xl sm:text-2xl">
             Three paths. One decision.
           </h2>
-          <p className="mb-3 text-sm text-muted-foreground">
-            Most people spend ₱5,000 to ₱20,000 on courses they never finish.
-            Once costs less and tells you exactly which path is right for you.
-          </p>
           <p className="mb-8 text-sm text-muted-foreground">
-            All start with the same free assessment. All are one-time. No subscription.
+            One-time payment. Lifetime access. No subscription. No upsells.
           </p>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -191,7 +187,7 @@ export default function Home() {
             <div className="relative rounded-2xl border-2 border-primary/20 bg-primary/[0.03] p-5 card-elevated">
               <div className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground">Most Popular</div>
               <p className="mb-1 text-label text-primary">Once Pro</p>
-              <p className="mb-1 text-xs text-muted-foreground">Your first side income. ₱15,000 to ₱40,000/month.</p>
+              <p className="mb-1 text-xs text-muted-foreground">Your first side income. ₱15,000–₱40,000/month.</p>
               <div className="mb-4 flex items-baseline gap-1">
                 <span className="text-sm text-muted-foreground">₱</span>
                 <span className="text-display text-3xl">2,350</span>
@@ -225,86 +221,24 @@ export default function Home() {
           <p className="mt-4 text-center text-xs text-muted-foreground">
             GCash and Maya accepted. No subscription. No upsells. Make your money back on your first client.
           </p>
-          <p className="mt-4 text-center once-signature">One investment. One path. Once<span style={{color:"#4F46E5"}}>.</span></p>
-        </Section>
 
-        {/* Comparison */}
-        <Section>
-          <h2 className="mb-2 text-section text-xl sm:text-2xl">How it compares</h2>
-          <p className="mb-6 text-sm text-muted-foreground">Once vs. everything else you&apos;ve tried.</p>
-
-          {/* Mobile: stacked cards */}
-          <div className="space-y-3 sm:hidden">
-            {[
-              { feature: "Price", once: "₱1,499–3,950 one-time", others: "₱2,000+ or ₱5,000+/mo" },
-              { feature: "Personalized", once: "Based on your actual scores", others: "Same content for everyone" },
-              { feature: "Sources", once: "100+ world-class minds", others: "One creator or one coach" },
-              { feature: "Format", once: "10-min daily lessons + action", others: "Long videos or live calls" },
-              { feature: "Income skills", once: "Built-in (Pro & AI plans)", others: "Usually just theory" },
-              { feature: "Recurring cost", once: "None. Pay once.", others: "Monthly subscription" },
-            ].map((row) => (
-              <div key={row.feature} className="rounded-xl border bg-card p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{row.feature}</p>
-                <div className="flex items-start gap-2 mb-1.5">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <p className="text-xs font-semibold text-foreground">{row.once}</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  <p className="text-xs text-muted-foreground">{row.others}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop: table */}
-          <div className="hidden sm:block overflow-x-auto rounded-xl border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground" />
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-primary">Once</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Online course</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Coaching</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y text-xs">
-                {[
-                  ["Price", "₱1,499/2,350/3,950 one-time", "₱2,000+", "₱5,000+/mo"],
-                  ["Built for you", "✓ Based on your scores", "✗ Same for all", "✓"],
-                  ["Sources", "✓ 100+ world-class minds", "✗ One creator", "✗ One coach"],
-                  ["Format", "10-min actionable lessons", "Video lectures", "Calls"],
-                  ["Income skills", "✓ Pro & AI plans", "✗ Usually theory", "Depends"],
-                  ["Recurring cost", "None", "Often subscription", "Monthly"],
-                ].map((row) => (
-                  <tr key={row[0]}>
-                    <td className="px-4 py-2.5 font-medium">{row[0]}</td>
-                    <td className="px-4 py-2.5 font-medium text-primary">{row[1]}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{row[2]}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{row[3]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Trust badges right under pricing */}
+          <div className="mt-8">
+            <TrustBadges />
           </div>
         </Section>
 
-        {/* Testimonials */}
-        <Section>
-          <Testimonials />
-        </Section>
-
-        {/* FAQ */}
+        {/* ━━━ 11. FAQ — Handle objections ━━━ */}
         <Section>
           <h2 className="mb-8 text-section text-xl sm:text-2xl">Common questions</h2>
           <div className="space-y-5">
             {[
-              { q: "Where does the content come from?", a: "Every lesson is built from published research and books by the world's leading thinkers in each field. We cite the source in each lesson. Nothing is invented." },
               { q: "Why should I trust this?", a: "You should not. Not until you try the free assessment. See if the results match what you already know about yourself. If they do, the path will help. If not, you have not paid anything." },
-              { q: "What is the difference between Core, Pro, and AI Careers?", a: "Core gives you the assessment and a personalized path with 25 lessons. Pro adds the income track: 100 additional lessons on social media management, e-commerce, freelancing, and building online side income. AI Careers includes everything in Pro plus three AI-powered career tracks: AI Business Services, AI Content & Design, and AI Web & No-Code. All with Philippine-specific tools and real peso numbers." },
               { q: "Is this another online course?", a: "No. No video lectures. No guru. Every lesson is a 10-minute worksheet: what the research says, one action step for today, one reflection question. You do. You do not watch." },
-              { q: "Will there be upsells?", a: "No. Your plan gets you everything in it. No hidden tier. No add-ons." },
+              { q: "Where does the content come from?", a: "Every lesson is built from published research and books by the world's leading thinkers in each field. We cite the source in each lesson. Nothing is invented." },
+              { q: "What is the difference between Core, Pro, and AI Careers?", a: "Core gives you the assessment and a personalized path with 25 lessons. Pro adds the income track: 100 additional lessons on social media management, e-commerce, freelancing, and building online side income. AI Careers includes everything in Pro plus three AI-powered career tracks. All with Philippine-specific tools and real peso numbers." },
               { q: "Can I see results before paying?", a: "Yes. The assessment is free. You see your scores and your path. You only pay if you want the full lessons." },
+              { q: "Will there be upsells?", a: "No. Your plan gets you everything in it. No hidden tier. No add-ons. No subscription." },
             ].map((faq) => (
               <div key={faq.q}>
                 <h3 className="mb-1 text-sm font-semibold">{faq.q}</h3>
@@ -314,7 +248,7 @@ export default function Home() {
           </div>
         </Section>
 
-        {/* Final CTA */}
+        {/* ━━━ 12. FINAL CTA ━━━ */}
         <section className="mx-auto max-w-3xl px-5 pb-16">
           <div className="rounded-2xl border-2 border-primary/15 bg-primary/[0.03] p-8 text-center sm:p-12 card-elevated">
             <h2 className="mb-3 text-display text-2xl sm:text-3xl">
@@ -343,9 +277,9 @@ export default function Home() {
   );
 }
 
-function Section({ children, id }: { children: React.ReactNode; id?: string }) {
+function Section({ children, id, tight }: { children: React.ReactNode; id?: string; tight?: boolean }) {
   return (
-    <section id={id} className="mx-auto max-w-3xl px-5 py-16 sm:py-24">
+    <section id={id} className={`mx-auto max-w-3xl px-5 ${tight ? "py-8 sm:py-12" : "py-14 sm:py-20"}`}>
       {children}
     </section>
   );
