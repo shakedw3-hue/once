@@ -53,12 +53,12 @@ export default async function LessonPage({ params }: Props) {
   const { data: allLessons } = await supabase
     .from("lessons")
     .select("id, order")
-    .eq("module_id", moduleId)
-    .order("order");
+    .eq("module_id", moduleId);
 
-  const currentIndex = (allLessons ?? []).findIndex((l) => l.id === lessonId);
-  const nextLessonId = allLessons?.[currentIndex + 1]?.id ?? null;
-  const prevLessonId = allLessons?.[currentIndex - 1]?.id ?? null;
+  const sortedLessons = (allLessons ?? []).sort((a, b) => a.order - b.order);
+  const currentIndex = sortedLessons.findIndex((l) => l.id === lessonId);
+  const nextLessonId = sortedLessons[currentIndex + 1]?.id ?? null;
+  const prevLessonId = sortedLessons[currentIndex - 1]?.id ?? null;
 
   return (
     <LessonView
@@ -69,6 +69,7 @@ export default async function LessonPage({ params }: Props) {
       prevLessonId={prevLessonId}
       userId={user.id}
       isPro={isPro}
+      totalLessonsInModule={(allLessons ?? []).length}
     />
   );
 }
