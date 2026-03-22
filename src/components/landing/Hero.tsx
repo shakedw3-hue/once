@@ -167,14 +167,16 @@ export default function Hero() {
                 WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
               }}
             >
-              <div className="marquee-track">
+              <div className="marquee-track" style={{ display: "flex", gap: "2rem", whiteSpace: "nowrap" }}>
                 {[0, 1].map((setIdx) => (
-                  <div key={setIdx} className="flex shrink-0 items-center gap-8 sm:gap-12">
+                  <div key={setIdx} style={{ display: "flex", gap: "2rem", paddingRight: "2rem", flexShrink: 0 }}>
                     {names.map((name) => (
                       <span
                         key={`${setIdx}-${name}`}
-                        className="shrink-0 text-base font-medium sm:text-lg"
                         style={{
+                          flexShrink: 0,
+                          fontSize: "1rem",
+                          fontWeight: 500,
                           color: "rgba(255,255,255,0.5)",
                           fontFamily: "'Playfair Display', Georgia, serif",
                           fontStyle: "italic",
@@ -221,7 +223,7 @@ export default function Hero() {
           .hero-fade{opacity:0;transform:translateY(20px);animation:hf .6s ease-out both}
           .hero-fade-only{opacity:0;animation:hfo .4s ease-out both}
           .pillar-bar{transform:scaleX(0);transform-origin:left;animation:pb .8s ease-out both}
-          .marquee-track{display:flex;gap:2rem;white-space:nowrap;animation:mq 12s linear infinite}
+          .marquee-track{animation:mq 25s linear infinite}
           @keyframes hf{to{opacity:1;transform:translateY(0)}}
           @keyframes hfo{to{opacity:1}}
           @keyframes pb{to{transform:scaleX(1)}}
