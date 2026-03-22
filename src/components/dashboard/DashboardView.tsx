@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,18 +100,18 @@ export default function DashboardView({
       <main className="mx-auto max-w-3xl px-5 py-8 sm:py-10">
 
         {/* Greeting */}
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <div className="mb-6">
           <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
             {hasStarted ? `Welcome back, ${firstName}.` : `${firstName}, your path starts here.`}
           </h1>
           <p className="text-sm text-muted-foreground">
             {totalCompleted} of {totalLessons} lessons completed.
           </p>
-        </motion.div>
+        </div>
 
         {/* Start here CTA */}
         {!hasStarted && firstLessonLink && (
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
+          <div className="mb-8">
             <Card className="overflow-hidden border-2 border-primary/30 shadow-md shadow-primary/10">
               <div className="h-1.5 bg-gradient-to-r from-primary to-primary/60" />
               <CardContent className="p-5">
@@ -123,11 +122,11 @@ export default function DashboardView({
                 </Button>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         )}
 
         {/* Overall progress */}
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-8">
+        <div className="mb-8">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
@@ -142,7 +141,7 @@ export default function DashboardView({
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* ═══════════════════════════════════════ */}
         {/* PRIMARY PATH — all lessons visible      */}
@@ -165,7 +164,7 @@ export default function DashboardView({
         {/* ═══════════════════════════════════════ */}
 
         {isPro && (
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-10">
+          <div className="mb-10">
             <h2 className="mb-1 font-display text-lg font-semibold tracking-tight sm:text-xl">Your Income Track</h2>
 
             {incomeUnlocked ? (
@@ -232,7 +231,7 @@ export default function DashboardView({
                 </Card>
               </>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Footer */}
@@ -261,7 +260,7 @@ function PathSection({ pathData, isPrimary }: { pathData: PathData; isPrimary?: 
   const firstIncompleteIdx = allLessons.findIndex((l) => !l.completed);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: isPrimary ? 0.25 : 0.35 }} className="mb-10">
+    <div className="mb-10">
       <div className="mb-4 flex items-center gap-3">
         <ModuleIllustration pillar={pathData.pillar} size="sm" />
         <div>
@@ -306,7 +305,7 @@ function PathSection({ pathData, isPrimary }: { pathData: PathData; isPrimary?: 
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
