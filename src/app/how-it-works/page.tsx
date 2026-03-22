@@ -79,7 +79,7 @@ export default function HowItWorksPage() {
           </p>
           <p>Growing as a person is the foundation. Growing your income is the launch.</p>
         </Step>
-        <p className="mt-8 text-center once-signature">This is how change happens. Once<span className="once-dot">.</span></p>
+        <p className="mt-8 text-center once-signature">This is how change happens. Once<span style={{color:"#4F46E5"}}>.</span></p>
       </div>
 
       <div className="mb-8 flex justify-end">

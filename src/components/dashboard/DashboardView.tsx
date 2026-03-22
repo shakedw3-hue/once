@@ -92,7 +92,7 @@ export default function DashboardView({
             </h1>
             <p className="text-muted-foreground">
               Your path is waiting.{" "}
-              <span className="once-signature">Once<span className="once-dot">.</span></span>
+              <span className="once-signature">Once<span style={{color:"#4F46E5"}}>.</span></span>
             </p>
           </motion.div>
 

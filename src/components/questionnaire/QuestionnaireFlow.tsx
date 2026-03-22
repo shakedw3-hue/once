@@ -209,7 +209,7 @@ export default function QuestionnaireFlow() {
             transition={{ delay: 2.0 }}
             className="mt-8 once-signature"
           >
-            Ten minutes. Honest answers. Once<span className="once-dot">.</span>
+            Ten minutes. Honest answers. Once<span style={{color:"#4F46E5"}}>.</span>
           </motion.p>
         </motion.div>
       </div>
@@ -271,7 +271,7 @@ export default function QuestionnaireFlow() {
             transition={{ delay: 3.0 }}
             className="mt-4 once-signature text-background"
           >
-            Once<span className="once-dot">.</span>
+            Once<span style={{color:"#4F46E5"}}>.</span>
           </motion.p>
         </motion.div>
       </div>

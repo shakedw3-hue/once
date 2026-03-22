@@ -371,7 +371,7 @@ export default function ProfileReveal({
                 Not sure? Start with Core ₱1,499. You can upgrade anytime.
               </p>
 
-              <p className="mt-6 text-center once-signature">One investment. One path. Once<span className="once-dot">.</span></p>
+              <p className="mt-6 text-center once-signature">One investment. One path. Once<span style={{color:"#4F46E5"}}>.</span></p>
             </motion.div>
           </>
         ) : (

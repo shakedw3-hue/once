@@ -30,7 +30,7 @@ export default function Home() {
           <p className="text-sm font-medium">
             Thousands of hours of research. One path. Built for you.
           </p>
-          <p className="mt-6 once-signature">Once<span className="once-dot">.</span></p>
+          <p className="mt-6 once-signature">Once<span style={{color:"#4F46E5"}}>.</span></p>
         </Section>
 
         {/* How Once works */}
@@ -61,7 +61,7 @@ export default function Home() {
             <p className="mt-6 text-xs text-muted-foreground">
               <Link href="/how-it-works" className="text-primary hover:underline">See the full breakdown →</Link>
             </p>
-            <p className="mt-4 text-center once-signature">This is how change happens. Once<span className="once-dot">.</span></p>
+            <p className="mt-4 text-center once-signature">This is how change happens. Once<span style={{color:"#4F46E5"}}>.</span></p>
           </div>
         </Section>
 
@@ -197,7 +197,7 @@ export default function Home() {
           <p className="mt-4 text-center text-xs text-muted-foreground">
             GCash and Maya accepted. No subscription. No upsells. Make your money back on your first client.
           </p>
-          <p className="mt-4 text-center once-signature">One investment. One path. Once<span className="once-dot">.</span></p>
+          <p className="mt-4 text-center once-signature">One investment. One path. Once<span style={{color:"#4F46E5"}}>.</span></p>
         </Section>
 
         {/* Comparison */}
@@ -278,7 +278,7 @@ export default function Home() {
             >
               Do It Once
             </Button>
-            <p className="mt-6 once-signature">Once<span className="once-dot">.</span></p>
+            <p className="mt-6 once-signature">Once<span style={{color:"#4F46E5"}}>.</span></p>
           </div>
         </section>
       </main>

@@ -19,7 +19,7 @@ export default function Hero() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mb-6 text-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.25rem]"
             >
-              Once.{" "}
+              Once<span style={{color:"#4F46E5"}}>.</span>{" "}
               <span className="text-muted-foreground">
                 The decision that changes everything.
               </span>

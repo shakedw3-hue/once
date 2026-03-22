@@ -270,7 +270,7 @@ export default function PricingPage() {
         >
           Do It Once
         </Button>
-        <p className="mt-6 text-center once-signature">One investment. One path. Once<span className="once-dot">.</span></p>
+        <p className="mt-6 text-center once-signature">One investment. One path. Once<span style={{color:"#4F46E5"}}>.</span></p>
       </div>
     </SiteLayout>
   );

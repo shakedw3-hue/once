@@ -149,7 +149,7 @@
     letter-spacing: -0.02em;
   }
   .once-dot {
-    color: oklch(0.44 0.19 265);
+    color: #4F46E5 !important;
   }
 
   /* Mobile-first button sizing */
