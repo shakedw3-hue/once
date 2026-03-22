@@ -16,6 +16,15 @@ export default async function LessonPage({ params }: Props) {
 
   if (!user) redirect("/auth/login");
 
+  // Get user plan to determine Pro/AI content
+  const { data: profile } = await supabase
+    .from("users")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+
+  const isPro = profile?.plan === "pro" || profile?.plan === "ai";
+
   const { data: lesson } = await supabase
     .from("lessons")
     .select("id, title, description, action_step, reflection_prompt, order, module_id")
@@ -26,7 +35,7 @@ export default async function LessonPage({ params }: Props) {
 
   const { data: mod } = await supabase
     .from("modules")
-    .select("id, title, order")
+    .select("id, title, description, order")
     .eq("id", moduleId)
     .single();
 
@@ -59,6 +68,7 @@ export default async function LessonPage({ params }: Props) {
       nextLessonId={nextLessonId}
       prevLessonId={prevLessonId}
       userId={user.id}
+      isPro={isPro}
     />
   );
 }
