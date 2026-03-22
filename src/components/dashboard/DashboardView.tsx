@@ -117,9 +117,11 @@ export default function DashboardView({
               <CardContent className="p-5">
                 <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">Start here</p>
                 <p className="mb-3 font-display text-lg font-semibold">{firstModuleTitle}</p>
-                <Button render={<Link href={firstLessonLink} />} size="lg" className="h-14 w-full text-base font-semibold shadow-lg shadow-primary/20">
-                  Begin Your First Lesson
-                </Button>
+                <a href={firstLessonLink}>
+                  <Button size="lg" className="h-14 w-full text-base font-semibold shadow-lg shadow-primary/20">
+                    Begin Your First Lesson
+                  </Button>
+                </a>
               </CardContent>
             </Card>
           </div>
@@ -363,8 +365,8 @@ function LessonRow({ lesson, moduleId, locked, isCurrent }: {
   if (locked) return <div>{content}</div>;
 
   return (
-    <Link href={`/dashboard/module/${moduleId}/lesson/${lesson.id}`} className="block">
+    <a href={`/dashboard/module/${moduleId}/lesson/${lesson.id}`} className="block">
       {content}
-    </Link>
+    </a>
   );
 }
