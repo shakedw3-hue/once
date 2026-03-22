@@ -54,3 +54,26 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
 
   redirect("/profile");
 }
+
+export async function devSkipPayment(plan: "core" | "pro" | "ai") {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      has_paid: true,
+      plan,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (error) return { error: error.message };
+
+  redirect("/dashboard");
+}

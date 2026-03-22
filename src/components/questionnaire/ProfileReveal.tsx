@@ -11,7 +11,8 @@ import { PILLARS, PILLAR_ORDER } from "@/lib/constants";
 import { normalizeScores } from "@/lib/questionnaire";
 import { theme } from "@/lib/theme";
 import Logo from "@/components/ui/logo";
-import type { Pillar, PillarScores, Recommendation } from "@/types/database";
+import { devSkipPayment } from "@/app/questionnaire/actions";
+import type { Pillar, PillarScores, Recommendation, Plan } from "@/types/database";
 
 interface ProfileRevealProps {
   fullName: string;

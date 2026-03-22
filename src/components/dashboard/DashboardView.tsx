@@ -168,7 +168,7 @@ export default function DashboardView({
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Core Modules</p>
                   <div className="space-y-2.5">
                     {pathGroup.coreMods.map((mod, i) => (
-                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} delay={groupIdx * 0.1 + i * 0.05} />
+                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} />
                     ))}
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export default function DashboardView({
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Pro Income Tracks</p>
                   <div className="space-y-2.5">
                     {pathGroup.proMods.map((mod, i) => (
-                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} delay={groupIdx * 0.1 + i * 0.05} isPro />
+                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} isPro />
                     ))}
                   </div>
                 </div>
@@ -210,49 +210,43 @@ export default function DashboardView({
   );
 }
 
-function ModuleCard({ mod, pillar, delay, isPro }: { mod: ModuleWithProgress; pillar: Pillar; delay: number; isPro?: boolean }) {
+function ModuleCard({ mod, pillar, isPro }: { mod: ModuleWithProgress; pillar: Pillar; delay?: number; isPro?: boolean }) {
   const modProgress = mod.totalLessons > 0 ? Math.round((mod.completedLessons / mod.totalLessons) * 100) : 0;
   const isComplete = modProgress === 100;
   const isActive = !isComplete && mod.completedLessons > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-    >
-      <Link href={`/dashboard/module/${mod.id}`}>
-        <Card className={`group transition-all hover:shadow-md hover:border-primary/20 ${isComplete ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="hidden sm:block">
-              <ModuleIllustration pillar={pillar} variant={mod.order} size="sm" />
-            </div>
+    <Link href={`/dashboard/module/${mod.id}`} className="block">
+      <div className={`group rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 ${isComplete ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:block">
+            <ModuleIllustration pillar={pillar} variant={mod.order} size="sm" />
+          </div>
 
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:hidden ${
-              isComplete ? "bg-emerald-50 text-emerald-600" : isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-            }`}>
-              {isComplete ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-              ) : mod.order}
-            </div>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:hidden ${
+            isComplete ? "bg-emerald-50 text-emerald-600" : isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+          }`}>
+            {isComplete ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            ) : mod.order}
+          </div>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold group-hover:text-primary transition-colors">{mod.title}</p>
-                {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
-              </div>
-              <p className="truncate text-sm text-muted-foreground">{mod.description}</p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold group-hover:text-primary transition-colors">{mod.title}</p>
+              {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
             </div>
+            <p className="truncate text-sm text-muted-foreground">{mod.description}</p>
+          </div>
 
-            <div className="hidden shrink-0 items-center gap-3 sm:flex">
-              <div className="w-20"><Progress value={modProgress} className="h-1.5" /></div>
-              <span className="w-14 text-right text-xs text-muted-foreground">{mod.completedLessons}/{mod.totalLessons}</span>
-            </div>
+          <div className="hidden shrink-0 items-center gap-3 sm:flex">
+            <div className="w-20"><Progress value={modProgress} className="h-1.5" /></div>
+            <span className="w-14 text-right text-xs text-muted-foreground">{mod.completedLessons}/{mod.totalLessons}</span>
+          </div>
 
-            <svg className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
+          <svg className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+        </div>
+      </div>
+    </Link>
   );
 }
