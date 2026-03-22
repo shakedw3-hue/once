@@ -174,16 +174,33 @@ export default function DashboardView({
                 </div>
               )}
 
-              {pathGroup.proMods.length > 0 && (
-                <div className="mb-6">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Pro Income Tracks</p>
-                  <div className="space-y-2.5">
-                    {pathGroup.proMods.map((mod, i) => (
-                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} isPro />
-                    ))}
+              {pathGroup.proMods.length > 0 && (() => {
+                const completedCoreCount = pathGroup.coreMods.filter((m) => m.completedLessons > 0).length;
+                const proUnlocked = completedCoreCount >= 3;
+                const remaining = 3 - completedCoreCount;
+                return (
+                  <div className="mb-6">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                      {recommendationTrack ? `${recommendationTrack} Track` : "Pro Income Tracks"}
+                    </p>
+                    {!proUnlocked && (
+                      <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <p className="text-xs text-amber-800">
+                          Complete <span className="font-semibold">{remaining} more Core module{remaining !== 1 ? "s" : ""}</span> to unlock your income track.
+                        </p>
+                      </div>
+                    )}
+                    <div className="space-y-2.5">
+                      {pathGroup.proMods.map((mod) => (
+                        <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} isPro locked={!proUnlocked} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </motion.div>
           ))}
 
@@ -210,43 +227,67 @@ export default function DashboardView({
   );
 }
 
-function ModuleCard({ mod, pillar, isPro }: { mod: ModuleWithProgress; pillar: Pillar; delay?: number; isPro?: boolean }) {
+function ModuleCard({ mod, pillar, isPro, locked }: { mod: ModuleWithProgress; pillar: Pillar; delay?: number; isPro?: boolean; locked?: boolean }) {
   const modProgress = mod.totalLessons > 0 ? Math.round((mod.completedLessons / mod.totalLessons) * 100) : 0;
   const isComplete = modProgress === 100;
   const isActive = !isComplete && mod.completedLessons > 0;
 
-  return (
-    <Link href={`/dashboard/module/${mod.id}`} className="block">
-      <div className={`group rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 ${isComplete ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:block">
-            <ModuleIllustration pillar={pillar} variant={mod.order} size="sm" />
-          </div>
+  const cardContent = (
+    <div className={`group rounded-xl border bg-card p-4 transition-all ${
+      locked ? "opacity-50 cursor-not-allowed" : "hover:shadow-md hover:border-primary/20"
+    } ${isComplete ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
+      <div className="flex items-center gap-4">
+        <div className="hidden sm:block">
+          <ModuleIllustration pillar={pillar} variant={mod.order} size="sm" />
+        </div>
 
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:hidden ${
-            isComplete ? "bg-emerald-50 text-emerald-600" : isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-          }`}>
-            {isComplete ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-            ) : mod.order}
-          </div>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:hidden ${
+          locked ? "bg-muted text-muted-foreground"
+            : isComplete ? "bg-emerald-50 text-emerald-600"
+            : isActive ? "bg-primary/10 text-primary"
+            : "bg-muted text-muted-foreground"
+        }`}>
+          {locked ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          ) : isComplete ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+          ) : mod.order}
+        </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold group-hover:text-primary transition-colors">{mod.title}</p>
-              {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
-            </div>
-            <p className="truncate text-sm text-muted-foreground">{mod.description}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className={`font-semibold ${locked ? "" : "group-hover:text-primary"} transition-colors`}>{mod.title}</p>
+            {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
+            {locked && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hidden text-muted-foreground sm:block">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            )}
           </div>
+          <p className="truncate text-sm text-muted-foreground">{mod.description}</p>
+        </div>
 
+        {!locked && (
           <div className="hidden shrink-0 items-center gap-3 sm:flex">
             <div className="w-20"><Progress value={modProgress} className="h-1.5" /></div>
             <span className="w-14 text-right text-xs text-muted-foreground">{mod.completedLessons}/{mod.totalLessons}</span>
           </div>
+        )}
 
-          <svg className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-        </div>
+        <svg className={`h-4 w-4 shrink-0 transition-transform ${locked ? "text-muted-foreground/30" : "text-muted-foreground/50 group-hover:translate-x-0.5"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
       </div>
+    </div>
+  );
+
+  if (locked) {
+    return <div>{cardContent}</div>;
+  }
+
+  return (
+    <Link href={`/dashboard/module/${mod.id}`} className="block">
+      {cardContent}
     </Link>
   );
 }
