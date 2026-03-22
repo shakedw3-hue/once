@@ -1,12 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { QUESTIONS } from "@/lib/questionnaire";
 import { submitQuestionnaire } from "@/app/questionnaire/actions";
 
 type Phase = "intro" | "questions" | "analyzing";
+
+const STORAGE_KEY = "once_questionnaire_progress";
+
+function loadProgress(): { answers: Record<string, number>; step: number } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data && typeof data.answers === "object" && typeof data.step === "number") {
+      return data;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function saveProgress(answers: Record<string, number>, step: number) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ answers, step }));
+  } catch { /* ignore */ }
+}
+
+function clearProgress() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch { /* ignore */ }
+}
 
 export default function QuestionnaireFlow() {
   const [phase, setPhase] = useState<Phase>("intro");
@@ -15,17 +42,43 @@ export default function QuestionnaireFlow() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [response, setResponse] = useState<string | null>(null);
   const [idleMsg, setIdleMsg] = useState(false);
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   const question = QUESTIONS[currentStep];
   const totalSteps = QUESTIONS.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
+  // Check for saved progress on mount
+  useEffect(() => {
+    const saved = loadProgress();
+    if (saved && saved.step > 0 && saved.step < totalSteps) {
+      setHasSavedProgress(true);
+    }
+  }, [totalSteps]);
+
+  // Idle message on intro
   useEffect(() => {
     if (phase === "intro") {
       const timer = setTimeout(() => setIdleMsg(true), 5000);
       return () => clearTimeout(timer);
     }
   }, [phase]);
+
+  const startFresh = useCallback(() => {
+    clearProgress();
+    setAnswers({});
+    setCurrentStep(0);
+    setPhase("questions");
+  }, []);
+
+  const resumeProgress = useCallback(() => {
+    const saved = loadProgress();
+    if (saved) {
+      setAnswers(saved.answers);
+      setCurrentStep(saved.step);
+    }
+    setPhase("questions");
+  }, []);
 
   function handleSelect(optionIndex: number) {
     if (selectedOption !== null) return;
@@ -35,12 +88,20 @@ export default function QuestionnaireFlow() {
     const newAnswers = { ...answers, [question.id]: optionIndex };
     setAnswers(newAnswers);
 
+    const nextStep = currentStep + 1;
+
+    // Save progress after every answer
+    if (nextStep < totalSteps) {
+      saveProgress(newAnswers, nextStep);
+    }
+
     setTimeout(() => {
-      if (currentStep < totalSteps - 1) {
-        setCurrentStep((s) => s + 1);
+      if (nextStep < totalSteps) {
+        setCurrentStep(nextStep);
         setSelectedOption(null);
         setResponse(null);
       } else {
+        clearProgress();
         setPhase("analyzing");
         doSubmit(newAnswers);
       }
@@ -68,7 +129,9 @@ export default function QuestionnaireFlow() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="mb-6 font-display text-2xl font-semibold text-background sm:text-3xl"
           >
-            This assessment is not for everyone.
+            {hasSavedProgress
+              ? "Welcome back."
+              : "This assessment is not for everyone."}
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -76,33 +139,61 @@ export default function QuestionnaireFlow() {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="mb-8 space-y-3 text-sm leading-relaxed text-background/60"
           >
-            <p>It takes 10 minutes. It requires honesty.</p>
-            <p>
-              And it will show you exactly what&apos;s holding you back,
-              and what to do about it.
-            </p>
-            <p>
-              Most people scroll past this.
-              <br />A few decide to actually find out.
-            </p>
+            {hasSavedProgress ? (
+              <>
+                <p>You left off in the middle. Your answers are saved.</p>
+                <p>Pick up where you stopped. It only takes a few more minutes.</p>
+              </>
+            ) : (
+              <>
+                <p>It takes 10 minutes. It requires honesty.</p>
+                <p>
+                  And it will show you exactly what&apos;s holding you back,
+                  and what to do about it.
+                </p>
+                <p>
+                  Most people scroll past this.
+                  <br />A few decide to actually find out.
+                </p>
+              </>
+            )}
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
+            className="flex flex-col gap-3"
           >
-            <Button
-              onClick={() => setPhase("questions")}
-              size="lg"
-              className="h-12 px-8 text-sm font-semibold bg-background text-foreground hover:bg-background/90"
-            >
-              I&apos;m ready to find out
-            </Button>
+            {hasSavedProgress ? (
+              <>
+                <Button
+                  onClick={resumeProgress}
+                  size="lg"
+                  className="h-14 w-full px-8 text-sm font-semibold bg-background text-foreground hover:bg-background/90"
+                >
+                  Continue where I left off
+                </Button>
+                <button
+                  onClick={startFresh}
+                  className="text-xs text-background/40 hover:text-background/60 transition-colors"
+                >
+                  Start over
+                </button>
+              </>
+            ) : (
+              <Button
+                onClick={startFresh}
+                size="lg"
+                className="h-14 w-full px-8 text-sm font-semibold bg-background text-foreground hover:bg-background/90 sm:w-auto"
+              >
+                I&apos;m ready to find out
+              </Button>
+            )}
           </motion.div>
 
           <AnimatePresence>
-            {idleMsg && (
+            {!hasSavedProgress && idleMsg && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
