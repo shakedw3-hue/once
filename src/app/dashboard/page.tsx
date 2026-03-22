@@ -40,7 +40,7 @@ export default async function DashboardPage() {
     pathPillars.push(profile.secondary_path as Pillar);
   }
 
-  // Step 1: Get paths
+  // Get paths
   const { data: pathRows } = await supabase
     .from("paths")
     .select("id, title, description, pillar")
@@ -48,37 +48,32 @@ export default async function DashboardPage() {
 
   const pathIds = (pathRows ?? []).map((p) => p.id);
 
-  // Step 2: Get modules for those paths
+  // Get modules (Core only: order 1-5)
   let allModules: { id: string; title: string; description: string; order: number; path_id: string }[] = [];
   if (pathIds.length > 0) {
     const { data: mods } = await supabase
       .from("modules")
       .select("id, title, description, order, path_id")
       .in("path_id", pathIds)
+      .lte("order", 5)
       .order("order");
     allModules = mods ?? [];
   }
 
-  // Filter modules by plan:
-  // Core: only order 1-5 (5 modules per path)
-  // Pro/AI: order 1-5 (core) + order 6-10 (one Pro track = 5 modules)
-  const isPro = profile.plan === "pro" || profile.plan === "ai";
-  const filteredModules = isPro
-    ? allModules.filter((m) => m.order <= 10)
-    : allModules.filter((m) => m.order <= 5);
+  const moduleIds = allModules.map((m) => m.id);
 
-  // Step 3: Get lessons for those modules
-  const moduleIds = filteredModules.map((m) => m.id);
-  let lessons: { id: string; module_id: string }[] = [];
+  // Get ALL lessons with titles and order
+  let lessons: { id: string; title: string; order: number; module_id: string }[] = [];
   if (moduleIds.length > 0) {
     const { data: lsns } = await supabase
       .from("lessons")
-      .select("id, module_id")
-      .in("module_id", moduleIds);
+      .select("id, title, order, module_id")
+      .in("module_id", moduleIds)
+      .order("order");
     lessons = lsns ?? [];
   }
 
-  // Step 4: Get user progress
+  // Get progress
   const { data: progress } = await supabase
     .from("user_progress")
     .select("lesson_id, completed")
@@ -88,58 +83,58 @@ export default async function DashboardPage() {
     (progress ?? []).filter((p) => p.completed).map((p) => p.lesson_id)
   );
 
-  // Build grouped path modules
-  const pathModules = pathPillars.map((pillar) => {
+  // Build flat lesson list per path with module grouping
+  const pathData = pathPillars.map((pillar) => {
     const pathRow = (pathRows ?? []).find((p) => p.pillar === pillar);
     if (!pathRow) return null;
 
-    const mods = filteredModules
+    const mods = allModules
       .filter((m) => m.path_id === pathRow.id)
       .map((mod) => {
-        const modLessons = lessons.filter((l) => l.module_id === mod.id);
-        const completedCount = modLessons.filter((l) => completedLessonIds.has(l.id)).length;
+        const modLessons = lessons
+          .filter((l) => l.module_id === mod.id)
+          .map((l) => ({
+            id: l.id,
+            title: l.title,
+            order: l.order,
+            moduleId: mod.id,
+            completed: completedLessonIds.has(l.id),
+          }));
+
         return {
           id: mod.id,
           title: mod.title,
-          description: mod.description,
           order: mod.order,
-          totalLessons: modLessons.length,
-          completedLessons: completedCount,
+          lessons: modLessons,
         };
       });
+
+    const allLessonsFlat = mods.flatMap((m) => m.lessons);
+    const completedCount = allLessonsFlat.filter((l) => l.completed).length;
 
     return {
       pillar,
       title: pathRow.title,
-      description: pathRow.description,
-      coreMods: mods.filter((m) => m.order <= 5),
-      proMods: mods.filter((m) => m.order > 5),
+      modules: mods,
+      totalLessons: allLessonsFlat.length,
+      completedLessons: completedCount,
     };
   }).filter(Boolean) as {
     pillar: Pillar;
     title: string;
-    description: string;
-    coreMods: Array<{ id: string; title: string; description: string; order: number; totalLessons: number; completedLessons: number }>;
-    proMods: Array<{ id: string; title: string; description: string; order: number; totalLessons: number; completedLessons: number }>;
+    modules: {
+      id: string;
+      title: string;
+      order: number;
+      lessons: { id: string; title: string; order: number; moduleId: string; completed: boolean }[];
+    }[];
+    totalLessons: number;
+    completedLessons: number;
   }[];
 
-  const totalLessons = lessons.length;
-  const totalCompleted = completedLessonIds.size;
-
-  // Get first lesson of first primary module for "Start here" CTA
-  const primaryGroup = pathModules.find((p) => p?.pillar === profile.primary_path);
-  const firstModule = primaryGroup?.coreMods[0];
-  let firstLessonId: string | null = null;
-  if (firstModule) {
-    const { data: firstLesson } = await supabase
-      .from("lessons")
-      .select("id")
-      .eq("module_id", firstModule.id)
-      .order("order")
-      .limit(1)
-      .single();
-    firstLessonId = firstLesson?.id ?? null;
-  }
+  // First lesson for "Start here"
+  const primaryData = pathData.find((p) => p.pillar === profile.primary_path);
+  const firstLesson = primaryData?.modules[0]?.lessons[0];
 
   return (
     <DashboardView
@@ -147,14 +142,11 @@ export default async function DashboardPage() {
       primaryPath={profile.primary_path as Pillar}
       secondaryPath={profile.secondary_path as Pillar}
       scores={(qa?.scores as PillarScores) ?? { money: 0, mind: 0, body: 0, spirit: 0 }}
-      pathModules={pathModules}
-      totalLessons={totalLessons}
-      totalCompleted={totalCompleted}
+      pathData={pathData}
       plan={profile.plan}
       recommendationTrack={profile.recommendation_track}
-      firstModuleId={firstModule?.id ?? null}
-      firstModuleTitle={firstModule?.title ?? null}
-      firstLessonId={firstLessonId}
+      firstLessonLink={firstLesson ? `/dashboard/module/${firstLesson.moduleId}/lesson/${firstLesson.id}` : null}
+      firstModuleTitle={primaryData?.modules[0]?.title ?? null}
     />
   );
 }
