@@ -59,9 +59,13 @@ export default async function DashboardPage() {
     allModules = mods ?? [];
   }
 
-  // Filter: Core users see only order 1-5, Pro/AI see all
+  // Filter modules by plan:
+  // Core: only order 1-5 (5 modules per path)
+  // Pro/AI: order 1-5 (core) + order 6-10 (one Pro track = 5 modules)
   const isPro = profile.plan === "pro" || profile.plan === "ai";
-  const filteredModules = isPro ? allModules : allModules.filter((m) => m.order <= 5);
+  const filteredModules = isPro
+    ? allModules.filter((m) => m.order <= 10)
+    : allModules.filter((m) => m.order <= 5);
 
   // Step 3: Get lessons for those modules
   const moduleIds = filteredModules.map((m) => m.id);
