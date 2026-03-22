@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { createServiceClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import AdminDateFilter from "./AdminDateFilter";
