@@ -18,7 +18,7 @@ const QUESTION_LABELS: Record<string, { question: string; options: string[] }> =
 export default async function InsightsPage() {
   const db = createServiceClient();
 
-  const { data: users } = await db.from("users").select("id, primary_path, secondary_path, plan, recommendation_plan, recommendation_track, has_paid, income_target, digital_comfort, created_at");
+  const { data: users } = await db.from("users").select("id, primary_path, secondary_path, plan, recommendation_plan, recommendation_track, has_paid, income_target, digital_comfort, created_at, age, location, occupation, bought_courses_before");
   const { data: answers } = await db.from("questionnaire_answers").select("user_id, answers, scores");
   const { data: progress } = await db.from("user_progress").select("user_id, lesson_id, completed").eq("completed", true);
   const { data: payments } = await db.from("payments").select("user_id, amount, status").eq("status", "completed");
@@ -274,6 +274,220 @@ export default async function InsightsPage() {
           ))}
         </div>
         <Takeaway text="Use the highest-converting answer profiles in your Facebook ad targeting. Lead with the pain points these users selected." />
+      </Section>
+
+      {/* ═══ INSIGHT 8: Demographics ═══ */}
+      <Section title="👥 Who Are Your Users?" sub="Age, location, occupation breakdown with conversion rates">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Age distribution */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Age Groups</p>
+              <div className="space-y-2">
+                {(() => {
+                  const ageBuckets = [
+                    { label: "16-20", min: 16, max: 20 },
+                    { label: "21-25", min: 21, max: 25 },
+                    { label: "26-30", min: 26, max: 30 },
+                    { label: "31-35", min: 31, max: 35 },
+                    { label: "36-40", min: 36, max: 40 },
+                    { label: "41+", min: 41, max: 100 },
+                  ];
+                  return ageBuckets.map(b => {
+                    const inBucket = (users ?? []).filter(u => {
+                      const age = (u as Record<string, unknown>).age as number | null;
+                      return age && age >= b.min && age <= b.max;
+                    });
+                    const paid = inBucket.filter(u => u.has_paid).length;
+                    const rate = inBucket.length > 0 ? Math.round((paid / inBucket.length) * 100) : 0;
+                    return (
+                      <div key={b.label} className="flex items-center justify-between">
+                        <span className="text-sm">{b.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{inBucket.length} users</span>
+                          {inBucket.length > 0 && <Badge variant={rate >= 50 ? "default" : "secondary"} className="text-[9px]">{rate}% paid</Badge>}
+                        </div>
+                      </div>
+                    );
+                  }).filter(el => {
+                    const props = el.props;
+                    return true; // show all
+                  });
+                })()}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top locations */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Top Locations</p>
+              <div className="space-y-2">
+                {(() => {
+                  const locMap: Record<string, { total: number; paid: number }> = {};
+                  (users ?? []).forEach(u => {
+                    const loc = (u as Record<string, unknown>).location as string | null;
+                    if (!loc) return;
+                    const normalized = loc.trim().toLowerCase();
+                    if (!locMap[normalized]) locMap[normalized] = { total: 0, paid: 0 };
+                    locMap[normalized].total++;
+                    if (u.has_paid) locMap[normalized].paid++;
+                  });
+                  return Object.entries(locMap)
+                    .sort((a, b) => b[1].total - a[1].total)
+                    .slice(0, 8)
+                    .map(([loc, data]) => (
+                      <div key={loc} className="flex items-center justify-between">
+                        <span className="text-sm capitalize">{loc}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{data.total}</span>
+                          {data.total > 0 && <Badge variant="secondary" className="text-[9px]">{Math.round((data.paid / data.total) * 100)}%</Badge>}
+                        </div>
+                      </div>
+                    ));
+                })()}
+                {(users ?? []).filter(u => (u as Record<string, unknown>).location).length === 0 && (
+                  <p className="text-xs text-muted-foreground">No location data yet</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top occupations */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Top Occupations</p>
+              <div className="space-y-2">
+                {(() => {
+                  const occMap: Record<string, { total: number; paid: number }> = {};
+                  (users ?? []).forEach(u => {
+                    const occ = (u as Record<string, unknown>).occupation as string | null;
+                    if (!occ) return;
+                    const normalized = occ.trim().toLowerCase();
+                    if (!occMap[normalized]) occMap[normalized] = { total: 0, paid: 0 };
+                    occMap[normalized].total++;
+                    if (u.has_paid) occMap[normalized].paid++;
+                  });
+                  return Object.entries(occMap)
+                    .sort((a, b) => b[1].total - a[1].total)
+                    .slice(0, 8)
+                    .map(([occ, data]) => (
+                      <div key={occ} className="flex items-center justify-between">
+                        <span className="text-sm capitalize">{occ}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{data.total}</span>
+                          {data.total > 0 && <Badge variant="secondary" className="text-[9px]">{Math.round((data.paid / data.total) * 100)}%</Badge>}
+                        </div>
+                      </div>
+                    ));
+                })()}
+                {(users ?? []).filter(u => (u as Record<string, unknown>).occupation).length === 0 && (
+                  <p className="text-xs text-muted-foreground">No occupation data yet</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bought courses before */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Previous Course Buyers</p>
+              {(() => {
+                const bought = (users ?? []).filter(u => (u as Record<string, unknown>).bought_courses_before === true);
+                const notBought = (users ?? []).filter(u => (u as Record<string, unknown>).bought_courses_before === false);
+                const boughtPaid = bought.filter(u => u.has_paid).length;
+                const notBoughtPaid = notBought.filter(u => u.has_paid).length;
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Bought before</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{bought.length} users</span>
+                        {bought.length > 0 && <Badge variant="default" className="text-[9px]">{Math.round((boughtPaid / bought.length) * 100)}% paid</Badge>}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">First time</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{notBought.length} users</span>
+                        {notBought.length > 0 && <Badge variant="secondary" className="text-[9px]">{Math.round((notBoughtPaid / notBought.length) * 100)}% paid</Badge>}
+                      </div>
+                    </div>
+                    {bought.length === 0 && notBought.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No data yet</p>
+                    )}
+                  </div>
+                );
+              })()}
+              <Takeaway text="If previous course buyers convert higher, target them in ads. If first-timers convert well, emphasize 'this is not like other courses.'" />
+            </CardContent>
+          </Card>
+        </div>
+      </Section>
+
+      {/* ═══ INSIGHT 9: Ideal Customer Profile ═══ */}
+      <Section title="🎯 Your Ideal Customer" sub="Based on who actually pays — this is who to target">
+        <Card>
+          <CardContent className="p-5">
+            {(() => {
+              // Find most common traits among paid users
+              const paidList = (users ?? []).filter(u => u.has_paid);
+              if (paidList.length === 0) return <p className="text-sm text-muted-foreground">Need more paid users for this analysis.</p>;
+
+              // Most common age range
+              const ages = paidList.map(u => (u as Record<string, unknown>).age as number | null).filter(Boolean) as number[];
+              const avgAge = ages.length > 0 ? Math.round(ages.reduce((s, a) => s + a, 0) / ages.length) : null;
+
+              // Most common location
+              const locs = paidList.map(u => (u as Record<string, unknown>).location as string | null).filter(Boolean) as string[];
+              const topLoc = locs.length > 0 ? Object.entries(locs.reduce((acc, l) => { acc[l.toLowerCase()] = (acc[l.toLowerCase()] ?? 0) + 1; return acc; }, {} as Record<string, number>)).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
+
+              // Most common occupation
+              const occs = paidList.map(u => (u as Record<string, unknown>).occupation as string | null).filter(Boolean) as string[];
+              const topOcc = occs.length > 0 ? Object.entries(occs.reduce((acc, o) => { acc[o.toLowerCase()] = (acc[o.toLowerCase()] ?? 0) + 1; return acc; }, {} as Record<string, number>)).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
+
+              // Most common pillar
+              const topPillar = Object.entries(pillarCount).sort((a, b) => {
+                const aRate = pillarConversion.find(p => p.pillar === a[0])?.rate ?? 0;
+                const bRate = pillarConversion.find(p => p.pillar === b[0])?.rate ?? 0;
+                return bRate - aRate;
+              })[0]?.[0];
+
+              return (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium mb-4">Based on {paidList.length} paying customers:</p>
+                  <div className="grid gap-2 grid-cols-2">
+                    {avgAge && (
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Age</p>
+                        <p className="text-lg font-bold">{avgAge} years old</p>
+                      </div>
+                    )}
+                    {topLoc && (
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Location</p>
+                        <p className="text-lg font-bold capitalize">{topLoc}</p>
+                      </div>
+                    )}
+                    {topOcc && (
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Occupation</p>
+                        <p className="text-lg font-bold capitalize">{topOcc}</p>
+                      </div>
+                    )}
+                    {topPillar && (
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Top Pillar</p>
+                        <p className="text-lg font-bold capitalize">{topPillar}</p>
+                      </div>
+                    )}
+                  </div>
+                  <Takeaway text={`Your ideal Facebook ad target: ${avgAge ? avgAge + " year old" : ""} ${topOcc ? topOcc : "professional"} ${topLoc ? "in " + topLoc : ""} struggling with ${topPillar ?? "life balance"}. Write your copy for this exact person.`} />
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
       </Section>
     </div>
   );
