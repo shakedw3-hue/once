@@ -1,4 +1,5 @@
 import type { Pillar, PillarScores, Plan, Recommendation } from "@/types/database";
+import { PILLARS } from "@/lib/constants";
 
 export interface QuestionOption {
   label: string;
@@ -302,7 +303,10 @@ export function determineRecommendation(
   const incomeTarget = answers["income_target"] ?? 0;
   const digitalComfort = answers["digital_skills"] ?? 1;
 
-  // Q12 option 2 (₱50K+) = high income ambition
+  // RULE: Never recommend Core. Always Pro or AI Careers.
+  // The system believes in the user. Core is a self-downgrade option only.
+
+  // Q12 option 2 (₱50K+) → AI Careers always
   if (incomeTarget === 2) {
     if (digitalComfort === 0) {
       return { plan: "ai", track: "AI Business Services" };
@@ -310,23 +314,43 @@ export function determineRecommendation(
     if (digitalComfort === 1) {
       return { plan: "ai", track: "AI Web & No-Code" };
     }
-    // digitalComfort 2 or 3 (nervous/not sure)
-    return { plan: "pro", track: "Social Media Management" };
+    // nervous or not sure — still AI, but easier track
+    return { plan: "ai", track: "AI Content & Design" };
   }
 
-  // Q12 option 3 (I just want stability) → Core
-  if (incomeTarget === 3) {
-    return { plan: "core", track: "" };
+  // Q12 option 1 (₱25K-40K, replace job) → AI Careers
+  if (incomeTarget === 1) {
+    if (digitalComfort <= 1) {
+      return { plan: "ai", track: "AI Web & No-Code" };
+    }
+    // less digital comfort — Pro with pillar-matched track
+    if (primaryPath === "money") {
+      return { plan: "pro", track: "Shopee/Lazada E-Commerce" };
+    }
+    if (primaryPath === "mind") {
+      return { plan: "pro", track: "Social Media Management" };
+    }
+    return { plan: "pro", track: "Freelancing" };
   }
 
-  // Q12 option 0 or 1 (₱5K-15K or job replacement) → Pro, track by pillar
+  // Q12 option 0 (₱5K-15K extra) → Pro, track by pillar
+  if (incomeTarget === 0) {
+    if (primaryPath === "money") {
+      return { plan: "pro", track: "Shopee/Lazada E-Commerce" };
+    }
+    if (primaryPath === "mind") {
+      return { plan: "pro", track: "Social Media Management" };
+    }
+    return { plan: "pro", track: "Freelancing" };
+  }
+
+  // Q12 option 3 ("I don't know") → Pro, track by pillar (safe default)
   if (primaryPath === "money") {
     return { plan: "pro", track: "Shopee/Lazada E-Commerce" };
   }
   if (primaryPath === "mind") {
     return { plan: "pro", track: "Social Media Management" };
   }
-  // body or spirit
   return { plan: "pro", track: "Freelancing" };
 }
 
@@ -338,38 +362,36 @@ export function buildRecommendation(
 ): Recommendation {
   const trackInfo = TRACK_DATA[track];
 
-  if (plan === "core" || !trackInfo) {
+  // Fallback — should never happen with new logic, but safety net
+  if (!trackInfo) {
     return {
-      plan: "core",
-      track: "",
-      why: `Your focus right now is building a strong ${primaryPath} foundation. Core gives you the structured path to get there.`,
-      skills: [
-        "Full 4-pillar assessment and personalized profile",
-        `5 structured ${primaryPath} modules`,
-        "25 actionable lessons with daily exercises",
-        "Progress tracking and reflections",
-        "Lifetime access to your path",
-      ],
-      earning: "",
+      plan: "pro",
+      track: "Freelancing",
+      why: "Your profile shows real potential. Freelancing is the fastest way to turn your skills into income.",
+      skills: TRACK_DATA["Freelancing"].skills,
+      earning: TRACK_DATA["Freelancing"].earning,
     };
   }
 
-  // Build the "why" sentence connecting their answers
   const incomeTarget = answers["income_target"] ?? 0;
+  const pillarTitle = PILLARS[primaryPath]?.title || primaryPath;
   let why = "";
 
   if (plan === "ai") {
     if (incomeTarget === 2) {
-      why = `You want ₱50,000+ per month and you're comfortable with digital tools. ${track} is the fastest path to that income level with AI doing the heavy lifting.`;
+      why = `You want ₱50,000+ per month. ${track} is the fastest path there — AI does the heavy lifting, you get paid.`;
+    } else if (incomeTarget === 1) {
+      why = `You want to replace your current income. ${track} gives you premium skills that clients pay top rates for.`;
     } else {
-      why = `Your ambition and digital comfort point to AI-powered skills. ${track} lets you earn premium rates while AI handles the complexity.`;
+      why = `Your answers show you are ready for more. ${track} turns that readiness into real income with AI doing the hard work.`;
     }
   } else {
     // Pro
-    const incomePhrase = incomeTarget === 0
-      ? "You want extra income on the side"
-      : "You want to replace your current income";
-    why = `${incomePhrase}, and your ${primaryPath} profile matches perfectly with ${track}. This is the most direct path to real earnings.`;
+    if (incomeTarget === 0) {
+      why = `You want extra income on the side. ${track} is the most proven path for someone with your ${pillarTitle} profile. Real skills, real clients, real money.`;
+    } else {
+      why = `Your ${pillarTitle} profile matches perfectly with ${track}. This is the most direct path from where you are to where you want to be.`;
+    }
   }
 
   return {
