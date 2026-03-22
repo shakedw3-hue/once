@@ -671,27 +671,76 @@ function DailyTracker({ primaryPath, todayTracking, trackingHistory, isDark, acc
         {saving ? "Saving..." : saved ? "✓ Saved for today" : "Save Check-in"}
       </button>
 
-      {/* Mini history chart */}
+      {/* Today's saved values */}
+      {(alreadySaved || saved) && (
+        <div className="mt-3 pt-3 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : undefined }}>
+          <p className={`mb-2 text-[10px] font-medium uppercase tracking-wider ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
+            Today&apos;s Entries
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {metrics.map((m) => {
+              const val = values[m.type] || todayTracking.find(t => t.metric_type === m.type)?.metric_value?.toString() || todayTracking.find(t => t.metric_type === m.type)?.metric_text;
+              if (!val) return null;
+              return (
+                <div key={m.type} className={`rounded-lg px-3 py-1.5 text-xs ${isDark ? "bg-white/[0.06]" : "bg-muted"}`}>
+                  <span>{m.emoji} </span>
+                  <span className={`font-semibold ${isDark ? "text-white" : ""}`}>{val}</span>
+                  {m.unit && !m.isText && <span className={isDark ? "text-white/40" : "text-muted-foreground"}> {m.unit}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* History chart */}
       {historyData.length >= 2 && historyMetric && (
-        <div className="mt-4 pt-3 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : undefined }}>
+        <div className="mt-3 pt-3 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : undefined }}>
           <p className={`mb-2 text-[10px] font-medium uppercase tracking-wider ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
             {historyMetric.emoji} {historyMetric.label} — Last {historyData.length} days
           </p>
-          <div className="flex items-end gap-1 h-12">
+          <div className="flex items-end gap-1 h-16">
             {historyData.map((h, i) => {
               const pct = maxVal > 0 ? (h.metric_value! / maxVal) * 100 : 0;
+              const isLatest = i === historyData.length - 1;
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                  <span className={`text-[9px] font-medium ${isLatest ? (isDark ? "text-white/70" : "text-foreground") : "opacity-0"}`}>
+                    {h.metric_value}
+                  </span>
                   <div
-                    className="w-full rounded-sm min-h-[4px] transition-all"
-                    style={{ height: `${Math.max(pct, 8)}%`, backgroundColor: accent, opacity: i === historyData.length - 1 ? 1 : 0.4 }}
+                    className="w-full rounded-t-sm min-h-[4px] transition-all"
+                    style={{ height: `${Math.max(pct, 10)}%`, backgroundColor: accent, opacity: isLatest ? 1 : 0.3 }}
                   />
                   <span className={`text-[8px] ${isDark ? "text-white/20" : "text-muted-foreground/50"}`}>
-                    {new Date(h.entry_date).getDate()}
+                    {new Date(h.entry_date + "T00:00:00").toLocaleDateString("en", { weekday: "narrow" })}
                   </span>
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Gratitude history (spirit pillar) */}
+      {primaryPath === "spirit" && trackingHistory.filter(h => h.metric_type === "gratitude" && h.metric_text).length > 0 && (
+        <div className="mt-3 pt-3 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : undefined }}>
+          <p className={`mb-2 text-[10px] font-medium uppercase tracking-wider ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
+            🙏 Recent Gratitude
+          </p>
+          <div className="space-y-1.5">
+            {trackingHistory
+              .filter(h => h.metric_type === "gratitude" && h.metric_text)
+              .sort((a, b) => b.entry_date.localeCompare(a.entry_date))
+              .slice(0, 5)
+              .map((h, i) => (
+                <div key={i} className={`rounded-lg px-3 py-2 text-xs ${isDark ? "bg-white/[0.04]" : "bg-muted/50"}`}>
+                  <span className={isDark ? "text-white/30" : "text-muted-foreground"}>
+                    {new Date(h.entry_date + "T00:00:00").toLocaleDateString("en", { month: "short", day: "numeric" })}:
+                  </span>{" "}
+                  <span className={isDark ? "text-white/70" : ""}>{h.metric_text}</span>
+                </div>
+              ))}
           </div>
         </div>
       )}
