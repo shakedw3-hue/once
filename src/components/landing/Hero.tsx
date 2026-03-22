@@ -53,7 +53,7 @@ export default function Hero() {
             className="mb-8 text-[11px] font-medium tracking-[0.3em] uppercase sm:text-xs"
             style={{ color: "rgba(167,139,250,0.6)" }}
           >
-            The only platform that diagnoses your life — then builds your path
+            The only platform that diagnoses your life, then builds your path
           </motion.p>
 
           {/* ── Headline — "Once." as monument ── */}
@@ -149,7 +149,7 @@ export default function Hero() {
               <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600 }}>
                 one personalized path
               </span>
-              . Not just knowledge —{" "}
+              . Not just knowledge.{" "}
               <span
                 style={{
                   color: "#818CF8",
@@ -199,15 +199,18 @@ export default function Hero() {
             transition={{ duration: 1, delay: 2.2 }}
           >
             <p
-              className="mb-5 text-center text-[10px] font-semibold tracking-[0.25em] uppercase sm:text-left"
-              style={{ color: "rgba(255,255,255,0.25)" }}
+              className="mb-5 text-center text-sm font-bold tracking-[0.15em] uppercase sm:text-left sm:text-base"
+              style={{
+                color: "#818CF8",
+                textShadow: "0 0 20px rgba(129,140,248,0.5), 0 0 60px rgba(129,140,248,0.2)",
+              }}
             >
               Built from the principles of
             </p>
 
             {/* Marquee container — full width overflow */}
             <div className="relative -mx-5 overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
-              <div className="flex animate-[marquee_18s_linear_infinite] gap-8 sm:gap-12 whitespace-nowrap">
+              <div className="flex animate-[marquee_10s_linear_infinite] gap-8 sm:gap-12 whitespace-nowrap">
                 {/* Double the items for seamless loop */}
                 {[...Array(2)].map((_, setIdx) => (
                   <div key={setIdx} className="flex shrink-0 items-center gap-8 sm:gap-12">

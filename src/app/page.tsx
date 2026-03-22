@@ -29,7 +29,7 @@ export default function Home() {
             You&apos;ve tried courses. You&apos;ve watched videos.
           </h2>
           <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-            And nothing stuck. Not because you&apos;re lazy — because none of it
+            And nothing stuck. Not because you&apos;re lazy. Because none of it
             was built for where <span className="font-medium text-foreground">you</span> actually are.
             Once is different. We start with your real scores, then build one
             path. Yours.
@@ -57,7 +57,7 @@ export default function Home() {
             <div className="space-y-3">
               {[
                 { before: "\"I don't know where to start\"", after: "A clear, personalized path on day one", icon: "→" },
-                { before: "\"I spent ₱40K on courses I never finished\"", after: "275 lessons you'll actually complete — ₱1,499", icon: "→" },
+                { before: "\"I spent ₱40K on courses I never finished\"", after: "275 lessons you'll actually complete. ₱1,499", icon: "→" },
                 { before: "\"I watch videos but nothing changes\"", after: "One action step per lesson. You do, not watch.", icon: "→" },
                 { before: "\"I want income but don't know how\"", after: "₱15,000–₱40,000/mo skills for PH market", icon: "→" },
               ].map((row) => (
@@ -74,7 +74,7 @@ export default function Home() {
                 size="lg"
                 className="h-12 px-8 text-sm font-semibold shadow-lg shadow-primary/10"
               >
-                Start Your Path — Free
+                Start Your Path. Free.
               </Button>
               <p className="mt-2 text-[10px] text-muted-foreground">Free assessment. 10 minutes. Keep your results.</p>
             </div>
@@ -96,7 +96,7 @@ export default function Home() {
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               { title: "Diagnose", icon: <IconCompass size="sm" />, desc: "15 questions across Money, Mind, Body, and Spirit. We find exactly where you are." },
-              { title: "Match", icon: <IconMatch size="sm" />, desc: "We build one path based on your scores. Not a catalog — your path." },
+              { title: "Match", icon: <IconMatch size="sm" />, desc: "We build one path based on your scores. Not a catalog. Your path." },
               { title: "Learn", icon: <IconLearn size="sm" />, desc: "10 minutes a day. Every lesson is built from what the world's best minds already proved." },
               { title: "Launch", icon: <IconRocket size="sm" />, desc: "Pro members get practical income skills for the Philippine market. Real pesos." },
             ].map((item) => (
@@ -115,7 +115,7 @@ export default function Home() {
         <Section>
           <h2 className="mb-2 text-center text-section text-xl sm:text-2xl">Your personal dashboard</h2>
           <p className="mb-8 text-center text-sm text-muted-foreground">
-            Track your scores, streaks, and lessons — all in one place.
+            Track your scores, streaks, and lessons. All in one place.
           </p>
           <PhoneMockup />
         </Section>
