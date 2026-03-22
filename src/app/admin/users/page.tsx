@@ -1,20 +1,62 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export default async function AdminUsersPage() {
-  const supabase = await createClient();
+const PATH_COLORS: Record<string, string> = {
+  confidence: "bg-purple-100 text-purple-700",
+  career: "bg-blue-100 text-blue-700",
+  money: "bg-emerald-100 text-emerald-700",
+  health: "bg-rose-100 text-rose-700",
+  relationships: "bg-amber-100 text-amber-700",
+};
 
+const PLAN_COLORS: Record<string, string> = {
+  core: "bg-slate-100 text-slate-700",
+  pro: "bg-indigo-100 text-indigo-700",
+  ai_careers: "bg-cyan-100 text-cyan-700",
+};
+
+function planLabel(plan: string | null): string {
+  if (!plan) return "Free";
+  if (plan === "ai_careers") return "AI Careers";
+  return plan.charAt(0).toUpperCase() + plan.slice(1);
+}
+
+export default async function AdminUsersPage() {
+  const supabase = createServiceClient();
+
+  // ── Fetch all users ──
   const { data: users } = await supabase
     .from("users")
-    .select("id, email, full_name, role, primary_path, has_paid, created_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .select(
+      "id, email, full_name, plan, primary_path, recommendation_track, current_streak, has_paid, last_activity_date, created_at"
+    )
+    .order("created_at", { ascending: false });
+
+  // ── Count completed lessons per user ──
+  const { data: progressRows } = await supabase
+    .from("user_progress")
+    .select("user_id")
+    .eq("completed", true);
+
+  const lessonCounts = new Map<string, number>();
+  for (const row of progressRows ?? []) {
+    lessonCounts.set(row.user_id, (lessonCounts.get(row.user_id) ?? 0) + 1);
+  }
+
+  // ── Total available lessons (for X/total display) ──
+  const { count: totalLessons } = await supabase
+    .from("lessons")
+    .select("*", { count: "exact", head: true });
+
+  const total = totalLessons ?? 0;
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Users</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Users
+        </h1>
         <Badge variant="secondary">{users?.length ?? 0} users</Badge>
       </div>
 
@@ -24,69 +66,127 @@ export default async function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
                     Email
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Path
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Plan
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Status
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Primary Path
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Role
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Rec. Track
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Streak
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Lessons
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
                     Joined
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Last Active
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Paid
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {(users ?? []).map((user) => (
-                  <tr key={user.id} className="border-b last:border-0">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {user.full_name || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {user.email}
-                    </td>
-                    <td className="px-4 py-3">
-                      {user.primary_path ? (
-                        <Badge variant="secondary" className="capitalize">
-                          {user.primary_path}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {user.has_paid ? (
-                        <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-50">
-                          Paid
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">Free</Badge>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {user.role === "admin" ? (
-                        <Badge className="bg-primary/10 text-primary">Admin</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">User</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
+                {(users ?? []).map((user) => {
+                  const done = lessonCounts.get(user.id) ?? 0;
+                  return (
+                    <tr
+                      key={user.id}
+                      className="border-b last:border-0 hover:bg-muted/30"
+                    >
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-foreground">
+                        {user.full_name || "\u2014"}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {user.email}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            PLAN_COLORS[user.plan ?? ""] ??
+                            "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {planLabel(user.plan)}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        {user.primary_path ? (
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                              PATH_COLORS[user.primary_path] ??
+                              "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {user.primary_path}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">&mdash;</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {user.recommendation_track ? (
+                          <span className="capitalize">
+                            {user.recommendation_track}
+                          </span>
+                        ) : (
+                          "\u2014"
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        {(user.current_streak ?? 0) > 0 ? (
+                          <span className="font-medium">
+                            <span className="mr-0.5">&#x1F525;</span>
+                            {user.current_streak}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {done}
+                        {total > 0 ? `/${total}` : ""}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {user.last_activity_date
+                          ? new Date(
+                              user.last_activity_date
+                            ).toLocaleDateString()
+                          : "\u2014"}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-center">
+                        {user.has_paid ? (
+                          <span className="text-emerald-600 font-semibold">
+                            &#x2713;
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            &#x2717;
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
                 {(!users || users.length === 0) && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={10}
                       className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No users yet.
