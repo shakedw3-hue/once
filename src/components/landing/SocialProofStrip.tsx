@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { number: "100+", label: "From the world's smartest minds — in one place" },
+  { number: "100+", label: "Books, studies & insights from the world's smartest minds — summarized into lessons" },
   { number: "275+", label: "Lessons built for you. Only you." },
   { number: "5–10x", label: "Return on investment by the time you finish" },
   { number: "10 min", label: "A day. That's all it takes." },

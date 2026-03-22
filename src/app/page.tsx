@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
-import AssessmentDemo from "@/components/landing/AssessmentDemo";
 import Testimonials from "@/components/landing/Testimonials";
 import StickyCTA from "@/components/landing/StickyCTA";
 import TrustBadges from "@/components/landing/TrustBadges";
@@ -57,24 +56,33 @@ export default function Home() {
           </div>
         </Section>
 
-        {/* ━━━ 5. DEMO — Engagement hook (try before buy) ━━━ */}
-        <Section>
-          <div className="rounded-2xl border bg-primary/[0.03] border-primary/10 p-5 sm:p-8">
-            <p className="mb-1 text-label text-primary">Try it now — free</p>
-            <h2 className="mb-2 text-section text-xl sm:text-2xl">See your real scores</h2>
-            <p className="mb-5 text-sm text-muted-foreground">
-              Answer 2 questions. Watch your pillar scores shift in real time.
-            </p>
-            <AssessmentDemo />
-            <div className="mt-5 text-center">
+        {/* ━━━ 5. BEFORE/AFTER — Transformation strip ━━━ */}
+        <Section tight>
+          <div className="rounded-2xl border bg-card p-5 sm:p-8">
+            <p className="mb-5 text-center text-label text-primary">What changes after Once</p>
+            <div className="space-y-3">
+              {[
+                { before: "\"I don't know where to start\"", after: "A clear, personalized path on day one", icon: "→" },
+                { before: "\"I spent ₱40K on courses I never finished\"", after: "275 lessons you'll actually complete — ₱1,499", icon: "→" },
+                { before: "\"I watch videos but nothing changes\"", after: "One action step per lesson. You do, not watch.", icon: "→" },
+                { before: "\"I want income but don't know how\"", after: "₱15,000–₱40,000/mo skills for PH market", icon: "→" },
+              ].map((row) => (
+                <div key={row.before} className="flex items-center gap-3 rounded-lg border px-4 py-3">
+                  <p className="flex-1 text-xs text-muted-foreground line-through decoration-red-300">{row.before}</p>
+                  <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  <p className="flex-1 text-xs font-semibold text-foreground">{row.after}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
               <Button
                 render={<Link href="/auth/signup" />}
                 size="lg"
                 className="h-12 px-8 text-sm font-semibold shadow-lg shadow-primary/10"
               >
-                Take the Full Assessment — Free
+                Start Your Path — Free
               </Button>
-              <p className="mt-2 text-[10px] text-muted-foreground">15 questions. 10 minutes. Keep your results.</p>
+              <p className="mt-2 text-[10px] text-muted-foreground">Free assessment. 10 minutes. Keep your results.</p>
             </div>
           </div>
         </Section>
