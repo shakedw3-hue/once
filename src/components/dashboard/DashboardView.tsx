@@ -34,6 +34,12 @@ interface PathData {
   completedLessons: number;
 }
 
+interface TrackingEntry {
+  metric_type: string;
+  metric_value: number | null;
+  metric_text: string | null;
+}
+
 interface DashboardViewProps {
   fullName: string;
   primaryPath: Pillar;
@@ -44,6 +50,10 @@ interface DashboardViewProps {
   recommendationTrack: string | null;
   firstLessonLink: string | null;
   firstModuleTitle: string | null;
+  streak: number;
+  longestStreak: number;
+  todayTracking: TrackingEntry[];
+  weeklyCompleted: number;
 }
 
 // ─── Plan-based theme system ───
@@ -99,6 +109,10 @@ export default function DashboardView({
   recommendationTrack,
   firstLessonLink,
   firstModuleTitle,
+  streak,
+  longestStreak,
+  todayTracking,
+  weeklyCompleted,
 }: DashboardViewProps) {
   const primary = PILLARS[primaryPath];
   const firstName = fullName.split(" ")[0] || "there";
@@ -171,6 +185,65 @@ export default function DashboardView({
             {isPro && !hasStarted ? t.greeting : `${totalCompleted} of ${totalLessons} lessons completed.`}
           </p>
         </div>
+
+        {/* Streak + Weekly Message */}
+        {hasStarted && (
+          <div className="mb-6 flex flex-wrap gap-3">
+            {/* Streak */}
+            <div className={`flex items-center gap-2 rounded-full px-4 py-2 ${isDark ? "bg-white/[0.06]" : "bg-muted"}`}>
+              <span className="text-lg">🔥</span>
+              <div>
+                <span className={`text-sm font-bold ${isDark ? "text-white" : ""}`}>{streak}</span>
+                <span className={`text-xs ml-1 ${isDark ? "text-white/50" : "text-muted-foreground"}`}>
+                  {streak === 1 ? "day" : "days"}
+                </span>
+              </div>
+              {streak >= 3 && <span className="text-[10px]">⭐</span>}
+              {streak >= 7 && <span className="text-[10px]">🏆</span>}
+              {streak >= 14 && <span className="text-[10px]">💎</span>}
+              {streak >= 30 && <span className="text-[10px]">👑</span>}
+            </div>
+
+            {/* Weekly progress */}
+            {weeklyCompleted > 0 && (
+              <div className={`flex items-center gap-2 rounded-full px-4 py-2 ${isDark ? "bg-white/[0.06]" : "bg-muted"}`}>
+                <span className="text-lg">📚</span>
+                <span className={`text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
+                  {weeklyCompleted} this week
+                </span>
+              </div>
+            )}
+
+            {/* Longest streak */}
+            {longestStreak > streak && longestStreak >= 3 && (
+              <div className={`flex items-center gap-2 rounded-full px-4 py-2 ${isDark ? "bg-white/[0.06]" : "bg-muted"}`}>
+                <span className={`text-xs ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+                  Best: {longestStreak} days
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Streak milestone message */}
+        {streak > 0 && streak < 3 && (
+          <div className={`mb-6 rounded-lg px-4 py-3 text-xs ${isDark ? "bg-white/[0.04] text-white/50" : "bg-muted/50 text-muted-foreground"}`}>
+            🔥 {3 - streak} more day{3 - streak !== 1 ? "s" : ""} to earn your first streak badge!
+          </div>
+        )}
+        {streak === 3 && (
+          <div className={`mb-6 rounded-lg px-4 py-3 text-xs ${isDark ? "bg-amber-500/10 text-amber-300" : "bg-amber-50 text-amber-800"}`}>
+            ⭐ 3-day streak! You are building momentum. Keep going.
+          </div>
+        )}
+        {streak === 7 && (
+          <div className={`mb-6 rounded-lg px-4 py-3 text-xs ${isDark ? "bg-amber-500/10 text-amber-300" : "bg-amber-50 text-amber-800"}`}>
+            🏆 7-day streak! One full week of growth. Most people never get here.
+          </div>
+        )}
+
+        {/* Daily tracking input */}
+        <DailyTracker primaryPath={primaryPath} todayTracking={todayTracking} isDark={isDark} accent={t.accent} />
 
         {/* Start here CTA */}
         {!hasStarted && firstLessonLink && (
@@ -461,6 +534,104 @@ function CollapsibleModule({ mod, allLessons, firstIncompleteIdx, defaultOpen, m
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Daily Tracker ───
+
+const PILLAR_METRICS: Record<string, { type: string; label: string; placeholder: string; unit: string; isText?: boolean }[]> = {
+  money: [
+    { type: "savings", label: "How much did you save today?", placeholder: "0", unit: "₱" },
+  ],
+  mind: [
+    { type: "reading_minutes", label: "Reading or learning today?", placeholder: "0", unit: "min" },
+  ],
+  body: [
+    { type: "weight", label: "Current weight", placeholder: "0", unit: "kg" },
+    { type: "sleep_hours", label: "Sleep last night", placeholder: "0", unit: "hrs" },
+  ],
+  spirit: [
+    { type: "gratitude", label: "One thing you are grateful for today", placeholder: "Write something...", unit: "", isText: true },
+  ],
+};
+
+function DailyTracker({ primaryPath, todayTracking, isDark, accent }: {
+  primaryPath: Pillar;
+  todayTracking: TrackingEntry[];
+  isDark: boolean;
+  accent: string;
+}) {
+  const metrics = PILLAR_METRICS[primaryPath] || PILLAR_METRICS.money;
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const m of metrics) {
+      const existing = todayTracking.find(t => t.metric_type === m.type);
+      init[m.type] = existing ? (m.isText ? existing.metric_text || "" : String(existing.metric_value || "")) : "";
+    }
+    return init;
+  });
+  const [saved, setSaved] = useState(false);
+
+  async function handleSave() {
+    const { saveTrackingEntry } = await import("@/app/dashboard/tracking-actions");
+    for (const m of metrics) {
+      const val = values[m.type];
+      if (!val) continue;
+      await saveTrackingEntry(m.type, m.isText ? null : Number(val), m.isText ? val : null);
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  const allFilled = metrics.every(m => values[m.type]);
+
+  return (
+    <div className={`mb-6 rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "bg-card"}`}>
+      <p className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+        Daily Check-in
+      </p>
+      <div className="space-y-3">
+        {metrics.map((m) => (
+          <div key={m.type}>
+            <label className={`mb-1 block text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
+              {m.label}
+            </label>
+            <div className="flex items-center gap-2">
+              {m.unit && !m.isText && (
+                <span className={`text-sm font-medium ${isDark ? "text-white/40" : "text-muted-foreground"}`}>{m.unit}</span>
+              )}
+              <input
+                type={m.isText ? "text" : "number"}
+                value={values[m.type]}
+                onChange={(e) => setValues(prev => ({ ...prev, [m.type]: e.target.value }))}
+                placeholder={m.placeholder}
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${
+                  isDark
+                    ? "border-white/10 bg-white/[0.05] text-white placeholder:text-white/20 focus:border-white/20"
+                    : "border-border bg-background focus:border-primary/30"
+                }`}
+              />
+              {m.unit && !m.isText && (
+                <span className={`text-xs ${isDark ? "text-white/30" : "text-muted-foreground"}`}>{m.unit}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={handleSave}
+        disabled={!allFilled}
+        className={`mt-3 w-full rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors ${
+          saved
+            ? "bg-emerald-500/20 text-emerald-400"
+            : allFilled
+              ? isDark ? "bg-white/10 text-white hover:bg-white/15" : "bg-primary/10 text-primary hover:bg-primary/15"
+              : isDark ? "bg-white/5 text-white/20 cursor-not-allowed" : "bg-muted text-muted-foreground cursor-not-allowed"
+        }`}
+      >
+        {saved ? "✓ Saved" : "Save Today's Check-in"}
+      </button>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 export async function completeLesson(lessonId: string, reflection: string | null) {
   const supabase = await createClient();
@@ -42,6 +42,32 @@ export async function completeLesson(lessonId: string, reflection: string | null
     event: "lesson_completion",
     metadata: { lesson_id: lessonId },
   });
+
+  // Update streak
+  const db = createServiceClient();
+  const today = new Date().toISOString().split("T")[0];
+  const { data: streakData } = await db
+    .from("users")
+    .select("current_streak, longest_streak, last_activity_date")
+    .eq("id", user.id)
+    .single();
+
+  if (streakData) {
+    const lastDate = streakData.last_activity_date;
+    let newStreak = streakData.current_streak || 0;
+
+    if (lastDate !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      newStreak = lastDate === yesterday.toISOString().split("T")[0] ? newStreak + 1 : 1;
+
+      await db.from("users").update({
+        current_streak: newStreak,
+        longest_streak: Math.max(newStreak, streakData.longest_streak || 0),
+        last_activity_date: today,
+      }).eq("id", user.id);
+    }
+  }
 
   return { success: true };
 }

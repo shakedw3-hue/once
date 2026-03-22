@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, primary_path, secondary_path, has_paid, plan, recommendation_track")
+    .select("full_name, primary_path, secondary_path, has_paid, plan, recommendation_track, current_streak, longest_streak, last_activity_date")
     .eq("id", user.id)
     .single();
 
@@ -141,6 +141,24 @@ export default async function DashboardPage() {
   const primaryData = pathData.find((p) => p.pillar === profile.primary_path);
   const firstLesson = primaryData?.modules[0]?.lessons[0];
 
+  // Get today's tracking entries
+  const today = new Date().toISOString().split("T")[0];
+  const { data: todayTracking } = await db
+    .from("user_tracking")
+    .select("metric_type, metric_value, metric_text")
+    .eq("user_id", user.id)
+    .eq("entry_date", today);
+
+  // Weekly message
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  const { count: weeklyCompleted } = await db
+    .from("user_progress")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("completed", true)
+    .gte("completed_at", startOfWeek.toISOString());
+
   return (
     <DashboardView
       fullName={profile.full_name}
@@ -152,6 +170,10 @@ export default async function DashboardPage() {
       recommendationTrack={profile.recommendation_track}
       firstLessonLink={firstLesson ? `/dashboard/module/${firstLesson.moduleId}/lesson/${firstLesson.id}` : null}
       firstModuleTitle={primaryData?.modules[0]?.title ?? null}
+      streak={profile.current_streak ?? 0}
+      longestStreak={profile.longest_streak ?? 0}
+      todayTracking={(todayTracking ?? []) as { metric_type: string; metric_value: number | null; metric_text: string | null }[]}
+      weeklyCompleted={weeklyCompleted ?? 0}
     />
   );
 }
