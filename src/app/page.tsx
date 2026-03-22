@@ -230,31 +230,58 @@ export default function Home() {
 
         {/* Comparison */}
         <Section>
-          <h2 className="mb-6 text-section text-xl sm:text-2xl">How it compares</h2>
-          <div className="overflow-x-auto rounded-xl border">
+          <h2 className="mb-2 text-section text-xl sm:text-2xl">How it compares</h2>
+          <p className="mb-6 text-sm text-muted-foreground">Once vs. everything else you&apos;ve tried.</p>
+
+          {/* Mobile: stacked cards */}
+          <div className="space-y-3 sm:hidden">
+            {[
+              { feature: "Price", once: "₱1,499–3,950 one-time", others: "₱2,000+ or ₱5,000+/mo" },
+              { feature: "Personalized", once: "Based on your actual scores", others: "Same content for everyone" },
+              { feature: "Sources", once: "100+ world-class minds", others: "One creator or one coach" },
+              { feature: "Format", once: "10-min daily lessons + action", others: "Long videos or live calls" },
+              { feature: "Income skills", once: "Built-in (Pro & AI plans)", others: "Usually just theory" },
+              { feature: "Recurring cost", once: "None. Pay once.", others: "Monthly subscription" },
+            ].map((row) => (
+              <div key={row.feature} className="rounded-xl border bg-card p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{row.feature}</p>
+                <div className="flex items-start gap-2 mb-1.5">
+                  <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <p className="text-xs font-semibold text-foreground">{row.once}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <p className="text-xs text-muted-foreground">{row.others}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block overflow-x-auto rounded-xl border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground sm:px-4" />
-                  <th className="px-3 py-2.5 text-left text-xs font-semibold text-primary sm:px-4">Once</th>
-                  <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground sm:px-4">Online course</th>
-                  <th className="hidden px-4 py-2.5 text-left text-xs font-medium text-muted-foreground sm:table-cell">Coaching</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground" />
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-primary">Once</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Online course</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Coaching</th>
                 </tr>
               </thead>
               <tbody className="divide-y text-xs">
                 {[
                   ["Price", "₱1,499/2,350/3,950 one-time", "₱2,000+", "₱5,000+/mo"],
                   ["Built for you", "✓ Based on your scores", "✗ Same for all", "✓"],
-                  ["Sources", "✓ Best research, one path", "✗ One creator", "✗ One coach"],
+                  ["Sources", "✓ 100+ world-class minds", "✗ One creator", "✗ One coach"],
                   ["Format", "10-min actionable lessons", "Video lectures", "Calls"],
-                  ["Income skills", "✓ Pro plan", "✗ Usually theory", "Depends"],
+                  ["Income skills", "✓ Pro & AI plans", "✗ Usually theory", "Depends"],
                   ["Recurring cost", "None", "Often subscription", "Monthly"],
                 ].map((row) => (
                   <tr key={row[0]}>
-                    <td className="px-3 py-2.5 font-medium sm:px-4">{row[0]}</td>
-                    <td className="px-3 py-2.5 font-medium text-primary sm:px-4">{row[1]}</td>
-                    <td className="px-3 py-2.5 text-muted-foreground sm:px-4">{row[2]}</td>
-                    <td className="hidden px-4 py-2.5 text-muted-foreground sm:table-cell">{row[3]}</td>
+                    <td className="px-4 py-2.5 font-medium">{row[0]}</td>
+                    <td className="px-4 py-2.5 font-medium text-primary">{row[1]}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{row[2]}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{row[3]}</td>
                   </tr>
                 ))}
               </tbody>

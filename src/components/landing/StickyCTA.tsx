@@ -4,54 +4,62 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function StickyCTA() {
-  const [visible, setVisible] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    function handleScroll() {
-      setVisible(window.scrollY > 600);
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setShow(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  if (!visible) return null;
-
   return (
-    <Link
-      href="/auth/signup"
+    <div
+      id="sticky-cta-float"
       style={{
         position: "fixed",
-        right: 20,
-        bottom: 28,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        backgroundColor: "#4F46E5",
-        color: "#fff",
-        fontSize: 14,
-        fontWeight: 600,
-        padding: "14px 22px",
-        borderRadius: 999,
-        boxShadow: "0 8px 30px rgba(79,70,229,0.35), 0 2px 8px rgba(0,0,0,0.1)",
-        textDecoration: "none",
-        transition: "transform 0.2s, box-shadow 0.2s",
-        letterSpacing: "-0.01em",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.05)";
-        e.currentTarget.style.boxShadow = "0 12px 40px rgba(79,70,229,0.45), 0 4px 12px rgba(0,0,0,0.15)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "0 8px 30px rgba(79,70,229,0.35), 0 2px 8px rgba(0,0,0,0.1)";
+        right: 16,
+        bottom: 24,
+        zIndex: 99999,
+        opacity: show ? 1 : 0,
+        transform: show ? "translateY(0) scale(1)" : "translateY(20px) scale(0.9)",
+        transition: "opacity 0.3s ease, transform 0.3s ease",
+        pointerEvents: show ? "auto" : "none",
       }}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 12h14M12 5l7 7-7 7" />
-      </svg>
-      Do It Once
-    </Link>
+      <Link
+        href="/auth/signup"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          backgroundColor: "#4F46E5",
+          color: "#fff",
+          fontSize: 14,
+          fontWeight: 600,
+          padding: "14px 24px",
+          borderRadius: 999,
+          boxShadow:
+            "0 8px 30px rgba(79,70,229,0.4), 0 2px 8px rgba(0,0,0,0.12)",
+          textDecoration: "none",
+          letterSpacing: "-0.01em",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+        Do It Once
+      </Link>
+    </div>
   );
 }
