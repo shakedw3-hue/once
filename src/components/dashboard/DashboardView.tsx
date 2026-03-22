@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -248,11 +249,9 @@ export default function DashboardView({
   );
 }
 
-// ─── Path Section: shows all modules with all lessons expanded ───
+// ─── Path Section: collapsible modules, current one open by default ───
 
 function PathSection({ pathData, isPrimary }: { pathData: PathData; isPrimary?: boolean }) {
-  const pillarInfo = PILLARS[pathData.pillar];
-
   // Build a flat ordered list of ALL lessons across modules
   const allLessons = pathData.modules.flatMap((mod) =>
     mod.lessons.map((l) => ({ ...l, moduleName: mod.title, moduleOrder: mod.order }))
@@ -260,6 +259,11 @@ function PathSection({ pathData, isPrimary }: { pathData: PathData; isPrimary?: 
 
   // Find the index of the first incomplete lesson
   const firstIncompleteIdx = allLessons.findIndex((l) => !l.completed);
+
+  // Find which module is "current" (contains the first incomplete lesson)
+  const currentModuleId = firstIncompleteIdx >= 0
+    ? allLessons[firstIncompleteIdx].moduleId
+    : null;
 
   return (
     <div className="mb-10">
@@ -274,39 +278,104 @@ function PathSection({ pathData, isPrimary }: { pathData: PathData; isPrimary?: 
         </div>
       </div>
 
-      <div className="space-y-1">
-        {pathData.modules.map((mod) => (
-          <div key={mod.id}>
-            {/* Module header */}
-            <div className="flex items-center gap-2 py-2">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                {mod.order}
-              </span>
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{mod.title}</p>
-            </div>
+      <div className="space-y-2">
+        {pathData.modules.map((mod) => {
+          const modCompleted = mod.lessons.filter((l) => l.completed).length;
+          const modTotal = mod.lessons.length;
+          const modDone = modCompleted === modTotal && modTotal > 0;
+          const isCurrent = mod.id === currentModuleId;
 
-            {/* Lessons */}
-            <div className="ml-3 border-l-2 border-muted pl-4 space-y-0.5">
-              {mod.lessons.map((lesson) => {
-                const globalIdx = allLessons.findIndex((l) => l.id === lesson.id);
-                // Unlocked if: completed, or is the first incomplete, or previous lesson is completed
-                const isUnlocked = lesson.completed || globalIdx === firstIncompleteIdx || (globalIdx === 0) || (globalIdx > 0 && allLessons[globalIdx - 1].completed);
-                const isCurrent = globalIdx === firstIncompleteIdx;
-
-                return (
-                  <LessonRow
-                    key={lesson.id}
-                    lesson={lesson}
-                    moduleId={mod.id}
-                    locked={!isUnlocked}
-                    isCurrent={isCurrent}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          return (
+            <CollapsibleModule
+              key={mod.id}
+              mod={mod}
+              allLessons={allLessons}
+              firstIncompleteIdx={firstIncompleteIdx}
+              defaultOpen={isCurrent || (!!isPrimary && mod.order === 1 && firstIncompleteIdx === -1)}
+              modCompleted={modCompleted}
+              modTotal={modTotal}
+              modDone={modDone}
+              isCurrent={isCurrent}
+            />
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+// ─── Collapsible Module ───
+
+function CollapsibleModule({ mod, allLessons, firstIncompleteIdx, defaultOpen, modCompleted, modTotal, modDone, isCurrent }: {
+  mod: ModuleGroup;
+  allLessons: (LessonItem & { moduleName: string; moduleOrder: number })[];
+  firstIncompleteIdx: number;
+  defaultOpen: boolean;
+  modCompleted: number;
+  modTotal: number;
+  modDone: boolean;
+  isCurrent: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className={`rounded-xl border transition-colors ${
+      isCurrent ? "border-primary/20 bg-primary/[0.02]" : modDone ? "border-emerald-200 bg-emerald-50/30" : ""
+    }`}>
+      {/* Module header — clickable to toggle */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 p-3 text-left"
+      >
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+          modDone ? "bg-emerald-100 text-emerald-600" : isCurrent ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+        }`}>
+          {modDone ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+          ) : mod.order}
+        </span>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold">{mod.title}</p>
+          <p className="text-[11px] text-muted-foreground">{modCompleted}/{modTotal} lessons</p>
+        </div>
+
+        {/* Progress ring + chevron */}
+        <div className="flex items-center gap-2">
+          {modTotal > 0 && !modDone && (
+            <span className="text-[10px] font-medium text-muted-foreground">{Math.round((modCompleted / modTotal) * 100)}%</span>
+          )}
+          <svg
+            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            className={`text-muted-foreground/50 transition-transform ${open ? "rotate-90" : ""}`}
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </div>
+      </button>
+
+      {/* Lessons — collapsible */}
+      {open && (
+        <div className="px-3 pb-3">
+          <div className="ml-4 border-l-2 border-muted pl-3 space-y-0.5">
+            {mod.lessons.map((lesson) => {
+              const globalIdx = allLessons.findIndex((l) => l.id === lesson.id);
+              const isUnlocked = lesson.completed || globalIdx === firstIncompleteIdx || (globalIdx === 0) || (globalIdx > 0 && allLessons[globalIdx - 1].completed);
+              const isCurrentLesson = globalIdx === firstIncompleteIdx;
+
+              return (
+                <LessonRow
+                  key={lesson.id}
+                  lesson={lesson}
+                  moduleId={mod.id}
+                  locked={!isUnlocked}
+                  isCurrent={isCurrentLesson}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
