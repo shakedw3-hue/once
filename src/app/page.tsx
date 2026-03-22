@@ -100,9 +100,9 @@ export default function Home() {
             <div className="space-y-3">
               {[
                 { before: "\"I don't know where to start\"", after: "A clear, personalized path on day one" },
-                { before: "\"I spent ₱40K on courses I never finished\"", after: "275 lessons you'll actually complete. ₱1,499" },
+                { before: "\"I spent ₱40K on courses I never finished\"", after: "A library of 275+ lessons. We pick the right ones for you." },
                 { before: "\"I watch videos but nothing changes\"", after: "One action step per lesson. You do, not watch." },
-                { before: "\"I want income but don't know how\"", after: "₱15,000 to ₱40,000/mo skills for PH market" },
+                { before: "\"I want income but don't know how\"", after: "Skills to earn ₱15,000 to ₱50,000 per project. Guaranteed." },
               ].map((row) => (
                 <div
                   key={row.before}
