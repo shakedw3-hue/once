@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import DashboardView from "@/components/dashboard/DashboardView";
 import type { Pillar, PillarScores } from "@/types/database";
 
@@ -40,37 +40,42 @@ export default async function DashboardPage() {
     pathPillars.push(profile.secondary_path as Pillar);
   }
 
+  // Use service client for content queries (bypasses RLS)
+  const db = createServiceClient();
+
   // Get paths
-  const { data: pathRows } = await supabase
+  const { data: pathRows } = await db
     .from("paths")
     .select("id, title, description, pillar")
     .in("pillar", pathPillars);
 
   const pathIds = (pathRows ?? []).map((p) => p.id);
 
-  // Get modules (Core only: order 1-5)
+  // Get all modules for user's paths, then filter in JS
+  // (column name "order" conflicts with PostgREST .order()/.lte() methods)
   let allModules: { id: string; title: string; description: string; order: number; path_id: string }[] = [];
   if (pathIds.length > 0) {
-    const { data: mods } = await supabase
+    const { data: mods } = await db
       .from("modules")
       .select("id, title, description, order, path_id")
-      .in("path_id", pathIds)
-      .lte("order", 5)
-      .order("order");
-    allModules = mods ?? [];
+      .in("path_id", pathIds);
+    // Filter Core (order 1-5) in JS, sort manually
+    allModules = (mods ?? [])
+      .filter((m) => m.order <= 5)
+      .sort((a, b) => a.order - b.order);
   }
 
   const moduleIds = allModules.map((m) => m.id);
 
+
   // Get ALL lessons with titles and order
   let lessons: { id: string; title: string; order: number; module_id: string }[] = [];
   if (moduleIds.length > 0) {
-    const { data: lsns } = await supabase
+    const { data: lsns } = await db
       .from("lessons")
       .select("id, title, order, module_id")
-      .in("module_id", moduleIds)
-      .order("order");
-    lessons = lsns ?? [];
+      .in("module_id", moduleIds);
+    lessons = (lsns ?? []).sort((a, b) => a.order - b.order);
   }
 
   // Get progress
