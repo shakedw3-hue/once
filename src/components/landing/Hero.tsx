@@ -220,8 +220,7 @@ export default function Hero() {
           .hero-fade{opacity:0;transform:translateY(20px);animation:hf .6s ease-out both}
           .hero-fade-only{opacity:0;animation:hfo .4s ease-out both}
           .pillar-bar{transform:scaleX(0);transform-origin:left;animation:pb .8s ease-out both}
-          .marquee-track{display:flex;animation:mq 40s linear infinite}
-          @media(max-width:640px){.marquee-track{animation-duration:30s}}
+          .marquee-track{display:flex;animation:mq 15s linear infinite}
           @keyframes hf{to{opacity:1;transform:translateY(0)}}
           @keyframes hfo{to{opacity:1}}
           @keyframes pb{to{transform:scaleX(1)}}
