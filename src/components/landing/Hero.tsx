@@ -207,7 +207,7 @@ export default function Hero() {
 
             {/* Marquee container — full width overflow */}
             <div className="relative -mx-5 overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
-              <div className="flex animate-[marquee_35s_linear_infinite] gap-8 sm:gap-12 whitespace-nowrap">
+              <div className="flex animate-[marquee_18s_linear_infinite] gap-8 sm:gap-12 whitespace-nowrap">
                 {/* Double the items for seamless loop */}
                 {[...Array(2)].map((_, setIdx) => (
                   <div key={setIdx} className="flex shrink-0 items-center gap-8 sm:gap-12">
@@ -238,13 +238,13 @@ export default function Hero() {
             </div>
 
             {/* Institutions below marquee */}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:justify-start sm:gap-x-7">
-              <span
-                className="text-[9px] font-semibold tracking-[0.2em] uppercase"
-                style={{ color: "rgba(255,255,255,0.2)" }}
-              >
-                Research from
-              </span>
+            <p
+              className="mt-6 mb-3 text-[9px] font-semibold tracking-[0.2em] uppercase sm:text-left text-center"
+              style={{ color: "rgba(255,255,255,0.2)" }}
+            >
+              Research sourced from
+            </p>
+            <div className="flex items-center justify-center gap-x-4 sm:justify-start sm:gap-x-7">
               {[
                 { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.85rem" },
                 { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "0.9rem" },
