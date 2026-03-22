@@ -29,7 +29,7 @@ export default async function AdminUsersPage() {
   const { data: users } = await supabase
     .from("users")
     .select(
-      "id, email, full_name, plan, primary_path, recommendation_track, current_streak, has_paid, last_activity_date, created_at"
+      "id, email, full_name, plan, primary_path, recommendation_track, current_streak, has_paid, last_activity_date, created_at, age, location, occupation, bought_courses_before"
     )
     .order("created_at", { ascending: false });
 
@@ -95,6 +95,18 @@ export default async function AdminUsersPage() {
                   </th>
                   <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
                     Paid
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Age
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Location
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Occupation
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
+                    Bought Before
                   </th>
                 </tr>
               </thead>
@@ -171,14 +183,22 @@ export default async function AdminUsersPage() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-center">
                         {user.has_paid ? (
-                          <span className="text-emerald-600 font-semibold">
-                            &#x2713;
-                          </span>
+                          <span className="text-emerald-600 font-semibold">&#x2713;</span>
                         ) : (
-                          <span className="text-muted-foreground">
-                            &#x2717;
-                          </span>
+                          <span className="text-muted-foreground">&#x2717;</span>
                         )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {String((user as Record<string, unknown>).age ?? "—")}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {String((user as Record<string, unknown>).location ?? "—")}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                        {String((user as Record<string, unknown>).occupation ?? "—")}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-center">
+                        {(user as Record<string, unknown>).bought_courses_before ? "Yes" : "—"}
                       </td>
                     </tr>
                   );
@@ -186,7 +206,7 @@ export default async function AdminUsersPage() {
                 {(!users || users.length === 0) && (
                   <tr>
                     <td
-                      colSpan={10}
+                      colSpan={14}
                       className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No users yet.

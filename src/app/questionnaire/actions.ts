@@ -52,7 +52,7 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
     return { error: updateError.message };
   }
 
-  redirect("/profile");
+  redirect("/profile/complete");
 }
 
 export async function devSkipPayment(plan: "core" | "pro" | "ai") {
