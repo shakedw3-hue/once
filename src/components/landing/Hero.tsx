@@ -29,17 +29,29 @@ export default function Hero() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="mb-8 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg"
+              className="mb-4 max-w-lg text-lg leading-relaxed text-muted-foreground sm:text-xl"
             >
               We studied what the world&apos;s most successful people actually
-              do and built one path. Yours.
+              do — and built <span className="font-semibold text-foreground">one personalized path</span> that
+              takes you from knowledge to <span className="font-semibold text-foreground">real income</span>.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.55 }}
+              className="mb-8 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base"
+            >
+              Not just theory. At the end of your path, you get{" "}
+              <span className="font-medium text-foreground">practical, step-by-step income training</span> built
+              for the Philippine market — so you make your investment back and more.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               <Button
                 render={<Link href="/auth/signup" />}
@@ -58,7 +70,7 @@ export default function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.9 }}
-              className="max-w-md text-xs leading-relaxed text-muted-foreground"
+              className="max-w-lg text-sm leading-relaxed text-muted-foreground"
             >
               Built from the principles of Warren Buffett, Kobe Bryant, Elon
               Musk, the Dalai Lama, and hundreds of the world&apos;s most
