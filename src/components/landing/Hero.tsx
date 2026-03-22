@@ -191,13 +191,14 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* ── Credibility ── */}
+          {/* ── Credibility — two rows: people + institutions ── */}
           <motion.div
             className="mt-16 sm:mt-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 2.4 }}
           >
+            {/* Row 1: People */}
             <p
               className="mb-3 text-[9px] font-semibold tracking-[0.25em] uppercase"
               style={{ color: "rgba(255,255,255,0.15)" }}
@@ -217,18 +218,49 @@ export default function Hero() {
                 >
                   {name}
                   {i < 3 && (
-                    <span className="ml-5 inline-block text-[8px]" style={{ color: "rgba(255,255,255,0.1)" }}>
-                      ◆
-                    </span>
+                    <span className="ml-5 inline-block text-[8px]" style={{ color: "rgba(255,255,255,0.1)" }}>◆</span>
                   )}
                 </span>
               ))}
-              <span
-                className="text-[11px]"
-                style={{ color: "rgba(255,255,255,0.12)" }}
-              >
+              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.12)" }}>
                 & hundreds more
               </span>
+            </div>
+
+            {/* Thin divider */}
+            <div className="my-5 h-px w-32" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.2), transparent)" }} />
+
+            {/* Row 2: Institutions — styled as research logos */}
+            <p
+              className="mb-4 text-[9px] font-semibold tracking-[0.25em] uppercase"
+              style={{ color: "rgba(255,255,255,0.12)" }}
+            >
+              Research sourced from
+            </p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-x-8">
+              {[
+                { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.7rem" },
+                { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "0.75rem" },
+                { name: "WHO", font: "Arial, sans-serif", weight: 800, spacing: "0.12em", size: "0.7rem" },
+                { name: "McKinsey", font: "Georgia, serif", weight: 400, spacing: "0.02em", size: "0.8rem", italic: true },
+                { name: "Forbes", font: "Georgia, serif", weight: 700, spacing: "-0.01em", size: "0.8rem", italic: true },
+              ].map((inst) => (
+                <span
+                  key={inst.name}
+                  className="select-none transition-opacity duration-300 hover:opacity-60"
+                  style={{
+                    fontFamily: inst.font,
+                    fontWeight: inst.weight,
+                    letterSpacing: inst.spacing,
+                    fontSize: inst.size,
+                    fontStyle: inst.italic ? "italic" : "normal",
+                    color: "rgba(255,255,255,0.18)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {inst.name}
+                </span>
+              ))}
             </div>
           </motion.div>
         </div>
