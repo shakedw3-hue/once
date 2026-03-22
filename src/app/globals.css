@@ -140,13 +140,16 @@
     transform: translateY(-2px);
   }
 
-  /* Once. brand signature */
+  /* Once. brand signature — word in black, period in indigo */
   .once-signature {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 1.125rem;
-    color: oklch(0.44 0.19 265);
+    color: var(--foreground);
     letter-spacing: -0.02em;
+  }
+  .once-dot {
+    color: oklch(0.44 0.19 265);
   }
 
   /* Mobile-first button sizing */

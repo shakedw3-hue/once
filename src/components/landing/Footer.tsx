@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
         <div>
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Once. The decision that changes everything.
+            &copy; {new Date().getFullYear()} Once<span className="once-dot">.</span> The decision that changes everything.
           </p>
         </div>
         <div className="flex gap-5 text-xs text-muted-foreground">

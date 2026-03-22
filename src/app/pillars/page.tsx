@@ -148,7 +148,7 @@ export default function PillarsPage() {
         </p>
       </div>
 
-      <p className="mt-8 text-center once-signature">Once.</p>
+      <p className="mt-8 text-center once-signature">Once<span className="once-dot">.</span></p>
 
       <div className="mb-8 flex justify-end">
         <Link href="/method" className="text-sm text-primary hover:underline">

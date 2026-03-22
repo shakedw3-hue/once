@@ -21,7 +21,7 @@ export default function CheckoutSuccessPage() {
           className="mb-8 font-display text-2xl font-semibold tracking-[-0.04em] sm:text-3xl"
         >
           You made the decision.{" "}
-          <span className="text-primary">Once.</span>
+          <span className="once-signature">Once<span className="once-dot">.</span></span>
         </motion.p>
 
         <motion.div

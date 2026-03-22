@@ -93,7 +93,7 @@ export default function Timeline() {
       </div>
 
       {/* Promise signature */}
-      <p className="mt-6 text-center once-signature">Once.</p>
+      <p className="mt-6 text-center once-signature">Once<span className="once-dot">.</span></p>
     </div>
   );
 }

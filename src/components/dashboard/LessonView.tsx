@@ -191,7 +191,7 @@ export default function LessonView({
               </Button>
             ) : (
               <div className="flex flex-col items-end gap-2">
-                <p className="once-signature">One more step. Once.</p>
+                <p className="once-signature">One more step. Once<span className="once-dot">.</span></p>
                 <Button onClick={handleNext} className="font-semibold">
                   {nextLessonId ? "Next Lesson" : "Back to Module"}
                   {nextLessonId && (
