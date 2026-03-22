@@ -2,281 +2,156 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+const QUESTION_NAMES: Record<string, string> = {
+  battery: "Q1: Life battery level",
+  proud: "Q2: Last time proud",
+  one_change: "Q3: One area to change",
+  two_years: "Q4: 2-year vision",
+  follow_through: "Q5: Follow-through blocker",
+  income: "Q6: Income feeling",
+  sleep: "Q7: Sleep hours",
+  reaction: "Q8: Reaction to problems",
+  values: "Q9: Clear values",
+  habits: "Q10: Habit consistency",
+  free_time: "Q11: Free time dream",
+  income_target: "Q12: Income target",
+  digital_skills: "Q13: Digital comfort",
+  success_def: "Q14: Success definition",
+  commitment: "Q15: Commitment",
+};
+
 export default async function AdminAnalyticsPage() {
-  const supabase = createServiceClient();
+  const db = createServiceClient();
 
-  // ──────────────────────────────────────
-  // SECTION 1 — User Funnel
-  // ──────────────────────────────────────
+  // ─── Core counts ───
+  const { count: totalSignups } = await db.from("users").select("*", { count: "exact", head: true });
+  const { count: questionnaireDone } = await db.from("questionnaire_answers").select("*", { count: "exact", head: true });
+  const { count: paidUsers } = await db.from("users").select("*", { count: "exact", head: true }).eq("has_paid", true);
 
-  const { count: totalSignups } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true });
+  // Users with progress
+  const { data: progressData } = await db.from("user_progress").select("user_id, lesson_id").eq("completed", true);
+  const userLessonCount: Record<string, number> = {};
+  (progressData ?? []).forEach(r => { userLessonCount[r.user_id] = (userLessonCount[r.user_id] ?? 0) + 1; });
+  const startedCount = Object.keys(userLessonCount).length;
+  const completed5 = Object.values(userLessonCount).filter(c => c >= 5).length;
+  const completed10 = Object.values(userLessonCount).filter(c => c >= 10).length;
+  const completed25 = Object.values(userLessonCount).filter(c => c >= 25).length;
+  const totalLessonsDone = Object.values(userLessonCount).reduce((s, v) => s + v, 0);
+  const avgLessons = startedCount > 0 ? (totalLessonsDone / startedCount).toFixed(1) : "0";
 
-  const { count: questionnaireDone } = await supabase
-    .from("questionnaire_answers")
-    .select("*", { count: "exact", head: true });
-
-  const { count: paidUsers } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .eq("has_paid", true);
-
-  // Users who have at least 1 completed lesson
-  const { data: startedLearningData } = await supabase
-    .from("user_progress")
-    .select("user_id")
-    .eq("completed", true);
-
-  const startedLearningUsers = new Set(
-    (startedLearningData ?? []).map((r) => r.user_id)
-  );
-  const startedLearningCount = startedLearningUsers.size;
-
-  // Users who completed 5+ lessons
-  const lessonCountByUser: Record<string, number> = {};
-  (startedLearningData ?? []).forEach((r) => {
-    lessonCountByUser[r.user_id] = (lessonCountByUser[r.user_id] ?? 0) + 1;
-  });
-  const completed5PlusCount = Object.values(lessonCountByUser).filter(
-    (c) => c >= 5
-  ).length;
-
+  // ─── Funnel ───
   const funnel = [
-    { stage: "Signed Up", count: totalSignups ?? 0 },
-    { stage: "Completed Questionnaire", count: questionnaireDone ?? 0 },
-    { stage: "Paid", count: paidUsers ?? 0 },
-    { stage: "Started Learning", count: startedLearningCount },
-    { stage: "Completed 5+ Lessons", count: completed5PlusCount },
+    { stage: "Visited Site", count: totalSignups ?? 0, note: "Signed up" },
+    { stage: "Completed Questionnaire", count: questionnaireDone ?? 0, note: "" },
+    { stage: "Paid", count: paidUsers ?? 0, note: "" },
+    { stage: "Started Learning", count: startedCount, note: "1+ lessons" },
+    { stage: "5+ Lessons", count: completed5, note: "" },
+    { stage: "10+ Lessons", count: completed10, note: "" },
+    { stage: "25+ Lessons", count: completed25, note: "Power user" },
   ];
-
   const maxFunnel = funnel[0]?.count || 1;
 
-  // ──────────────────────────────────────
-  // SECTION 2 — Questionnaire Analytics
-  // ──────────────────────────────────────
-
-  const { data: allAnswers } = await supabase
-    .from("questionnaire_answers")
-    .select("answers");
-
-  // Which question has highest drop-off
-  const questionCounts: Record<string, number> = {};
-  (allAnswers ?? []).forEach((row) => {
-    const ans = row.answers as Record<string, unknown> | null;
-    if (ans && typeof ans === "object") {
-      Object.keys(ans).forEach((key) => {
-        questionCounts[key] = (questionCounts[key] ?? 0) + 1;
-      });
-    }
+  // ─── Question-by-question drop-off ───
+  const { data: allAnswers } = await db.from("questionnaire_answers").select("answers");
+  const questionOrder = ["battery", "proud", "one_change", "two_years", "follow_through", "income", "sleep", "reaction", "values", "habits", "free_time", "income_target", "digital_skills", "success_def", "commitment"];
+  const questionCounts = questionOrder.map(qId => {
+    const count = (allAnswers ?? []).filter(row => {
+      const ans = row.answers as Record<string, unknown> | null;
+      return ans && qId in ans;
+    }).length;
+    return { id: qId, name: QUESTION_NAMES[qId] || qId, count };
   });
-  const questionsSorted = Object.entries(questionCounts).sort(
-    (a, b) => b[1] - a[1]
-  );
-  // The question with the lowest answer count relative to total questionnaire starts
-  const questionWithHighestDropoff = questionsSorted.length > 0
-    ? questionsSorted[questionsSorted.length - 1]
-    : null;
+  const totalStarts = allAnswers?.length ?? 0;
 
-  // Most common primary_path
-  const { data: pathData } = await supabase
-    .from("users")
-    .select("primary_path")
-    .not("primary_path", "is", null);
+  // ─── Path/Plan/Track distribution ───
+  const { data: userData } = await db.from("users").select("primary_path, plan, recommendation_plan, recommendation_track, utm_source, device_type, created_at, last_activity_date, current_streak");
 
-  const pathCounts: Record<string, number> = {};
-  (pathData ?? []).forEach((u) => {
-    if (u.primary_path) {
-      pathCounts[u.primary_path] = (pathCounts[u.primary_path] ?? 0) + 1;
-    }
-  });
-  const topPath = Object.entries(pathCounts).sort((a, b) => b[1] - a[1])[0];
+  const pathDist: Record<string, number> = {};
+  const planDist: Record<string, number> = {};
+  const trackDist: Record<string, number> = {};
+  const sourceDist: Record<string, number> = {};
+  const deviceDist: Record<string, number> = {};
+  const streaks = (userData ?? []).map(u => u.current_streak ?? 0);
+  const avgStreak = streaks.length > 0 ? (streaks.reduce((s, v) => s + v, 0) / streaks.length).toFixed(1) : "0";
 
-  // Most common recommendation_plan
-  const { data: planData } = await supabase
-    .from("users")
-    .select("recommendation_plan")
-    .not("recommendation_plan", "is", null);
-
-  const planCounts: Record<string, number> = {};
-  (planData ?? []).forEach((u) => {
-    if (u.recommendation_plan) {
-      planCounts[u.recommendation_plan] =
-        (planCounts[u.recommendation_plan] ?? 0) + 1;
-    }
-  });
-  const topPlan = Object.entries(planCounts).sort((a, b) => b[1] - a[1])[0];
-
-  // Most common recommendation_track
-  const { data: trackData } = await supabase
-    .from("users")
-    .select("recommendation_track")
-    .not("recommendation_track", "is", null);
-
-  const trackCounts: Record<string, number> = {};
-  (trackData ?? []).forEach((u) => {
-    if (u.recommendation_track) {
-      trackCounts[u.recommendation_track] =
-        (trackCounts[u.recommendation_track] ?? 0) + 1;
-    }
-  });
-  const topTrack = Object.entries(trackCounts).sort((a, b) => b[1] - a[1])[0];
-
-  // ──────────────────────────────────────
-  // SECTION 3 — Engagement
-  // ──────────────────────────────────────
-
-  // Average streak
-  const { data: streakData } = await supabase
-    .from("users")
-    .select("current_streak");
-
-  const streaks = (streakData ?? []).map((u) => u.current_streak ?? 0);
-  const avgStreak =
-    streaks.length > 0
-      ? (streaks.reduce((s, v) => s + v, 0) / streaks.length).toFixed(1)
-      : "0";
-
-  // Users active in last 7 days
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const { count: activeIn7Days } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .gte("last_activity_date", sevenDaysAgo.toISOString().split("T")[0]);
+  let activeIn7 = 0;
 
-  // Average lessons completed per user
-  const totalLessonsCompleted = Object.values(lessonCountByUser).reduce(
-    (s, v) => s + v,
-    0
-  );
-  const usersWithProgress = Object.keys(lessonCountByUser).length;
-  const avgLessonsPerUser =
-    usersWithProgress > 0
-      ? (totalLessonsCompleted / usersWithProgress).toFixed(1)
-      : "0";
-
-  // Most completed modules
-  const { data: completedLessons } = await supabase
-    .from("user_progress")
-    .select("lesson_id")
-    .eq("completed", true);
-
-  const lessonIds = [
-    ...new Set((completedLessons ?? []).map((r) => r.lesson_id)),
-  ];
-
-  let moduleCompletionRanking: { title: string; count: number }[] = [];
-  if (lessonIds.length > 0) {
-    const { data: lessonsWithModules } = await supabase
-      .from("lessons")
-      .select("id, module_id")
-      .in("id", lessonIds);
-
-    const { data: allModules } = await supabase
-      .from("modules")
-      .select("id, title");
-
-    const moduleMap = new Map(
-      (allModules ?? []).map((m) => [m.id, m.title])
-    );
-
-    // Count completions per module
-    const lessonToModule = new Map(
-      (lessonsWithModules ?? []).map((l) => [l.id, l.module_id])
-    );
-
-    const moduleCompletions: Record<string, number> = {};
-    (completedLessons ?? []).forEach((r) => {
-      const modId = lessonToModule.get(r.lesson_id);
-      if (modId) {
-        moduleCompletions[modId] = (moduleCompletions[modId] ?? 0) + 1;
-      }
-    });
-
-    moduleCompletionRanking = Object.entries(moduleCompletions)
-      .map(([modId, count]) => ({
-        title: moduleMap.get(modId) ?? modId,
-        count,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-  }
-
-  // ──────────────────────────────────────
-  // SECTION 4 — Device/Time
-  // ──────────────────────────────────────
-
-  // Signups by day of week
-  const { data: allUsers } = await supabase
-    .from("users")
-    .select("created_at");
-
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const signupsByDay = [0, 0, 0, 0, 0, 0, 0];
-  (allUsers ?? []).forEach((u) => {
-    const day = new Date(u.created_at).getDay();
-    signupsByDay[day]++;
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  (userData ?? []).forEach(u => {
+    if (u.primary_path) pathDist[u.primary_path] = (pathDist[u.primary_path] ?? 0) + 1;
+    if (u.plan) planDist[u.plan] = (planDist[u.plan] ?? 0) + 1;
+    if (u.recommendation_track) trackDist[u.recommendation_track] = (trackDist[u.recommendation_track] ?? 0) + 1;
+    const src = u.utm_source || "direct";
+    sourceDist[src] = (sourceDist[src] ?? 0) + 1;
+    const dev = u.device_type || "unknown";
+    deviceDist[dev] = (deviceDist[dev] ?? 0) + 1;
+    if (u.last_activity_date && new Date(u.last_activity_date) >= sevenDaysAgo) activeIn7++;
+    signupsByDay[new Date(u.created_at).getDay()]++;
   });
+
   const maxDaySignups = Math.max(...signupsByDay, 1);
 
-  // Recent analytics events
-  const { data: recentEvents } = await supabase
-    .from("analytics")
-    .select("event, created_at, user_id, metadata")
-    .order("created_at", { ascending: false })
-    .limit(20);
+  // ─── Revenue / AOV ───
+  const { data: payments } = await db.from("payments").select("amount, status, created_at").eq("status", "completed");
+  const totalRevenue = (payments ?? []).reduce((s, p) => s + (p.amount ?? 0), 0) / 100;
+  const orderCount = (payments ?? []).length;
+  const aov = orderCount > 0 ? (totalRevenue / orderCount).toFixed(0) : "0";
+
+  // This month
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  const monthRevenue = (payments ?? []).filter(p => new Date(p.created_at) >= startOfMonth).reduce((s, p) => s + (p.amount ?? 0), 0) / 100;
+
+  // ─── Recent events ───
+  const { data: recentEvents } = await db.from("analytics").select("event, created_at, user_id").order("created_at", { ascending: false }).limit(20);
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold tracking-tight text-foreground">
-        Analytics
-      </h1>
+      <h1 className="mb-6 text-2xl font-bold tracking-tight">Analytics</h1>
 
-      {/* ── Section 1: User Funnel ── */}
+      {/* ═══ KEY METRICS ═══ */}
+      <div className="mb-8 grid gap-3 grid-cols-2 sm:grid-cols-4">
+        <MetricCard label="Total Users" value={totalSignups ?? 0} />
+        <MetricCard label="Paid Users" value={paidUsers ?? 0} sub={`${totalSignups ? Math.round(((paidUsers ?? 0) / (totalSignups ?? 1)) * 100) : 0}% conversion`} />
+        <MetricCard label="Total Revenue" value={`₱${totalRevenue.toLocaleString()}`} sub={`₱${monthRevenue.toLocaleString()} this month`} />
+        <MetricCard label="AOV" value={`₱${aov}`} sub={`${orderCount} orders`} />
+      </div>
+
+      <div className="mb-8 grid gap-3 grid-cols-2 sm:grid-cols-4">
+        <MetricCard label="Avg Streak" value={`${avgStreak} days`} />
+        <MetricCard label="Active (7d)" value={activeIn7} sub={`${totalSignups ? Math.round((activeIn7 / (totalSignups ?? 1)) * 100) : 0}% of total`} />
+        <MetricCard label="Avg Lessons/User" value={avgLessons} sub={`${startedCount} active users`} />
+        <MetricCard label="Total Lessons Done" value={totalLessonsDone} />
+      </div>
+
+      {/* ═══ CONVERSION FUNNEL ═══ */}
       <div className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          User Funnel
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold">Conversion Funnel</h2>
         <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
+          <CardContent className="p-5">
+            <div className="space-y-3">
               {funnel.map((step, i) => {
-                const pct =
-                  maxFunnel > 0
-                    ? Math.round((step.count / maxFunnel) * 100)
-                    : 0;
-                const dropoff =
-                  i > 0 && funnel[i - 1].count > 0
-                    ? Math.round(
-                        ((funnel[i - 1].count - step.count) /
-                          funnel[i - 1].count) *
-                          100
-                      )
-                    : null;
-
+                const pct = maxFunnel > 0 ? Math.round((step.count / maxFunnel) * 100) : 0;
+                const dropoff = i > 0 && funnel[i - 1].count > 0
+                  ? Math.round(((funnel[i - 1].count - step.count) / funnel[i - 1].count) * 100) : null;
                 return (
                   <div key={step.stage}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium text-muted-foreground">
-                        {step.stage}
-                      </span>
+                      <span className="text-muted-foreground">{step.stage}</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-foreground">
-                          {step.count}
-                        </span>
+                        <span className="font-bold">{step.count}</span>
                         {dropoff !== null && dropoff > 0 && (
-                          <span className="text-xs text-red-600">
-                            -{dropoff}%
-                          </span>
+                          <span className={`text-xs ${dropoff > 50 ? "text-red-500 font-semibold" : "text-amber-500"}`}>-{dropoff}%</span>
                         )}
                       </div>
                     </div>
-                    <div className="h-6 overflow-hidden rounded-md bg-muted">
-                      <div
-                        className="h-full rounded-md bg-primary/80 transition-all"
-                        style={{ width: `${Math.max(pct, 2)}%` }}
-                      />
+                    <div className="h-5 overflow-hidden rounded bg-muted">
+                      <div className="h-full rounded bg-primary/70" style={{ width: `${Math.max(pct, 2)}%` }} />
                     </div>
                   </div>
                 );
@@ -286,257 +161,153 @@ export default async function AdminAnalyticsPage() {
         </Card>
       </div>
 
-      {/* ── Section 2: Questionnaire Analytics ── */}
+      {/* ═══ QUESTIONNAIRE DROP-OFF ═══ */}
       <div className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Questionnaire Analytics
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Highest Drop-off Question
-              </p>
-              <p className="mt-1 text-lg font-bold tracking-tight text-foreground">
-                {questionWithHighestDropoff
-                  ? questionWithHighestDropoff[0]
-                  : "N/A"}
-              </p>
-              {questionWithHighestDropoff && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {questionWithHighestDropoff[1]} answered of{" "}
-                  {allAnswers?.length ?? 0} total
-                </p>
-              )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Top Primary Path
-              </p>
-              <p className="mt-1 text-lg font-bold capitalize tracking-tight text-foreground">
-                {topPath ? topPath[0] : "N/A"}
-              </p>
-              {topPath && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {topPath[1]} users
-                </p>
-              )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Top Recommendation Plan
-              </p>
-              <p className="mt-1 text-lg font-bold capitalize tracking-tight text-foreground">
-                {topPlan ? topPlan[0] : "N/A"}
-              </p>
-              {topPlan && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {topPlan[1]} users
-                </p>
-              )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Top Recommendation Track
-              </p>
-              <p className="mt-1 text-lg font-bold capitalize tracking-tight text-foreground">
-                {topTrack ? topTrack[0] : "N/A"}
-              </p>
-              {topTrack && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {topTrack[1]} users
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* ── Section 3: Engagement ── */}
-      <div className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Engagement
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Avg Streak
-              </p>
-              <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                {avgStreak}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">days</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Active (Last 7 Days)
-              </p>
-              <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                {activeIn7Days ?? 0}{" "}
-                <span className="text-base font-normal text-muted-foreground">
-                  / {totalSignups ?? 0}
-                </span>
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {(totalSignups ?? 0) > 0
-                  ? Math.round(
-                      ((activeIn7Days ?? 0) / (totalSignups ?? 1)) * 100
-                    )
-                  : 0}
-                % of total
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Avg Lessons / User
-              </p>
-              <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                {avgLessonsPerUser}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {usersWithProgress} users with progress
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Total Lessons Done
-              </p>
-              <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                {totalLessonsCompleted}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Most completed modules */}
-        {moduleCompletionRanking.length > 0 && (
-          <div className="mt-4">
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Most Completed Modules
-            </h3>
-            <Card>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border">
-                  {moduleCompletionRanking.map((mod) => (
-                    <div
-                      key={mod.title}
-                      className="flex items-center justify-between px-4 py-3"
-                    >
-                      <span className="text-sm font-medium text-foreground">
-                        {mod.title}
-                      </span>
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {mod.count} completions
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* ── Section 4: Device/Time ── */}
-      <div className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Signups by Day of Week
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold">Questionnaire Drop-off (Question by Question)</h2>
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-end gap-2">
-              {dayNames.map((day, i) => {
-                const pct = Math.round((signupsByDay[i] / maxDaySignups) * 100);
-                return (
-                  <div
-                    key={day}
-                    className="flex flex-1 flex-col items-center gap-1"
-                  >
-                    <span className="text-xs font-bold text-foreground">
-                      {signupsByDay[i]}
-                    </span>
-                    <div className="w-full overflow-hidden rounded-t-md bg-muted">
-                      <div
-                        className="w-full rounded-t-md bg-primary/80 transition-all"
-                        style={{
-                          height: `${Math.max(pct, 4)}px`,
-                          minHeight: "4px",
-                          maxHeight: "120px",
-                          // Scale to 120px max
-                          ...(maxDaySignups > 0
-                            ? {
-                                height: `${Math.max(
-                                  (signupsByDay[i] / maxDaySignups) * 120,
-                                  4
-                                )}px`,
-                              }
-                            : {}),
-                        }}
-                      />
+          <CardContent className="p-5">
+            {totalStarts === 0 ? (
+              <p className="text-sm text-muted-foreground">No questionnaire data yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {questionCounts.map((q, i) => {
+                  const pct = totalStarts > 0 ? Math.round((q.count / totalStarts) * 100) : 0;
+                  const prev = i > 0 ? questionCounts[i - 1].count : totalStarts;
+                  const drop = prev > 0 ? Math.round(((prev - q.count) / prev) * 100) : 0;
+                  return (
+                    <div key={q.id} className="flex items-center gap-3">
+                      <span className="w-48 text-xs text-muted-foreground truncate">{q.name}</span>
+                      <div className="flex-1 h-4 rounded bg-muted overflow-hidden">
+                        <div className={`h-full rounded ${drop > 20 ? "bg-red-400" : drop > 10 ? "bg-amber-400" : "bg-emerald-400"}`} style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="w-8 text-xs font-medium text-right">{q.count}</span>
+                      {drop > 0 && i > 0 && (
+                        <span className={`w-10 text-[10px] text-right ${drop > 20 ? "text-red-500 font-bold" : "text-muted-foreground"}`}>-{drop}%</span>
+                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground">{day}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ═══ DISTRIBUTIONS ═══ */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-2">
+        {/* Path distribution */}
+        <Card>
+          <CardContent className="p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Primary Path Distribution</p>
+            <div className="space-y-2">
+              {Object.entries(pathDist).sort((a, b) => b[1] - a[1]).map(([path, count]) => (
+                <div key={path} className="flex items-center justify-between">
+                  <span className="text-sm capitalize">{path}</span>
+                  <Badge variant="secondary">{count}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Plan distribution */}
+        <Card>
+          <CardContent className="p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Plan Distribution</p>
+            <div className="space-y-2">
+              {Object.entries(planDist).sort((a, b) => b[1] - a[1]).map(([plan, count]) => (
+                <div key={plan} className="flex items-center justify-between">
+                  <span className="text-sm">{plan === "ai" ? "AI Careers" : plan.charAt(0).toUpperCase() + plan.slice(1)}</span>
+                  <Badge variant="secondary">{count}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Track distribution */}
+        <Card>
+          <CardContent className="p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recommended Track</p>
+            <div className="space-y-2">
+              {Object.entries(trackDist).sort((a, b) => b[1] - a[1]).map(([track, count]) => (
+                <div key={track} className="flex items-center justify-between">
+                  <span className="text-sm">{track}</span>
+                  <Badge variant="secondary">{count}</Badge>
+                </div>
+              ))}
+              {Object.keys(trackDist).length === 0 && <p className="text-xs text-muted-foreground">No data yet</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Traffic source */}
+        <Card>
+          <CardContent className="p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Traffic Source</p>
+            <div className="space-y-2">
+              {Object.entries(sourceDist).sort((a, b) => b[1] - a[1]).map(([src, count]) => (
+                <div key={src} className="flex items-center justify-between">
+                  <span className="text-sm">{src}</span>
+                  <Badge variant="secondary">{count}</Badge>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity Log */}
+      {/* ═══ SIGNUPS BY DAY ═══ */}
+      <div className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold">Signups by Day</h2>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-end gap-2 h-28">
+              {dayNames.map((day, i) => (
+                <div key={day} className="flex-1 flex flex-col items-center gap-1">
+                  <span className="text-xs font-bold">{signupsByDay[i]}</span>
+                  <div className="w-full rounded-t bg-primary/70" style={{ height: `${Math.max((signupsByDay[i] / maxDaySignups) * 100, 4)}%` }} />
+                  <span className="text-[10px] text-muted-foreground">{day}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ═══ ACTIVITY LOG ═══ */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Recent Activity Log
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold">Recent Activity</h2>
         <Card>
           <CardContent className="p-0">
-            <div className="divide-y divide-border">
-              {(recentEvents ?? []).map((event, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {event.event}
-                    </Badge>
-                    {event.user_id && (
-                      <span className="text-xs text-muted-foreground">
-                        {event.user_id.slice(0, 8)}...
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(event.created_at).toLocaleDateString()}{" "}
-                    {new Date(event.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+            <div className="divide-y">
+              {(recentEvents ?? []).map((ev, i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-2.5">
+                  <Badge variant="outline" className="font-mono text-[10px]">{ev.event}</Badge>
+                  <span className="text-[10px] text-muted-foreground">
+                    {new Date(ev.created_at).toLocaleDateString()} {new Date(ev.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
               ))}
               {(!recentEvents || recentEvents.length === 0) && (
-                <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  No events recorded yet.
-                </p>
+                <p className="px-4 py-8 text-center text-sm text-muted-foreground">No events yet.</p>
               )}
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
+  );
+}
+
+function MetricCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="mt-1 text-2xl font-bold tracking-tight">{value}</p>
+        {sub && <p className="mt-0.5 text-[10px] text-muted-foreground">{sub}</p>}
+      </CardContent>
+    </Card>
   );
 }
