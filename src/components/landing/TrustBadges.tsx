@@ -50,7 +50,7 @@ const badges = [
 
 export default function TrustBadges() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
       {badges.map((badge, i) => (
         <motion.div
           key={badge.title}
@@ -58,17 +58,27 @@ export default function TrustBadges() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: i * 0.08 }}
-          className="flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center"
+          className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 text-center"
+          style={{
+            boxShadow:
+              "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)",
+          }}
         >
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: "rgba(79,70,229,0.08)", color: "#4F46E5" }}
+            className="flex h-11 w-11 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: "rgba(79,70,229,0.08)",
+              color: "#4F46E5",
+              boxShadow: "0 0 12px rgba(79,70,229,0.2), 0 0 4px rgba(79,70,229,0.1)",
+            }}
           >
             {badge.icon}
           </div>
           <div>
             <p className="text-xs font-semibold text-foreground">{badge.title}</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">{badge.sub}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              {badge.sub}
+            </p>
           </div>
         </motion.div>
       ))}
