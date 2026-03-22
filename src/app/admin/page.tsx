@@ -1,327 +1,226 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
+import AdminDateFilter from "./AdminDateFilter";
 
-export default async function AdminOverview() {
-  const supabase = createServiceClient();
+interface Props {
+  searchParams: Promise<{ from?: string; to?: string; range?: string }>;
+}
 
-  // ── Total users ──
-  const { count: totalUsers } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true });
+export default async function AdminOverview({ searchParams }: Props) {
+  const { from, to, range } = await searchParams;
+  const db = createServiceClient();
 
-  // ── New users this week ──
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const { count: newThisWeek } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", oneWeekAgo.toISOString());
+  // Determine date range
+  const now = new Date();
+  let fromDate: Date;
+  let toDate: Date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
-  // ── Paid users by plan ──
-  const { data: paidUsersData } = await supabase
-    .from("users")
-    .select("plan")
-    .eq("has_paid", true);
-
-  const paidUsers = paidUsersData ?? [];
-  const coreCount = paidUsers.filter((u) => u.plan === "core").length;
-  const proCount = paidUsers.filter((u) => u.plan === "pro").length;
-  const aiCount = paidUsers.filter((u) => u.plan === "ai_careers").length;
-  const totalPaid = paidUsers.length;
-
-  // ── Today's revenue ──
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const { data: todayPayments } = await supabase
-    .from("payments")
-    .select("amount")
-    .eq("status", "completed")
-    .gte("created_at", todayStart.toISOString());
-
-  const todayRevenue = (todayPayments ?? []).reduce(
-    (sum, p) => sum + (p.amount ?? 0),
-    0
-  );
-
-  // ── Total revenue (all time) ──
-  const { data: allPayments } = await supabase
-    .from("payments")
-    .select("amount")
-    .eq("status", "completed");
-
-  const totalRevenue = (allPayments ?? []).reduce(
-    (sum, p) => sum + (p.amount ?? 0),
-    0
-  );
-
-  // ── Questionnaire completions (unique users) ──
-  const { data: questionnaireUsers } = await supabase
-    .from("questionnaire_answers")
-    .select("user_id");
-
-  const uniqueQuestionnaireUsers = new Set(
-    (questionnaireUsers ?? []).map((q) => q.user_id)
-  ).size;
-
-  // ── Average lessons per paid user ──
-  const { data: paidUserIds } = await supabase
-    .from("users")
-    .select("id")
-    .eq("has_paid", true);
-
-  const paidIdSet = new Set((paidUserIds ?? []).map((u) => u.id));
-
-  const { data: completedLessons } = await supabase
-    .from("user_progress")
-    .select("user_id")
-    .eq("completed", true);
-
-  const lessonsByPaidUser = new Map<string, number>();
-  for (const row of completedLessons ?? []) {
-    if (paidIdSet.has(row.user_id)) {
-      lessonsByPaidUser.set(
-        row.user_id,
-        (lessonsByPaidUser.get(row.user_id) ?? 0) + 1
-      );
-    }
+  if (from && to) {
+    fromDate = new Date(from);
+    toDate = new Date(to + "T23:59:59");
+  } else {
+    const r = range || "7d";
+    const days = r === "1d" ? 1 : r === "7d" ? 7 : r === "30d" ? 30 : r === "90d" ? 90 : 7;
+    fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+    fromDate.setHours(0, 0, 0, 0);
   }
-  const avgLessons =
-    lessonsByPaidUser.size > 0
-      ? (
-          Array.from(lessonsByPaidUser.values()).reduce((a, b) => a + b, 0) /
-          lessonsByPaidUser.size
-        ).toFixed(1)
-      : "0";
 
-  // ── Most popular primary path ──
-  const { data: pathUsers } = await supabase
-    .from("users")
-    .select("primary_path")
-    .not("primary_path", "is", null);
+  const fromISO = fromDate.toISOString();
+  const toISO = toDate.toISOString();
 
-  const pathCounts: Record<string, number> = {};
-  for (const u of pathUsers ?? []) {
-    if (u.primary_path) {
-      pathCounts[u.primary_path] = (pathCounts[u.primary_path] ?? 0) + 1;
-    }
+  // ─── Period metrics ───
+  const { count: newUsers } = await db.from("users").select("*", { count: "exact", head: true }).gte("created_at", fromISO).lte("created_at", toISO);
+  const { count: totalUsers } = await db.from("users").select("*", { count: "exact", head: true });
+  const { count: newQuestionnaires } = await db.from("questionnaire_answers").select("*", { count: "exact", head: true }).gte("completed_at", fromISO).lte("completed_at", toISO);
+
+  const { data: periodPayments } = await db.from("payments").select("amount, user_id, created_at").eq("status", "completed").gte("created_at", fromISO).lte("created_at", toISO);
+  const periodRevenue = (periodPayments ?? []).reduce((s, p) => s + (p.amount ?? 0), 0) / 100;
+  const periodOrders = (periodPayments ?? []).length;
+  const periodAOV = periodOrders > 0 ? Math.round(periodRevenue / periodOrders) : 0;
+
+  const { data: periodProgress } = await db.from("user_progress").select("user_id, completed_at").eq("completed", true).gte("completed_at", fromISO).lte("completed_at", toISO);
+  const periodLessons = (periodProgress ?? []).length;
+  const periodActiveUsers = new Set((periodProgress ?? []).map(p => p.user_id)).size;
+
+  // ─── All-time totals ───
+  const { data: allPayments } = await db.from("payments").select("amount").eq("status", "completed");
+  const totalRevenue = (allPayments ?? []).reduce((s, p) => s + (p.amount ?? 0), 0) / 100;
+  const { count: totalPaid } = await db.from("users").select("*", { count: "exact", head: true }).eq("has_paid", true);
+
+  // ─── Daily breakdown for chart ───
+  const dailyMap: Record<string, { signups: number; revenue: number; lessons: number; questionnaires: number }> = {};
+
+  // Initialize days
+  const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / 86400000) + 1;
+  for (let i = 0; i < Math.min(daysDiff, 90); i++) {
+    const d = new Date(fromDate);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().split("T")[0];
+    dailyMap[key] = { signups: 0, revenue: 0, lessons: 0, questionnaires: 0 };
   }
-  const topPath =
-    Object.entries(pathCounts).sort((a, b) => b[1] - a[1])[0] ?? null;
 
-  // ── Active users (last 7 days) ──
-  const { count: activeUsers } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .gte("last_activity_date", oneWeekAgo.toISOString());
+  // Fill signups
+  const { data: periodUsers } = await db.from("users").select("created_at").gte("created_at", fromISO).lte("created_at", toISO);
+  (periodUsers ?? []).forEach(u => {
+    const day = u.created_at.split("T")[0];
+    if (dailyMap[day]) dailyMap[day].signups++;
+  });
 
-  // ── Funnel calculations ──
-  const total = totalUsers ?? 0;
-  const questionnaireRate =
-    total > 0 ? Math.round((uniqueQuestionnaireUsers / total) * 100) : 0;
-  const paidRate = total > 0 ? Math.round((totalPaid / total) * 100) : 0;
+  // Fill revenue
+  (periodPayments ?? []).forEach(p => {
+    const day = p.created_at.split("T")[0];
+    if (dailyMap[day]) dailyMap[day].revenue += (p.amount ?? 0) / 100;
+  });
+
+  // Fill lessons
+  (periodProgress ?? []).forEach(p => {
+    if (p.completed_at) {
+      const day = p.completed_at.split("T")[0];
+      if (dailyMap[day]) dailyMap[day].lessons++;
+    }
+  });
+
+  // Fill questionnaires
+  const { data: periodQA } = await db.from("questionnaire_answers").select("completed_at").gte("completed_at", fromISO).lte("completed_at", toISO);
+  (periodQA ?? []).forEach(q => {
+    if (q.completed_at) {
+      const day = q.completed_at.split("T")[0];
+      if (dailyMap[day]) dailyMap[day].questionnaires++;
+    }
+  });
+
+  const dailyData = Object.entries(dailyMap).sort((a, b) => a[0].localeCompare(b[0]));
+  const maxSignups = Math.max(...dailyData.map(d => d[1].signups), 1);
+  const maxRevenue = Math.max(...dailyData.map(d => d[1].revenue), 1);
+  const maxLessons = Math.max(...dailyData.map(d => d[1].lessons), 1);
+
+  const rangeLabel = from && to ? `${from} to ${to}` : range === "1d" ? "Today" : range === "30d" ? "Last 30 days" : range === "90d" ? "Last 90 days" : "Last 7 days";
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold tracking-tight text-foreground">
-        Overview
-      </h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
+        <AdminDateFilter />
+      </div>
 
-      {/* ── Top metric cards ── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <p className="mb-4 text-xs text-muted-foreground">Showing: {rangeLabel}</p>
+
+      {/* Period metrics */}
+      <div className="mb-6 grid gap-3 grid-cols-2 sm:grid-cols-4">
+        <MC label="New Users" value={newUsers ?? 0} sub={`${totalUsers ?? 0} total`} />
+        <MC label="Revenue" value={`₱${periodRevenue.toLocaleString()}`} sub={`₱${totalRevenue.toLocaleString()} all-time`} />
+        <MC label="Orders" value={periodOrders} sub={periodAOV > 0 ? `₱${periodAOV} avg` : ""} />
+        <MC label="Questionnaires" value={newQuestionnaires ?? 0} />
+      </div>
+
+      <div className="mb-8 grid gap-3 grid-cols-2 sm:grid-cols-4">
+        <MC label="Lessons Done" value={periodLessons} />
+        <MC label="Active Users" value={periodActiveUsers} />
+        <MC label="Paid Users" value={totalPaid ?? 0} sub={totalUsers ? `${Math.round(((totalPaid ?? 0) / (totalUsers ?? 1)) * 100)}% of total` : ""} />
+        <MC label="Conversion" value={`${totalUsers ? Math.round(((totalPaid ?? 0) / (totalUsers ?? 1)) * 100) : 0}%`} sub="signup → paid" />
+      </div>
+
+      {/* Daily chart */}
+      <h2 className="mb-3 text-lg font-semibold">Daily Breakdown</h2>
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        {/* Signups chart */}
         <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Users
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {total}
-            </p>
-            {(newThisWeek ?? 0) > 0 && (
-              <p className="mt-1 text-sm text-emerald-600">
-                +{newThisWeek} this week
-              </p>
-            )}
+          <CardContent className="p-4">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Signups</p>
+            <div className="flex items-end gap-[2px] h-20">
+              {dailyData.map(([day, d]) => (
+                <div key={day} className="flex-1 flex flex-col items-center">
+                  <div className="w-full rounded-t bg-blue-400" style={{ height: `${Math.max((d.signups / maxSignups) * 100, 3)}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-1 flex justify-between text-[8px] text-muted-foreground">
+              <span>{dailyData[0]?.[0]?.slice(5)}</span>
+              <span>{dailyData[dailyData.length - 1]?.[0]?.slice(5)}</span>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Revenue chart */}
         <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Today&apos;s Revenue
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              ₱{(todayRevenue / 100).toLocaleString()}
-            </p>
+          <CardContent className="p-4">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Revenue (₱)</p>
+            <div className="flex items-end gap-[2px] h-20">
+              {dailyData.map(([day, d]) => (
+                <div key={day} className="flex-1 flex flex-col items-center">
+                  <div className="w-full rounded-t bg-emerald-400" style={{ height: `${Math.max((d.revenue / maxRevenue) * 100, 3)}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-1 flex justify-between text-[8px] text-muted-foreground">
+              <span>{dailyData[0]?.[0]?.slice(5)}</span>
+              <span>{dailyData[dailyData.length - 1]?.[0]?.slice(5)}</span>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Lessons chart */}
         <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Revenue
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              ₱{(totalRevenue / 100).toLocaleString()}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Active Users (7d)
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {activeUsers ?? 0}
-            </p>
+          <CardContent className="p-4">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Lessons Completed</p>
+            <div className="flex items-end gap-[2px] h-20">
+              {dailyData.map(([day, d]) => (
+                <div key={day} className="flex-1 flex flex-col items-center">
+                  <div className="w-full rounded-t bg-violet-400" style={{ height: `${Math.max((d.lessons / maxLessons) * 100, 3)}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-1 flex justify-between text-[8px] text-muted-foreground">
+              <span>{dailyData[0]?.[0]?.slice(5)}</span>
+              <span>{dailyData[dailyData.length - 1]?.[0]?.slice(5)}</span>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* ── Conversion Funnel ── */}
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-foreground">
-        Conversion Funnel
-      </h2>
+      {/* Day-by-day table */}
+      <h2 className="mb-3 text-lg font-semibold">Day by Day</h2>
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
-            {/* Step 1: Signup */}
-            <div className="flex-1">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Signups
-              </p>
-              <div className="relative h-24 w-full overflow-hidden rounded-lg bg-blue-100">
-                <div
-                  className="absolute inset-0 rounded-lg bg-blue-500"
-                  style={{ width: "100%" }}
-                />
-                <span className="relative z-10 flex h-full items-center justify-center text-2xl font-bold text-white">
-                  {total}
-                </span>
-              </div>
-              <p className="mt-1 text-center text-xs text-muted-foreground">
-                100%
-              </p>
-            </div>
-
-            <div className="hidden text-2xl text-muted-foreground sm:block">
-              &rarr;
-            </div>
-
-            {/* Step 2: Questionnaire */}
-            <div className="flex-1">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Questionnaire
-              </p>
-              <div className="relative h-24 w-full overflow-hidden rounded-lg bg-amber-100">
-                <div
-                  className="absolute inset-0 rounded-lg bg-amber-500"
-                  style={{
-                    width: `${Math.max(questionnaireRate, 4)}%`,
-                  }}
-                />
-                <span className="relative z-10 flex h-full items-center justify-center text-2xl font-bold text-white">
-                  {uniqueQuestionnaireUsers}
-                </span>
-              </div>
-              <p className="mt-1 text-center text-xs text-muted-foreground">
-                {questionnaireRate}%
-              </p>
-            </div>
-
-            <div className="hidden text-2xl text-muted-foreground sm:block">
-              &rarr;
-            </div>
-
-            {/* Step 3: Paid */}
-            <div className="flex-1">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Paid
-              </p>
-              <div className="relative h-24 w-full overflow-hidden rounded-lg bg-emerald-100">
-                <div
-                  className="absolute inset-0 rounded-lg bg-emerald-500"
-                  style={{
-                    width: `${Math.max(paidRate, 4)}%`,
-                  }}
-                />
-                <span className="relative z-10 flex h-full items-center justify-center text-2xl font-bold text-white">
-                  {totalPaid}
-                </span>
-              </div>
-              <p className="mt-1 text-center text-xs text-muted-foreground">
-                {paidRate}%
-              </p>
-            </div>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Date</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">Signups</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">Questionnaires</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">Revenue</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">Lessons</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {dailyData.reverse().map(([day, d]) => (
+                  <tr key={day} className={d.signups === 0 && d.revenue === 0 && d.lessons === 0 ? "opacity-40" : ""}>
+                    <td className="px-4 py-2 text-xs">{new Date(day + "T00:00:00").toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric" })}</td>
+                    <td className="px-4 py-2 text-xs text-right font-medium">{d.signups || "—"}</td>
+                    <td className="px-4 py-2 text-xs text-right">{d.questionnaires || "—"}</td>
+                    <td className="px-4 py-2 text-xs text-right font-medium">{d.revenue > 0 ? `₱${d.revenue.toLocaleString()}` : "—"}</td>
+                    <td className="px-4 py-2 text-xs text-right">{d.lessons || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
-
-      {/* ── Plan Breakdown + Extra Metrics ── */}
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-foreground">
-        Plan Breakdown
-      </h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Core
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {coreCount}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Pro
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {proCount}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              AI Careers
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {aiCount}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Avg Lessons / Paid User
-            </p>
-            <p className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-              {avgLessons}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ── Most Popular Path ── */}
-      {topPath && (
-        <div className="mt-4">
-          <Card>
-            <CardContent className="flex items-center gap-3 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Most Popular Path
-              </p>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold capitalize text-primary">
-                {topPath[0]}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {topPath[1]} users
-              </span>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
+  );
+}
+
+function MC({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <p className="mt-1 text-2xl font-bold tracking-tight">{value}</p>
+        {sub && <p className="mt-0.5 text-[10px] text-muted-foreground">{sub}</p>}
+      </CardContent>
+    </Card>
   );
 }
