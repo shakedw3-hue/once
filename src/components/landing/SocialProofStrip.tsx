@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { number: "50+", label: "Published Studies" },
-  { number: "275+", label: "Expert Lessons" },
-  { number: "4", label: "Life Pillars" },
-  { number: "10 min", label: "Per Day" },
+  { number: "100+", label: "From the world's smartest minds — in one place" },
+  { number: "275+", label: "Lessons built for you. Only you." },
+  { number: "5–10x", label: "Return on investment by the time you finish" },
+  { number: "10 min", label: "A day. That's all it takes." },
 ];
 
 export default function SocialProofStrip() {
@@ -15,7 +15,7 @@ export default function SocialProofStrip() {
       className="rounded-2xl border p-6 sm:p-8"
       style={{ background: "linear-gradient(135deg, rgba(79,70,229,0.03) 0%, rgba(99,102,241,0.06) 100%)" }}
     >
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -31,7 +31,7 @@ export default function SocialProofStrip() {
             >
               {stat.number}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{stat.label}</p>
           </motion.div>
         ))}
       </div>
