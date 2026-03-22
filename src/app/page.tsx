@@ -7,7 +7,6 @@ import Testimonials from "@/components/landing/Testimonials";
 import StickyCTA from "@/components/landing/StickyCTA";
 import TrustBadges from "@/components/landing/TrustBadges";
 import SocialProofStrip from "@/components/landing/SocialProofStrip";
-import CredibilityStrip from "@/components/landing/CredibilityStrip";
 import PhoneMockup from "@/components/landing/PhoneMockup";
 import { IconMoney, IconMind, IconBody, IconSpirit, IconCompass, IconMatch, IconLearn, IconRocket } from "@/components/ui/icons";
 
@@ -19,12 +18,7 @@ export default function Home() {
         {/* ━━━ 1. HERO — Hook + CTA ━━━ */}
         <Hero />
 
-        {/* ━━━ 2. CREDIBILITY — Immediate trust ━━━ */}
-        <section className="mx-auto max-w-3xl px-5 -mt-8 mb-4 sm:-mt-12 sm:mb-8">
-          <CredibilityStrip />
-        </section>
-
-        {/* ━━━ 3. SOCIAL PROOF — Big numbers early ━━━ */}
+        {/* ━━━ 2. SOCIAL PROOF — Big numbers early ━━━ */}
         <Section tight>
           <SocialProofStrip />
         </Section>
