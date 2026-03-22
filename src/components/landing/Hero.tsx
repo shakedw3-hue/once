@@ -35,7 +35,7 @@ export default function Hero() {
                   className="inline-block h-1.5 w-1.5 rounded-full"
                   style={{ background: "#4F46E5" }}
                 />
-                The first platform that finds the right path for you
+                The only platform that diagnoses your life — then builds your path
               </span>
             </motion.div>
 
