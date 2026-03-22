@@ -191,92 +191,93 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* ── Credibility — single unified block ── */}
+          {/* ── Credibility — marquee carousel ── */}
           <motion.div
             className="mt-14 sm:mt-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 2.2 }}
           >
-            <div
-              className="rounded-2xl p-6 sm:p-8"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                backdropFilter: "blur(8px)",
-              }}
+            <p
+              className="mb-5 text-center text-[10px] font-semibold tracking-[0.25em] uppercase sm:text-left"
+              style={{ color: "rgba(255,255,255,0.25)" }}
             >
-              {/* Main statement */}
-              <p
-                className="mb-5 text-base font-medium leading-relaxed sm:text-lg"
-                style={{ color: "rgba(255,255,255,0.7)" }}
-              >
-                Built from the principles of{" "}
-                {["Warren Buffett", "Kobe Bryant", "Elon Musk", "the Dalai Lama"].map((name, i) => (
-                  <span key={name}>
-                    <span
-                      style={{
-                        color: "#fff",
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        fontStyle: "italic",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {name}
-                    </span>
-                    {i < 3 && (
-                      <span style={{ color: "rgba(255,255,255,0.3)" }}>
-                        {i < 2 ? ", " : " & "}
+              Built from the principles of
+            </p>
+
+            {/* Marquee container — full width overflow */}
+            <div className="relative -mx-5 overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
+              <div className="flex animate-[marquee_35s_linear_infinite] gap-8 sm:gap-12 whitespace-nowrap">
+                {/* Double the items for seamless loop */}
+                {[...Array(2)].map((_, setIdx) => (
+                  <div key={setIdx} className="flex shrink-0 items-center gap-8 sm:gap-12">
+                    {[
+                      "Warren Buffett", "Tony Robbins", "Elon Musk", "Dalai Lama",
+                      "Andrew Huberman", "James Clear", "Ray Dalio", "Oprah Winfrey",
+                      "Peter Attia", "Cal Newport", "Viktor Frankl", "Robert Kiyosaki",
+                      "LeBron James", "Matthew Walker", "Ryan Holiday", "Gary Vaynerchuk",
+                      "Cristiano Ronaldo", "Simon Sinek", "Mark Cuban", "Jay Shetty",
+                      "Tim Ferriss", "David Goggins", "Naval Ravikant", "Brené Brown",
+                      "Kobe Bryant",
+                    ].map((name) => (
+                      <span
+                        key={`${setIdx}-${name}`}
+                        className="shrink-0 text-base font-medium sm:text-lg"
+                        style={{
+                          color: "rgba(255,255,255,0.5)",
+                          fontFamily: "'Playfair Display', Georgia, serif",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {name}
                       </span>
-                    )}
-                  </span>
-                ))}
-                <span style={{ color: "rgba(255,255,255,0.4)" }}>
-                  {" "}— and hundreds more.
-                </span>
-              </p>
-
-              {/* Divider */}
-              <div className="mb-5 h-px" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.2), rgba(99,102,241,0.05), transparent)" }} />
-
-              {/* Institutions row */}
-              <p
-                className="mb-4 text-[9px] font-semibold tracking-[0.25em] uppercase"
-                style={{ color: "rgba(255,255,255,0.25)" }}
-              >
-                Research sourced from
-              </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-7">
-                {[
-                  { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.95rem" },
-                  { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "1rem" },
-                  { name: "WHO", font: "Arial, sans-serif", weight: 800, spacing: "0.12em", size: "0.95rem" },
-                  { name: "McKinsey", font: "Georgia, serif", weight: 400, spacing: "0.02em", size: "1.05rem", italic: true },
-                  { name: "Forbes", font: "Georgia, serif", weight: 700, spacing: "-0.01em", size: "1.05rem", italic: true },
-                ].map((inst, i) => (
-                  <span key={inst.name} className="flex items-center">
-                    <span
-                      className="select-none"
-                      style={{
-                        fontFamily: inst.font,
-                        fontWeight: inst.weight,
-                        letterSpacing: inst.spacing,
-                        fontSize: inst.size,
-                        fontStyle: inst.italic ? "italic" : "normal",
-                        color: "rgba(255,255,255,0.45)",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {inst.name}
-                    </span>
-                    {i < 4 && (
-                      <span className="ml-4 sm:ml-7 inline-block h-4 w-px" style={{ background: "rgba(99,102,241,0.15)" }} />
-                    )}
-                  </span>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
+
+            {/* Institutions below marquee */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:justify-start sm:gap-x-7">
+              <span
+                className="text-[9px] font-semibold tracking-[0.2em] uppercase"
+                style={{ color: "rgba(255,255,255,0.2)" }}
+              >
+                Research from
+              </span>
+              {[
+                { name: "HARVARD", font: "Georgia, serif", weight: 700, spacing: "0.08em", size: "0.85rem" },
+                { name: "MIT", font: "'Arial Black', Arial, sans-serif", weight: 900, spacing: "0.15em", size: "0.9rem" },
+                { name: "WHO", font: "Arial, sans-serif", weight: 800, spacing: "0.12em", size: "0.85rem" },
+                { name: "McKinsey", font: "Georgia, serif", weight: 400, spacing: "0.02em", size: "0.9rem", italic: true },
+                { name: "Forbes", font: "Georgia, serif", weight: 700, spacing: "-0.01em", size: "0.9rem", italic: true },
+              ].map((inst) => (
+                <span
+                  key={inst.name}
+                  className="select-none"
+                  style={{
+                    fontFamily: inst.font,
+                    fontWeight: inst.weight,
+                    letterSpacing: inst.spacing,
+                    fontSize: inst.size,
+                    fontStyle: inst.italic ? "italic" : "normal",
+                    color: "rgba(255,255,255,0.35)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {inst.name}
+                </span>
+              ))}
+            </div>
           </motion.div>
+
+          {/* Marquee keyframes */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes marquee {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+          ` }} />
         </div>
       </section>
 
