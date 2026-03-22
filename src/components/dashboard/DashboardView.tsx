@@ -251,6 +251,18 @@ export default function DashboardView({
         {/* Daily tracking + history */}
         <DailyTracker primaryPath={primaryPath} todayTracking={todayTracking} trackingHistory={trackingHistory} isDark={isDark} accent={t.accent} />
 
+        {/* Progress Insights + Badges */}
+        <ProgressInsights
+          trackingHistory={trackingHistory}
+          primaryPath={primaryPath}
+          totalCompleted={totalCompleted}
+          totalLessons={totalLessons}
+          streak={streak}
+          longestStreak={longestStreak}
+          isDark={isDark}
+          accent={t.accent}
+        />
+
         {/* Start here CTA */}
         {!hasStarted && firstLessonLink && (
           <div className="mb-8">
@@ -744,6 +756,122 @@ function DailyTracker({ primaryPath, todayTracking, trackingHistory, isDark, acc
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Progress Insights + Badges ───
+
+function ProgressInsights({ trackingHistory, primaryPath, totalCompleted, totalLessons, streak, longestStreak, isDark, accent }: {
+  trackingHistory: TrackingHistoryEntry[];
+  primaryPath: Pillar;
+  totalCompleted: number;
+  totalLessons: number;
+  streak: number;
+  longestStreak: number;
+  isDark: boolean;
+  accent: string;
+}) {
+  const metrics = PILLAR_METRICS[primaryPath] || PILLAR_METRICS.money;
+  const numericMetrics = metrics.filter(m => !m.isText);
+
+  // Calculate monthly averages for numeric metrics
+  const averages = numericMetrics.map(m => {
+    const entries = trackingHistory.filter(h => h.metric_type === m.type && h.metric_value != null);
+    if (entries.length === 0) return null;
+    const sum = entries.reduce((s, e) => s + (e.metric_value ?? 0), 0);
+    const avg = sum / entries.length;
+
+    // Calculate trend: compare last 7 days avg vs previous 7 days
+    const sorted = entries.sort((a, b) => a.entry_date.localeCompare(b.entry_date));
+    const recent = sorted.slice(-7);
+    const older = sorted.slice(-14, -7);
+    const recentAvg = recent.length > 0 ? recent.reduce((s, e) => s + (e.metric_value ?? 0), 0) / recent.length : 0;
+    const olderAvg = older.length > 0 ? older.reduce((s, e) => s + (e.metric_value ?? 0), 0) / older.length : 0;
+    const trend = older.length >= 3 && recent.length >= 3 ? ((recentAvg - olderAvg) / olderAvg) * 100 : null;
+
+    return { ...m, avg: Math.round(avg * 10) / 10, entries: entries.length, trend };
+  }).filter(Boolean) as { type: string; label: string; emoji: string; unit: string; avg: number; entries: number; trend: number | null }[];
+
+  // Determine badges
+  const badges: { emoji: string; label: string; earned: boolean }[] = [
+    { emoji: "🌱", label: "First Step", earned: totalCompleted >= 1 },
+    { emoji: "⭐", label: "3-Day Streak", earned: longestStreak >= 3 },
+    { emoji: "📚", label: "5 Lessons", earned: totalCompleted >= 5 },
+    { emoji: "🔥", label: "7-Day Streak", earned: longestStreak >= 7 },
+    { emoji: "💪", label: "10 Lessons", earned: totalCompleted >= 10 },
+    { emoji: "🏆", label: "14-Day Streak", earned: longestStreak >= 14 },
+    { emoji: "🎯", label: "25 Lessons", earned: totalCompleted >= 25 },
+    { emoji: "👑", label: "30-Day Streak", earned: longestStreak >= 30 },
+    { emoji: "💎", label: "50 Lessons", earned: totalCompleted >= 50 },
+    { emoji: "🌟", label: "All Complete", earned: totalCompleted >= totalLessons && totalLessons > 0 },
+  ];
+
+  const earnedBadges = badges.filter(b => b.earned);
+  const nextBadge = badges.find(b => !b.earned);
+
+  if (averages.length === 0 && earnedBadges.length === 0) return null;
+
+  return (
+    <div className={`mb-6 rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "bg-card border"}`}>
+      {/* Monthly Averages */}
+      {averages.length > 0 && (
+        <div className="mb-4">
+          <p className={`mb-2.5 text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+            Monthly Averages
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {averages.map((a) => (
+              <div key={a.type} className={`rounded-lg p-3 ${isDark ? "bg-white/[0.04]" : "bg-muted/50"}`}>
+                <p className={`text-[10px] ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+                  {a.emoji} {a.label}
+                </p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className={`text-lg font-bold ${isDark ? "text-white" : ""}`}>{a.avg}</span>
+                  <span className={`text-xs ${isDark ? "text-white/30" : "text-muted-foreground"}`}>{a.unit}</span>
+                  {a.trend !== null && (
+                    <span className={`text-[10px] font-medium ${
+                      a.trend > 0 ? "text-emerald-500" : a.trend < 0 ? "text-red-400" : isDark ? "text-white/30" : "text-muted-foreground"
+                    }`}>
+                      {a.trend > 0 ? "↑" : a.trend < 0 ? "↓" : "→"}{Math.abs(Math.round(a.trend))}%
+                    </span>
+                  )}
+                </div>
+                <p className={`text-[9px] ${isDark ? "text-white/20" : "text-muted-foreground/60"}`}>
+                  {a.entries} entries
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Badges */}
+      <div>
+        <p className={`mb-2.5 text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+          Achievements
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {badges.map((b) => (
+            <div
+              key={b.label}
+              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium transition-all ${
+                b.earned
+                  ? isDark ? "bg-white/[0.08] text-white" : "bg-primary/10 text-primary"
+                  : isDark ? "bg-white/[0.02] text-white/15" : "bg-muted/50 text-muted-foreground/30"
+              }`}
+            >
+              <span className={b.earned ? "" : "grayscale opacity-30"}>{b.emoji}</span>
+              <span>{b.label}</span>
+            </div>
+          ))}
+        </div>
+        {nextBadge && (
+          <p className={`mt-2 text-[10px] ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
+            Next: {nextBadge.emoji} {nextBadge.label}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

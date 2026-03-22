@@ -149,14 +149,14 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .eq("entry_date", today);
 
-  // Get last 14 days of tracking for history
-  const twoWeeksAgo = new Date();
-  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  // Get last 30 days of tracking for history + averages
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const { data: trackingHistory } = await db
     .from("user_tracking")
     .select("entry_date, metric_type, metric_value, metric_text")
     .eq("user_id", user.id)
-    .gte("entry_date", twoWeeksAgo.toISOString().split("T")[0]);
+    .gte("entry_date", thirtyDaysAgo.toISOString().split("T")[0]);
 
   // Weekly message
   const startOfWeek = new Date();
