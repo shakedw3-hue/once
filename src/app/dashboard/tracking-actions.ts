@@ -63,13 +63,15 @@ export async function saveTrackingEntry(
   text: string | null
 ) {
   const supabase = await createClient();
+  const db = createServiceClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
   const today = new Date().toISOString().split("T")[0];
 
-  const { error } = await supabase
+  // Use service client to bypass RLS for upsert
+  const { error } = await db
     .from("user_tracking")
     .upsert({
       user_id: user.id,
