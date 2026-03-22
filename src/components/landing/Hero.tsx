@@ -215,7 +215,7 @@ export default function Hero() {
           .hero-fade{opacity:0;transform:translateY(20px);animation:hf .6s ease-out both}
           .hero-fade-only{opacity:0;animation:hfo .4s ease-out both}
           .pillar-bar{transform:scaleX(0);transform-origin:left;animation:pb .8s ease-out both}
-          .marquee-wrap{display:flex;width:max-content;animation:mq 20s linear infinite}
+          .marquee-wrap{display:flex;width:max-content;animation:mq 35s linear infinite}
           .marquee-set{display:flex;gap:2.5rem}
           .marquee-set+.marquee-set{margin-left:2.5rem}
           .marquee-name{flex-shrink:0;font-size:1rem;font-weight:500;color:rgba(255,255,255,0.5);font-family:'Playfair Display',Georgia,serif;font-style:italic;white-space:nowrap}
