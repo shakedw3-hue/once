@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { calculateScores, determinePaths, determineRecommendation } from "@/lib/questionnaire";
+import { sendProfileReadyEmail } from "@/lib/email";
 
 export async function submitQuestionnaire(answers: Record<string, number>) {
   const supabase = await createClient();
@@ -53,6 +54,17 @@ export async function submitQuestionnaire(answers: Record<string, number>) {
     console.error("Profile update error:", updateError.message);
     return { error: "Something went wrong updating your profile. Please try again." };
   }
+
+  // Fire-and-forget profile ready email
+  const recPlanName = recommendation.plan === "ai" ? "Once AI Careers" : recommendation.plan === "pro" ? "Once Pro" : "Once Core";
+  const firstName = (user.user_metadata?.full_name as string)?.split(" ")[0] || "there";
+  sendProfileReadyEmail({
+    email: user.email || "",
+    firstName,
+    primaryPillar: paths.primary,
+    planName: recPlanName,
+    trackName: recommendation.track || undefined,
+  }).catch(console.error);
 
   redirect("/profile/complete");
 }

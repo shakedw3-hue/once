@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -46,6 +47,9 @@ export async function signup(formData: FormData) {
   if (error) {
     return { error: friendlyAuthError(error.message) };
   }
+
+  // Fire-and-forget welcome email
+  sendWelcomeEmail({ email, firstName: fullName.split(" ")[0] }).catch(console.error);
 
   redirect("/questionnaire");
 }

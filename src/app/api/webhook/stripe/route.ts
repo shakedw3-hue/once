@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+import { sendPurchaseConfirmationEmail } from "@/lib/email";
 
 function getSupabaseAdmin() {
   return createClient(
@@ -68,6 +69,33 @@ export async function POST(request: Request) {
           session_id: session.id,
         },
       });
+
+      // Fire-and-forget purchase confirmation email
+      const { data: userData } = await supabaseAdmin
+        .from("users")
+        .select("primary_path, recommendation_plan, recommendation_track")
+        .eq("id", userId)
+        .single();
+
+      const customerEmail = session.customer_details?.email || session.metadata?.email;
+      const customerName = session.customer_details?.name || session.metadata?.name || "";
+
+      if (customerEmail) {
+        const planLabels: Record<string, string> = { core: "Once Core", pro: "Once Pro", ai: "Once AI Careers" };
+        const planLabel = planLabels[plan] || plan;
+        const priceLookup: Record<string, number> = { core: 1499, pro: 2350, ai: 3950 };
+        const lessonLookup: Record<string, number> = { core: 20, pro: 40, ai: 60 };
+
+        sendPurchaseConfirmationEmail({
+          email: customerEmail,
+          firstName: customerName.split(" ")[0] || "there",
+          planName: planLabel,
+          primaryPillar: userData?.primary_path || "",
+          trackName: userData?.recommendation_track || undefined,
+          price: priceLookup[plan] || (session.amount_total ? session.amount_total / 100 : 0),
+          lessonCount: lessonLookup[plan] || 20,
+        }).catch(console.error);
+      }
     }
   }
 
