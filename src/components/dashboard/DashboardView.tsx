@@ -49,44 +49,35 @@ interface DashboardViewProps {
 // ─── Plan-based theme system ───
 const PLAN_THEMES = {
   core: {
-    bg: "bg-background",
-    headerBg: "bg-background/95",
-    headerBorder: "border-b",
+    bgColor: "",
+    headerBg: "",
     accent: "#4F46E5",
     accentLight: "bg-primary/10",
     accentText: "text-primary",
     badgeBg: "bg-primary/10 text-primary",
-    progressColor: "",
     cardBorder: "",
-    footerBg: "bg-primary/[0.02] border-primary/10",
     label: "Core",
     greeting: "",
   },
   pro: {
-    bg: "bg-[#0C0A09]",
-    headerBg: "bg-[#0C0A09]/95 border-amber-900/20",
-    headerBorder: "border-b border-amber-900/20",
+    bgColor: "#0C0A09",
+    headerBg: "rgba(12,10,9,0.95)",
     accent: "#F59E0B",
     accentLight: "bg-amber-500/10",
     accentText: "text-amber-400",
     badgeBg: "bg-amber-500/15 text-amber-400",
-    progressColor: "[&>div]:bg-amber-500",
-    cardBorder: "border-amber-900/20 bg-amber-950/20",
-    footerBg: "bg-amber-950/30 border-amber-900/20",
+    cardBorder: "border-amber-900/30",
     label: "Pro",
     greeting: "Your premium path is waiting.",
   },
   ai: {
-    bg: "bg-[#050714]",
-    headerBg: "bg-[#050714]/95 border-blue-900/20",
-    headerBorder: "border-b border-blue-900/20",
+    bgColor: "#050714",
+    headerBg: "rgba(5,7,20,0.95)",
     accent: "#3B82F6",
     accentLight: "bg-blue-500/10",
     accentText: "text-blue-400",
     badgeBg: "bg-blue-500/15 text-blue-400",
-    progressColor: "[&>div]:bg-blue-500",
-    cardBorder: "border-blue-900/20 bg-blue-950/20",
-    footerBg: "bg-blue-950/30 border-blue-900/20",
+    cardBorder: "border-blue-900/30",
     label: "AI Careers",
     greeting: "The future belongs to you.",
   },
@@ -129,22 +120,28 @@ export default function DashboardView({
   const incomeUnlocked = primaryProgress >= 50;
 
   return (
-    <div className={`relative min-h-screen ${t.bg} ${isDark ? "text-white" : ""}`}>
+    <div
+      className={`relative min-h-screen ${isDark ? "text-white" : ""}`}
+      style={isDark ? { backgroundColor: t.bgColor } : undefined}
+    >
       {/* Premium background effects */}
       {isAI && (
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full bg-blue-500/[0.03] blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-purple-500/[0.03] blur-[100px]" />
+          <div className="absolute top-0 left-1/4 h-[600px] w-[600px] rounded-full blur-[120px]" style={{ backgroundColor: "rgba(59,130,246,0.04)" }} />
+          <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full blur-[100px]" style={{ backgroundColor: "rgba(139,92,246,0.04)" }} />
         </div>
       )}
       {plan === "pro" && (
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute top-0 right-1/3 h-[500px] w-[500px] rounded-full bg-amber-500/[0.03] blur-[120px]" />
+          <div className="absolute top-0 right-1/3 h-[500px] w-[500px] rounded-full blur-[120px]" style={{ backgroundColor: "rgba(245,158,11,0.04)" }} />
         </div>
       )}
 
       {/* Nav */}
-      <header className={`sticky top-0 z-10 backdrop-blur-sm ${t.headerBg} ${t.headerBorder}`}>
+      <header
+        className={`sticky top-0 z-10 backdrop-blur-sm border-b ${isDark ? "border-white/10" : ""}`}
+        style={isDark ? { backgroundColor: t.headerBg } : undefined}
+      >
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-5">
           <Link href="/dashboard" className="font-display text-xl font-semibold tracking-[-0.04em]">
             <span className={isDark ? "text-white" : "text-foreground"}>Once</span>
@@ -203,12 +200,12 @@ export default function DashboardView({
 
         {/* Progress */}
         <div className="mb-8">
-          <div className={`rounded-xl border p-4 ${isDark ? t.cardBorder : "bg-card"}`}>
+          <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.04]" : "bg-card"}`}>
             <div className="flex items-center justify-between mb-2">
               <PillarBadge pillar={primaryPath} label={`${primary.title} Path`} />
               <span className={`text-sm font-bold ${isDark ? "text-white" : ""}`}>{primaryProgress}%</span>
             </div>
-            <Progress value={primaryProgress} className={`h-2.5 ${isDark ? "bg-white/10" : ""} ${t.progressColor}`} />
+            <Progress value={primaryProgress} className={`h-2.5 ${isDark ? "bg-white/10" : ""}`} style={isDark ? { ["--progress-color" as string]: t.accent } : undefined} />
             {isPro && !incomeUnlocked && (
               <p className={`mt-2 text-[11px] ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
                 {Math.ceil(primaryTotal * 0.5) - primaryCompleted} more lessons to unlock your income track
@@ -250,7 +247,7 @@ export default function DashboardView({
                         <div key={track.id} className={`rounded-xl border p-4 ${
                           isRec
                             ? isDark ? `border-2 shadow-lg ${isAI ? "border-blue-500/30 bg-blue-950/40 shadow-blue-500/10" : "border-amber-500/30 bg-amber-950/40 shadow-amber-500/10"}` : "border-2 border-primary/30 shadow-md shadow-primary/10 bg-card"
-                            : isDark ? t.cardBorder : "bg-card"
+                            : isDark ? "border-white/10 bg-white/[0.04]" : "bg-card"
                         }`}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
@@ -313,7 +310,7 @@ export default function DashboardView({
         )}
 
         {/* Footer */}
-        <div className={`rounded-xl border p-5 text-center ${t.footerBg}`}>
+        <div className={`rounded-xl border p-5 text-center ${isDark ? "border-white/10" : "border-primary/10"}`} style={isDark ? { backgroundColor: `${t.accent}08` } : undefined}>
           <p className={`text-xs ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
             Once {t.label} · {totalLessons} lessons · Lifetime access
           </p>
