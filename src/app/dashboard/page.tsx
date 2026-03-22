@@ -34,49 +34,47 @@ export default async function DashboardPage() {
     .limit(1)
     .single();
 
-  // Get ALL paths the user has access to
+  // User's pillars
   const pathPillars: Pillar[] = [profile.primary_path as Pillar];
   if (profile.secondary_path && profile.secondary_path !== profile.primary_path) {
     pathPillars.push(profile.secondary_path as Pillar);
   }
 
-  // Get path rows for all pillars the user gets
+  // Step 1: Get paths
   const { data: pathRows } = await supabase
     .from("paths")
     .select("id, title, description, pillar")
     .in("pillar", pathPillars);
 
-  const allPathIds = (pathRows ?? []).map((p) => p.id);
+  const pathIds = (pathRows ?? []).map((p) => p.id);
 
-  // Get Core modules (order 1-5) for user's paths
-  const { data: coreModules } = await supabase
-    .from("modules")
-    .select("id, title, description, order, path_id")
-    .in("path_id", allPathIds.length > 0 ? allPathIds : ["none"])
-    .lte("order", 5)
-    .order("order");
-
-  // Get Pro modules (order 6+) if user is Pro or AI
-  let proModules: typeof coreModules = [];
-  if (profile.plan === "pro" || profile.plan === "ai") {
-    const { data: pm } = await supabase
+  // Step 2: Get modules for those paths
+  let allModules: { id: string; title: string; description: string; order: number; path_id: string }[] = [];
+  if (pathIds.length > 0) {
+    const { data: mods } = await supabase
       .from("modules")
       .select("id, title, description, order, path_id")
-      .in("path_id", allPathIds.length > 0 ? allPathIds : ["none"])
-      .gt("order", 5)
+      .in("path_id", pathIds)
       .order("order");
-    proModules = pm ?? [];
+    allModules = mods ?? [];
   }
 
-  const allModules = [...(coreModules ?? []), ...(proModules ?? [])];
-  const moduleIds = allModules.map((m) => m.id);
+  // Filter: Core users see only order 1-5, Pro/AI see all
+  const isPro = profile.plan === "pro" || profile.plan === "ai";
+  const filteredModules = isPro ? allModules : allModules.filter((m) => m.order <= 5);
 
-  // Get lessons and progress
-  const { data: lessons } = await supabase
-    .from("lessons")
-    .select("id, module_id")
-    .in("module_id", moduleIds.length > 0 ? moduleIds : ["none"]);
+  // Step 3: Get lessons for those modules
+  const moduleIds = filteredModules.map((m) => m.id);
+  let lessons: { id: string; module_id: string }[] = [];
+  if (moduleIds.length > 0) {
+    const { data: lsns } = await supabase
+      .from("lessons")
+      .select("id, module_id")
+      .in("module_id", moduleIds);
+    lessons = lsns ?? [];
+  }
 
+  // Step 4: Get user progress
   const { data: progress } = await supabase
     .from("user_progress")
     .select("lesson_id, completed")
@@ -86,42 +84,42 @@ export default async function DashboardPage() {
     (progress ?? []).filter((p) => p.completed).map((p) => p.lesson_id)
   );
 
-  // Build modules with progress, grouped by path
+  // Build grouped path modules
   const pathModules = pathPillars.map((pillar) => {
     const pathRow = (pathRows ?? []).find((p) => p.pillar === pillar);
     if (!pathRow) return null;
 
-    const mods = allModules
+    const mods = filteredModules
       .filter((m) => m.path_id === pathRow.id)
       .map((mod) => {
-        const modLessons = (lessons ?? []).filter((l) => l.module_id === mod.id);
+        const modLessons = lessons.filter((l) => l.module_id === mod.id);
         const completedCount = modLessons.filter((l) => completedLessonIds.has(l.id)).length;
         return {
-          ...mod,
+          id: mod.id,
+          title: mod.title,
+          description: mod.description,
+          order: mod.order,
           totalLessons: modLessons.length,
           completedLessons: completedCount,
         };
       });
 
-    const coreMods = mods.filter((m) => m.order <= 5);
-    const proMods = mods.filter((m) => m.order > 5);
-
     return {
       pillar,
       title: pathRow.title,
       description: pathRow.description,
-      coreMods,
-      proMods,
+      coreMods: mods.filter((m) => m.order <= 5),
+      proMods: mods.filter((m) => m.order > 5),
     };
   }).filter(Boolean) as {
     pillar: Pillar;
     title: string;
     description: string;
-    coreMods: Array<{ id: string; title: string; description: string; order: number; path_id: string; totalLessons: number; completedLessons: number }>;
-    proMods: Array<{ id: string; title: string; description: string; order: number; path_id: string; totalLessons: number; completedLessons: number }>;
+    coreMods: Array<{ id: string; title: string; description: string; order: number; totalLessons: number; completedLessons: number }>;
+    proMods: Array<{ id: string; title: string; description: string; order: number; totalLessons: number; completedLessons: number }>;
   }[];
 
-  const totalLessons = (lessons ?? []).length;
+  const totalLessons = lessons.length;
   const totalCompleted = completedLessonIds.size;
 
   return (
