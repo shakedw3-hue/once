@@ -126,6 +126,21 @@ export default async function DashboardPage() {
   const totalLessons = lessons.length;
   const totalCompleted = completedLessonIds.size;
 
+  // Get first lesson of first primary module for "Start here" CTA
+  const primaryGroup = pathModules.find((p) => p?.pillar === profile.primary_path);
+  const firstModule = primaryGroup?.coreMods[0];
+  let firstLessonId: string | null = null;
+  if (firstModule) {
+    const { data: firstLesson } = await supabase
+      .from("lessons")
+      .select("id")
+      .eq("module_id", firstModule.id)
+      .order("order")
+      .limit(1)
+      .single();
+    firstLessonId = firstLesson?.id ?? null;
+  }
+
   return (
     <DashboardView
       fullName={profile.full_name}
@@ -137,6 +152,9 @@ export default async function DashboardPage() {
       totalCompleted={totalCompleted}
       plan={profile.plan}
       recommendationTrack={profile.recommendation_track}
+      firstModuleId={firstModule?.id ?? null}
+      firstModuleTitle={firstModule?.title ?? null}
+      firstLessonId={firstLessonId}
     />
   );
 }

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PILLARS } from "@/lib/constants";
-import { ModuleIllustration, PillarBadge, PillarDivider } from "@/components/ui/illustrations";
+import { ModuleIllustration, PillarBadge } from "@/components/ui/illustrations";
 import PillarRadar from "./PillarRadar";
 import type { Pillar, PillarScores } from "@/types/database";
 import { logout } from "@/app/auth/actions";
@@ -39,17 +39,10 @@ interface DashboardViewProps {
   totalCompleted: number;
   plan: string | null;
   recommendationTrack: string | null;
+  firstModuleId: string | null;
+  firstModuleTitle: string | null;
+  firstLessonId: string | null;
 }
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
 
 export default function DashboardView({
   fullName,
@@ -61,27 +54,43 @@ export default function DashboardView({
   totalCompleted,
   plan,
   recommendationTrack,
+  firstModuleId,
+  firstModuleTitle,
+  firstLessonId,
 }: DashboardViewProps) {
   const primary = PILLARS[primaryPath];
+  const secondary = PILLARS[secondaryPath];
   const firstName = fullName.split(" ")[0] || "there";
   const overallProgress = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
-
-  const allMods = pathModules.flatMap((p) => [...p.coreMods, ...p.proMods]);
-  const nextModule = allMods.find((m) => m.completedLessons < m.totalLessons);
-
   const planLabel = plan === "ai" ? "AI Careers" : plan === "pro" ? "Pro" : "Core";
+  const isPro = plan === "pro" || plan === "ai";
+
+  const primaryGroup = pathModules.find((p) => p.pillar === primaryPath);
+  const secondaryGroup = pathModules.find((p) => p.pillar === secondaryPath);
+
+  // Count completed primary core modules (at least 1 lesson done)
+  const completedPrimaryCoreCount = (primaryGroup?.coreMods ?? []).filter((m) => m.completedLessons > 0).length;
+  const secondaryUnlocked = completedPrimaryCoreCount >= 3;
+  const proUnlocked = completedPrimaryCoreCount >= 3;
+
+  // Has user started at all?
+  const hasStarted = totalCompleted > 0;
+
+  // Find next module to continue
+  const primaryCoreMods = primaryGroup?.coreMods ?? [];
+  const nextPrimaryModule = primaryCoreMods.find((m) => m.completedLessons < m.totalLessons);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Nav */}
       <header className="relative z-10 border-b bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-5">
           <Link href="/dashboard" className="font-display text-xl font-semibold tracking-[-0.04em]">
             <span className="text-foreground">Once</span>
             <span className="text-primary">.</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="hidden text-[10px] sm:inline-flex">{planLabel}</Badge>
-            <span className="hidden text-sm text-muted-foreground sm:block">{fullName}</span>
+            <Badge variant="secondary" className="text-[10px]">{planLabel}</Badge>
             <form action={logout}>
               <Button variant="ghost" size="sm" type="submit">Log out</Button>
             </form>
@@ -89,205 +98,289 @@ export default function DashboardView({
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-5xl px-5 py-8 sm:py-10">
-        <motion.div variants={stagger} initial="hidden" animate="visible">
+      <main className="relative z-10 mx-auto max-w-3xl px-5 py-8 sm:py-10">
 
-          <motion.div variants={fadeUp} className="mb-8">
-            <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              Welcome back, {firstName}.
-            </h1>
-            <p className="text-muted-foreground">
-              Your path is waiting.{" "}
-              <span className="once-signature">Once<span style={{color:"#4F46E5"}}>.</span></span>
-            </p>
-          </motion.div>
+        {/* ═══ Greeting ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6"
+        >
+          <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {hasStarted ? `Welcome back, ${firstName}.` : `${firstName}, your path starts here.`}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {hasStarted
+              ? `${totalCompleted} of ${totalLessons} lessons completed.`
+              : "One path. One step at a time."}
+          </p>
+        </motion.div>
 
-          <motion.div variants={fadeUp} className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="sm:col-span-2 lg:col-span-1">
-              <CardContent className="p-5">
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Overall Progress</p>
-                <div className="mb-3 flex items-baseline gap-2">
-                  <span className="text-4xl font-bold tracking-tight text-foreground">{overallProgress}%</span>
-                  <span className="text-sm text-muted-foreground">{totalCompleted}/{totalLessons} lessons</span>
-                </div>
-                <Progress value={overallProgress} className="h-2" />
+        {/* ═══ START HERE CTA (only if not started) ═══ */}
+        {!hasStarted && firstModuleId && firstLessonId && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-8"
+          >
+            <Card className="overflow-hidden border-2 border-primary/30 shadow-md shadow-primary/10">
+              <div className="h-1.5 bg-gradient-to-r from-primary via-primary/80 to-primary/60" />
+              <CardContent className="p-5 sm:p-6">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">Start here</p>
+                <p className="mb-3 font-display text-lg font-semibold">{firstModuleTitle}</p>
+                <Button
+                  render={<Link href={`/dashboard/module/${firstModuleId}/lesson/${firstLessonId}`} />}
+                  size="lg"
+                  className="h-14 w-full text-base font-semibold shadow-lg shadow-primary/20"
+                >
+                  Begin Your First Lesson
+                </Button>
               </CardContent>
             </Card>
+          </motion.div>
+        )}
 
-            <Card className="lg:col-span-2">
-              <CardContent className="flex flex-col items-center justify-center gap-4 p-5 sm:flex-row sm:gap-8">
-                <PillarRadar scores={scores} />
+        {/* ═══ CONTINUE CTA (if started) ═══ */}
+        {hasStarted && nextPrimaryModule && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-8"
+          >
+            <Card className="relative overflow-hidden border-primary/20">
+              <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
+              <CardContent className="flex items-center justify-between gap-4 p-5 pl-6">
                 <div>
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your Paths</p>
-                  <div className="flex flex-wrap gap-2">
-                    <PillarBadge pillar={primaryPath} label={`${primary.title} (Primary)`} />
-                    <PillarBadge pillar={secondaryPath} label={`${PILLARS[secondaryPath].title} (Secondary)`} />
-                  </div>
-                  {recommendationTrack && (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Track: <span className="font-medium text-foreground">{recommendationTrack}</span>
-                    </p>
-                  )}
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">Continue</p>
+                  <p className="mt-0.5 font-semibold">{nextPrimaryModule.title}</p>
+                  <p className="text-sm text-muted-foreground">{nextPrimaryModule.completedLessons}/{nextPrimaryModule.totalLessons} lessons</p>
                 </div>
+                <Button render={<Link href={`/dashboard/module/${nextPrimaryModule.id}`} />} className="shrink-0">
+                  Continue Once
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
+        )}
 
-          {nextModule && (
-            <motion.div variants={fadeUp} className="mb-8">
-              <Card className="relative overflow-hidden border-primary/20">
-                <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-primary/70" />
-                <CardContent className="flex items-center justify-between gap-4 p-5 pl-6">
+        {/* ═══ Progress + Scores (compact) ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-8 grid gap-4 sm:grid-cols-2"
+        >
+          <Card>
+            <CardContent className="p-4">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Progress</p>
+              <div className="mb-2 flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight">{overallProgress}%</span>
+                <span className="text-xs text-muted-foreground">{totalCompleted}/{totalLessons}</span>
+              </div>
+              <Progress value={overallProgress} className="h-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center gap-4 p-4">
+              <PillarRadar scores={scores} />
+              <div>
+                <PillarBadge pillar={primaryPath} label={primary.title} />
+                <p className="mt-1 text-[10px] text-muted-foreground">Primary path</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* ═══════════════════════════════════════════ */}
+        {/* SECTION 1 — YOUR PATH (primary only)       */}
+        {/* ═══════════════════════════════════════════ */}
+
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mb-10"
+        >
+          <div className="mb-4 flex items-center gap-3">
+            <ModuleIllustration pillar={primaryPath} size="sm" />
+            <div>
+              <h2 className="font-display text-lg font-semibold tracking-tight sm:text-xl">
+                Your {primary.title} Path
+              </h2>
+              <p className="text-xs text-muted-foreground">This is your main path. Start here.</p>
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
+            {primaryCoreMods.map((mod) => (
+              <ModuleCard key={mod.id} mod={mod} pillar={primaryPath} />
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ═══════════════════════════════════════════ */}
+        {/* SECTION 2 — SECONDARY PATH                 */}
+        {/* ═══════════════════════════════════════════ */}
+
+        {secondaryGroup && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-10"
+          >
+            {secondaryUnlocked ? (
+              <>
+                <div className="mb-1 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                  <p className="text-xs font-semibold text-emerald-600">Unlocked</p>
+                </div>
+                <div className="mb-4 flex items-center gap-3">
+                  <ModuleIllustration pillar={secondaryPath} size="sm" />
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">Continue Learning</p>
-                    <p className="mt-0.5 font-semibold text-foreground">{nextModule.title}</p>
-                    <p className="text-sm text-muted-foreground">{nextModule.completedLessons} of {nextModule.totalLessons} lessons done</p>
+                    <h2 className="font-display text-lg font-semibold tracking-tight sm:text-xl">
+                      {secondary.title} Path
+                    </h2>
+                    <p className="text-xs text-muted-foreground">Your secondary path is ready.</p>
                   </div>
-                  <Button render={<Link href={`/dashboard/module/${nextModule.id}`} />} className="shrink-0">Continue Once</Button>
+                </div>
+                <div className="space-y-2.5">
+                  {secondaryGroup.coreMods.map((mod) => (
+                    <ModuleCard key={mod.id} mod={mod} pillar={secondaryPath} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="flex items-center gap-4 p-5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{secondary.title} Path</p>
+                    <p className="text-xs text-muted-foreground">
+                      Complete {3 - completedPrimaryCoreCount} more {primary.title} module{3 - completedPrimaryCoreCount !== 1 ? "s" : ""} to unlock.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
-            </motion.div>
-          )}
-
-          {pathModules.map((pathGroup, groupIdx) => (
-            <motion.div key={pathGroup.pillar} variants={fadeUp}>
-              <PillarDivider pillar={pathGroup.pillar} />
-
-              <div className="mb-4 flex items-center gap-3">
-                <ModuleIllustration pillar={pathGroup.pillar} size="sm" />
-                <div>
-                  <h2 className="font-display text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                    {pathGroup.title} Path
-                  </h2>
-                  <p className="text-xs text-muted-foreground">{pathGroup.description}</p>
-                </div>
-              </div>
-
-              {pathGroup.coreMods.length > 0 && (
-                <div className="mb-6">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Core Modules</p>
-                  <div className="space-y-2.5">
-                    {pathGroup.coreMods.map((mod, i) => (
-                      <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {pathGroup.proMods.length > 0 && (() => {
-                const completedCoreCount = pathGroup.coreMods.filter((m) => m.completedLessons > 0).length;
-                const proUnlocked = completedCoreCount >= 3;
-                const remaining = 3 - completedCoreCount;
-                return (
-                  <div className="mb-6">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">
-                      {recommendationTrack ? `${recommendationTrack} Track` : "Pro Income Tracks"}
-                    </p>
-                    {!proUnlocked && (
-                      <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
-                        <p className="text-xs text-amber-800">
-                          Complete <span className="font-semibold">{remaining} more Core module{remaining !== 1 ? "s" : ""}</span> to unlock your income track.
-                        </p>
-                      </div>
-                    )}
-                    <div className="space-y-2.5">
-                      {pathGroup.proMods.map((mod) => (
-                        <ModuleCard key={mod.id} mod={mod} pillar={pathGroup.pillar} isPro locked={!proUnlocked} />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-            </motion.div>
-          ))}
-
-          <motion.div variants={fadeUp} className="mt-8">
-            <Card className="border-primary/10 bg-primary/[0.02]">
-              <CardContent className="p-5 text-center">
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">Your Once {planLabel} includes</p>
-                <div className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                  <span>{totalLessons} lessons</span>
-                  <span>·</span>
-                  <span>{pathModules.length} paths</span>
-                  <span>·</span>
-                  <span>{allMods.length} modules</span>
-                  <span>·</span>
-                  <span>Lifetime access</span>
-                </div>
-                <p className="mt-3 once-signature">Once<span style={{color:"#4F46E5"}}>.</span></p>
-              </CardContent>
-            </Card>
+            )}
           </motion.div>
+        )}
+
+        {/* ═══════════════════════════════════════════ */}
+        {/* SECTION 3 — INCOME TRACK (Pro/AI only)     */}
+        {/* ═══════════════════════════════════════════ */}
+
+        {isPro && primaryGroup && primaryGroup.proMods.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mb-10"
+          >
+            <h2 className="mb-1 font-display text-lg font-semibold tracking-tight sm:text-xl">
+              {recommendationTrack || "Your Income Track"}
+            </h2>
+
+            {proUnlocked ? (
+              <>
+                <p className="mb-4 text-xs text-muted-foreground">Your income modules are unlocked. Time to earn.</p>
+                <div className="space-y-2.5">
+                  {primaryGroup.proMods.map((mod) => (
+                    <ModuleCard key={mod.id} mod={mod} pillar={primaryPath} isPro />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Card className="border-dashed border-amber-300 bg-amber-50/50">
+                <CardContent className="flex items-center gap-4 p-5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-amber-900">{recommendationTrack || "Income Track"}</p>
+                    <p className="text-xs text-amber-800">
+                      Complete {3 - completedPrimaryCoreCount} more Core module{3 - completedPrimaryCoreCount !== 1 ? "s" : ""} to unlock your income skills.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </motion.div>
+        )}
+
+        {/* ═══ Summary footer ═══ */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <Card className="border-primary/10 bg-primary/[0.02]">
+            <CardContent className="p-5 text-center">
+              <p className="text-xs text-muted-foreground">
+                Once {planLabel} · {totalLessons} lessons · Lifetime access
+              </p>
+              <p className="mt-2 once-signature">Once<span style={{color:"#4F46E5"}}>.</span></p>
+            </CardContent>
+          </Card>
         </motion.div>
       </main>
     </div>
   );
 }
 
-function ModuleCard({ mod, pillar, isPro, locked }: { mod: ModuleWithProgress; pillar: Pillar; delay?: number; isPro?: boolean; locked?: boolean }) {
+// ─── Module Card ───
+
+function ModuleCard({ mod, pillar, isPro }: { mod: ModuleWithProgress; pillar: Pillar; isPro?: boolean }) {
   const modProgress = mod.totalLessons > 0 ? Math.round((mod.completedLessons / mod.totalLessons) * 100) : 0;
   const isComplete = modProgress === 100;
   const isActive = !isComplete && mod.completedLessons > 0;
 
-  const cardContent = (
-    <div className={`group rounded-xl border bg-card p-4 transition-all ${
-      locked ? "opacity-50 cursor-not-allowed" : "hover:shadow-md hover:border-primary/20"
-    } ${isComplete ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
-      <div className="flex items-center gap-4">
-        <div className="hidden sm:block">
-          <ModuleIllustration pillar={pillar} variant={mod.order} size="sm" />
-        </div>
-
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:hidden ${
-          locked ? "bg-muted text-muted-foreground"
-            : isComplete ? "bg-emerald-50 text-emerald-600"
-            : isActive ? "bg-primary/10 text-primary"
-            : "bg-muted text-muted-foreground"
-        }`}>
-          {locked ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          ) : isComplete ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-          ) : mod.order}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className={`font-semibold ${locked ? "" : "group-hover:text-primary"} transition-colors`}>{mod.title}</p>
-            {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
-            {locked && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hidden text-muted-foreground sm:block">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            )}
-          </div>
-          <p className="truncate text-sm text-muted-foreground">{mod.description}</p>
-        </div>
-
-        {!locked && (
-          <div className="hidden shrink-0 items-center gap-3 sm:flex">
-            <div className="w-20"><Progress value={modProgress} className="h-1.5" /></div>
-            <span className="w-14 text-right text-xs text-muted-foreground">{mod.completedLessons}/{mod.totalLessons}</span>
-          </div>
-        )}
-
-        <svg className={`h-4 w-4 shrink-0 transition-transform ${locked ? "text-muted-foreground/30" : "text-muted-foreground/50 group-hover:translate-x-0.5"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-      </div>
-    </div>
-  );
-
-  if (locked) {
-    return <div>{cardContent}</div>;
-  }
-
   return (
     <Link href={`/dashboard/module/${mod.id}`} className="block">
-      {cardContent}
+      <div className={`group rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 ${
+        isComplete ? "border-emerald-200 bg-emerald-50/50" : ""
+      }`}>
+        <div className="flex items-center gap-3">
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+            isComplete ? "bg-emerald-100 text-emerald-600"
+              : isActive ? "bg-primary/10 text-primary"
+              : "bg-muted text-muted-foreground"
+          }`}>
+            {isComplete ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            ) : mod.order}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold group-hover:text-primary transition-colors">{mod.title}</p>
+              {isPro && <Badge variant="outline" className="text-[9px]">Pro</Badge>}
+            </div>
+            <p className="truncate text-xs text-muted-foreground">{mod.description}</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{mod.completedLessons}/{mod.totalLessons}</span>
+            <svg className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        {mod.totalLessons > 0 && (
+          <div className="mt-2.5 ml-12">
+            <Progress value={modProgress} className="h-1.5" />
+          </div>
+        )}
+      </div>
     </Link>
   );
 }
