@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
 const links = [
   { href: "/how-it-works", label: "How it works" },
@@ -14,46 +13,35 @@ const links = [
   { href: "/pricing", label: "Pricing" },
 ];
 
-const SCROLL_THRESHOLD = 80;
-
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { scrollY } = useScroll();
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > SCROLL_THRESHOLD);
-  });
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <motion.header
-      className="fixed top-0 z-50 w-full transition-[background-color,border-color,box-shadow] duration-300"
-      animate={
-        scrolled
-          ? {
-              backgroundColor: "rgba(255, 255, 255, 0.82)",
-              borderBottomColor: "rgba(0, 0, 0, 0.06)",
-              boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.04)",
-            }
-          : {
-              backgroundColor: "rgba(255, 255, 255, 0)",
-              borderBottomColor: "rgba(0, 0, 0, 0)",
-              boxShadow: "0 0px 0px 0 rgba(0, 0, 0, 0)",
-            }
-      }
+    <header
+      className="fixed top-0 z-50 w-full transition-all duration-300"
       style={{
+        backgroundColor: scrolled ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: scrolled ? "blur(12px) saturate(180%)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(12px) saturate(180%)" : "none",
-        borderBottom: "1px solid transparent",
+        borderBottom: scrolled ? "1px solid rgba(0,0,0,0.06)" : "1px solid transparent",
+        boxShadow: scrolled ? "0 1px 3px rgba(0,0,0,0.04)" : "none",
       }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
-        {/* Logo — inline so we control color per scroll state */}
+        {/* Logo */}
         <Link
           href="/"
-          className="font-display text-base font-semibold tracking-[-0.04em]"
+          className="text-base font-semibold tracking-tight"
+          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
         >
           <span
             className="transition-colors duration-300"
@@ -70,15 +58,12 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-300 ${
-                pathname === link.href
-                  ? scrolled
-                    ? "text-foreground"
-                    : "text-white"
-                  : scrolled
-                    ? "text-muted-foreground hover:text-foreground"
-                    : "text-white/70 hover:text-white"
-              }`}
+              className="rounded-md px-3 py-1.5 text-sm transition-colors duration-300"
+              style={{
+                color: scrolled
+                  ? pathname === link.href ? "#111" : "#666"
+                  : pathname === link.href ? "#fff" : "rgba(255,255,255,0.7)",
+              }}
             >
               {link.label}
             </Link>
@@ -93,37 +78,37 @@ export default function Header() {
                 Do It Once
               </Button>
             ) : (
-              <Button
-                render={<Link href="/auth/signup" />}
-                size="sm"
-                className="border-white/20 bg-white/10 text-white shadow-sm backdrop-blur-sm hover:bg-white/20"
+              <Link
+                href="/auth/signup"
+                className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#fff",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                }}
               >
                 Do It Once
-              </Button>
+              </Link>
             )}
           </div>
         </div>
 
         {/* Mobile hamburger */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            render={<Button variant="ghost" size="sm" />}
-            className="md:hidden"
-          >
+          <SheetTrigger className="md:hidden rounded-md p-1.5">
             <svg
               width="20"
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke={scrolled ? "currentColor" : "#fff"}
               strokeWidth="2"
               className="transition-colors duration-300"
+              style={{ stroke: scrolled ? "#111" : "#fff" }}
             >
               <path d="M3 12h18M3 6h18M3 18h18" />
             </svg>
           </SheetTrigger>
 
-          {/* Mobile sheet — always light/normal since it's an overlay */}
           <SheetContent side="right" className="w-64">
             <div className="mt-8 flex flex-col gap-1">
               {links.map((link) => (
@@ -150,6 +135,6 @@ export default function Header() {
           </SheetContent>
         </Sheet>
       </nav>
-    </motion.header>
+    </header>
   );
 }
