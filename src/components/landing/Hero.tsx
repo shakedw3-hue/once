@@ -1,15 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-/* ── stagger orchestration ── */
-const seq = (i: number) => ({
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, delay: 0.3 + i * 0.15, ease: "easeOut" as const },
-});
 
 const pillars = [
   { label: "Money", pct: 72, color: "#F59E0B" },
@@ -48,16 +40,15 @@ export default function Hero() {
 
         <div className="relative z-10 mx-auto w-full max-w-5xl">
           {/* ── Eyebrow ── */}
-          <motion.p
-            {...seq(0)}
+          <p
             className="mb-8 text-[11px] font-medium tracking-[0.3em] uppercase sm:text-xs"
-            style={{ color: "rgba(167,139,250,0.6)" }}
+            style={{ color: "rgba(167,139,250,0.6)", animation: "heroFadeIn 0.8s ease-out 0.3s both" }}
           >
             The only platform that diagnoses your life, then builds your path
-          </motion.p>
+          </p>
 
           {/* ── Headline — "Once." as monument ── */}
-          <motion.div {...seq(1)}>
+          <div style={{ animation: "heroFadeIn 0.8s ease-out 0.45s both" }}>
             <h1
               className="text-[4.5rem] font-bold leading-[0.9] tracking-tight sm:text-[7rem] md:text-[9rem] lg:text-[11rem]"
               style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#fff" }}
@@ -81,21 +72,20 @@ export default function Hero() {
                 />
               </span>
             </h1>
-          </motion.div>
+          </div>
 
           {/* ── Subtitle ── */}
-          <motion.p
-            {...seq(2)}
+          <p
             className="mt-4 max-w-lg text-lg font-light leading-relaxed sm:mt-6 sm:text-xl md:text-2xl"
-            style={{ color: "rgba(255,255,255,0.45)" }}
+            style={{ color: "rgba(255,255,255,0.45)", animation: "heroFadeIn 0.8s ease-out 0.6s both" }}
           >
             The decision that changes everything.
-          </motion.p>
+          </p>
 
           {/* ── Pillar visualization — the product IS the hero ── */}
-          <motion.div
-            {...seq(3)}
+          <div
             className="mt-10 max-w-md sm:mt-14"
+            style={{ animation: "heroFadeIn 0.8s ease-out 0.75s both" }}
           >
             <div className="space-y-3">
               {pillars.map((p, i) => (
@@ -107,39 +97,42 @@ export default function Hero() {
                     {p.label}
                   </span>
                   <div className="relative h-[6px] flex-1 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <motion.div
+                    <div
                       className="absolute inset-y-0 left-0 rounded-full"
-                      style={{ background: `linear-gradient(90deg, ${p.color}CC, ${p.color})` }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${p.pct}%` }}
-                      transition={{ duration: 1.2, delay: 1.0 + i * 0.15, ease: "easeOut" as const }}
+                      style={{
+                        background: `linear-gradient(90deg, ${p.color}CC, ${p.color})`,
+                        animation: `pillarGrow${i} 1.2s ease-out ${1.0 + i * 0.15}s both`,
+                      }}
                     />
-                    <motion.span
+                    <span
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold tabular-nums"
-                      style={{ color: "rgba(255,255,255,0.3)" }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1.6 + i * 0.15 }}
+                      style={{
+                        color: "rgba(255,255,255,0.3)",
+                        animation: `heroFadeInOnly 0.4s ease-out ${1.6 + i * 0.15}s both`,
+                      }}
                     >
                       {p.pct}
-                    </motion.span>
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
-            <motion.p
+            <p
               className="mt-3 text-[11px] tracking-wide"
-              style={{ color: "rgba(255,255,255,0.2)" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2.2 }}
+              style={{
+                color: "rgba(255,255,255,0.2)",
+                animation: "heroFadeInOnly 0.4s ease-out 2.2s both",
+              }}
             >
               Your scores. Your path. Your results.
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
 
           {/* ── Value + income text ── */}
-          <motion.div {...seq(4)} className="mt-10 max-w-lg sm:mt-14">
+          <div
+            className="mt-10 max-w-lg sm:mt-14"
+            style={{ animation: "heroFadeIn 0.8s ease-out 0.9s both" }}
+          >
             <p
               className="text-sm leading-[1.8] sm:text-[0.95rem]"
               style={{ color: "rgba(255,255,255,0.5)" }}
@@ -161,12 +154,12 @@ export default function Hero() {
               </span>{" "}
               built for the Philippine market. You finish the path. You earn it back. And more.
             </p>
-          </motion.div>
+          </div>
 
           {/* ── CTA ── */}
-          <motion.div
-            {...seq(5)}
+          <div
             className="mt-10 flex flex-col gap-4 sm:mt-12 sm:flex-row sm:items-center"
+            style={{ animation: "heroFadeIn 0.8s ease-out 1.05s both" }}
           >
             <Button
               render={<Link href="/auth/signup" />}
@@ -189,14 +182,12 @@ export default function Hero() {
                 No card required. Keep your results.
               </span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ── Credibility — marquee carousel ── */}
-          <motion.div
+          <div
             className="mt-14 sm:mt-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 2.2 }}
+            style={{ animation: "heroFadeInOnly 1s ease-out 2.2s both" }}
           >
             <p
               className="mb-5 text-center text-sm font-bold tracking-[0.15em] uppercase sm:text-left sm:text-base"
@@ -220,7 +211,7 @@ export default function Hero() {
                       "Peter Attia", "Cal Newport", "Viktor Frankl", "Robert Kiyosaki",
                       "LeBron James", "Matthew Walker", "Ryan Holiday", "Gary Vaynerchuk",
                       "Cristiano Ronaldo", "Simon Sinek", "Mark Cuban", "Jay Shetty",
-                      "Tim Ferriss", "David Goggins", "Naval Ravikant", "Brené Brown",
+                      "Tim Ferriss", "David Goggins", "Naval Ravikant", "Brene Brown",
                       "Kobe Bryant",
                     ].map((name) => (
                       <span
@@ -272,13 +263,37 @@ export default function Hero() {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Marquee keyframes */}
+          {/* Keyframes for all CSS animations */}
           <style dangerouslySetInnerHTML={{ __html: `
             @keyframes marquee {
               0% { transform: translateX(0); }
               100% { transform: translateX(-50%); }
+            }
+            @keyframes heroFadeIn {
+              from { opacity: 0; transform: translateY(30px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes heroFadeInOnly {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes pillarGrow0 {
+              from { width: 0; }
+              to { width: 72%; }
+            }
+            @keyframes pillarGrow1 {
+              from { width: 0; }
+              to { width: 85%; }
+            }
+            @keyframes pillarGrow2 {
+              from { width: 0; }
+              to { width: 58%; }
+            }
+            @keyframes pillarGrow3 {
+              from { width: 0; }
+              to { width: 41%; }
             }
           ` }} />
         </div>

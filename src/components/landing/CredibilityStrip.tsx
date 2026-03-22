@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 const institutions = [
   {
     name: "HARVARD",
@@ -43,23 +39,14 @@ const institutions = [
 
 export default function CredibilityStrip() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-    >
+    <div>
       <p className="mb-4 text-center text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium">
         Research sources include
       </p>
       <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
         {institutions.map((inst, i) => (
-          <motion.div
+          <div
             key={inst.name}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.1 }}
             className="flex items-center gap-4"
           >
             <span
@@ -78,9 +65,9 @@ export default function CredibilityStrip() {
             {i < institutions.length - 1 && (
               <span className="hidden sm:block h-4 w-px bg-border" />
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

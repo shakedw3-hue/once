@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 const badges = [
   {
     icon: (
@@ -51,13 +47,9 @@ const badges = [
 export default function TrustBadges() {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-      {badges.map((badge, i) => (
-        <motion.div
+      {badges.map((badge) => (
+        <div
           key={badge.title}
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: i * 0.08 }}
           className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 text-center"
           style={{
             boxShadow:
@@ -80,7 +72,7 @@ export default function TrustBadges() {
               {badge.sub}
             </p>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

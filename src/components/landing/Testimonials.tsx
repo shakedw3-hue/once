@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 const reviews = [
   {
@@ -162,6 +161,26 @@ export default function Testimonials() {
 
   return (
     <div>
+      <style>{`
+        @keyframes testimonialFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .testimonial-card {
+          animation: testimonialFadeIn 0.4s ease both;
+        }
+        .testimonial-card:hover {
+          transform: translateY(-3px) !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06) !important;
+        }
+      `}</style>
+
       {/* Header with arrows */}
       <div className="mb-5 flex items-end justify-between">
         <div>
@@ -201,22 +220,15 @@ export default function Testimonials() {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {reviews.map((review, i) => (
-          <motion.div
+          <div
             key={review.name}
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.05 }}
-            className="group w-[280px] shrink-0 snap-start rounded-xl bg-white p-5 sm:w-[320px]"
+            className="testimonial-card group w-[280px] shrink-0 snap-start rounded-xl bg-white p-5 sm:w-[320px]"
             style={{
               boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
               transition: "transform 0.25s ease, box-shadow 0.25s ease",
               overflow: "hidden",
               position: "relative",
-            }}
-            whileHover={{
-              y: -3,
-              boxShadow: "0 8px 32px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06)",
+              animationDelay: `${i * 0.05}s`,
             }}
           >
             {/* Top accent line */}
@@ -277,7 +289,7 @@ export default function Testimonials() {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 

@@ -1,14 +1,6 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 export default function PhoneMockup() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+    <div
       className="flex justify-center"
     >
       <div className="relative">
@@ -112,6 +104,6 @@ export default function PhoneMockup() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
