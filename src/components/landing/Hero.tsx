@@ -3,270 +3,244 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import PillarOrbs from "./PillarOrbs";
 
-/* ── animation helpers ── */
-const fade = (delay: number) => ({
-  initial: { opacity: 0, y: 18 },
+/* ── stagger orchestration ── */
+const seq = (i: number) => ({
+  initial: { opacity: 0, y: 30 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  transition: { duration: 0.8, delay: 0.3 + i * 0.15, ease: "easeOut" as const },
 });
 
 const pillars = [
-  { label: "Money", color: "#F59E0B" },
-  { label: "Mind", color: "#A78BFA" },
-  { label: "Body", color: "#34D399" },
-  { label: "Spirit", color: "#60A5FA" },
-] as const;
-
-const names = [
-  "Warren Buffett",
-  "Kobe Bryant",
-  "Elon Musk",
-  "Dalai Lama",
-] as const;
+  { label: "Money", pct: 72, color: "#F59E0B" },
+  { label: "Mind", pct: 85, color: "#A78BFA" },
+  { label: "Body", pct: 58, color: "#34D399" },
+  { label: "Spirit", pct: 41, color: "#60A5FA" },
+];
 
 export default function Hero() {
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden px-5 pt-20 pb-16">
-      {/* ── Ambient background ── */}
-      {/* Large indigo glow — top center */}
-      <div
-        className="pointer-events-none absolute -top-[200px] left-1/2 h-[800px] w-[800px] -translate-x-1/2 rounded-full blur-[180px]"
-        style={{ background: "radial-gradient(circle, rgba(79,70,229,0.06) 0%, transparent 70%)" }}
-      />
-      {/* Warm accent glow — bottom right */}
-      <div
-        className="pointer-events-none absolute -right-[100px] bottom-[10%] h-[500px] w-[500px] rounded-full blur-[160px]"
-        style={{ background: "radial-gradient(circle, rgba(245,158,11,0.04) 0%, transparent 70%)" }}
-      />
-      {/* Cool accent glow — bottom left */}
-      <div
-        className="pointer-events-none absolute -left-[100px] bottom-[20%] h-[400px] w-[400px] rounded-full blur-[140px]"
-        style={{ background: "radial-gradient(circle, rgba(96,165,250,0.04) 0%, transparent 70%)" }}
-      />
+    <>
+      <section
+        className="relative flex min-h-[100dvh] flex-col justify-center overflow-hidden px-5 pb-20 pt-24"
+        style={{
+          background: "linear-gradient(165deg, #0c0a1a 0%, #111029 35%, #0d0b1e 70%, #08071a 100%)",
+        }}
+      >
+        {/* ── Grain overlay ── */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        />
 
-      {/* ── Floating ambient particles (CSS only) ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: [3, 2, 4, 2][i],
-              height: [3, 2, 4, 2][i],
-              left: `${[15, 75, 55, 30][i]}%`,
-              top: `${[25, 35, 65, 80][i]}%`,
-              background: [
-                "rgba(79,70,229,0.3)",
-                "rgba(167,139,250,0.25)",
-                "rgba(52,211,153,0.25)",
-                "rgba(96,165,250,0.2)",
-              ][i],
-              animation: `heroFloat${i} ${[7, 9, 8, 10][i]}s ease-in-out infinite`,
-            }}
-          />
-        ))}
-      </div>
+        {/* ── Ambient orbs ── */}
+        <div
+          className="pointer-events-none absolute top-[-20%] right-[-10%] h-[700px] w-[700px] rounded-full blur-[200px]"
+          style={{ background: "radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 65%)" }}
+        />
+        <div
+          className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full blur-[180px]"
+          style={{ background: "radial-gradient(circle, rgba(96,165,250,0.08) 0%, transparent 65%)" }}
+        />
 
-      {/* Keyframes for hero animations */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes heroFloat0 { 0%, 100% { transform: translate(0, 0); opacity: 0.4; } 50% { transform: translate(12px, -18px); opacity: 0.8; } }
-        @keyframes heroFloat1 { 0%, 100% { transform: translate(0, 0); opacity: 0.3; } 50% { transform: translate(-15px, 12px); opacity: 0.7; } }
-        @keyframes heroFloat2 { 0%, 100% { transform: translate(0, 0); opacity: 0.35; } 50% { transform: translate(10px, 15px); opacity: 0.75; } }
-        @keyframes heroFloat3 { 0%, 100% { transform: translate(0, 0); opacity: 0.25; } 50% { transform: translate(-8px, -20px); opacity: 0.65; } }
-        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 4px rgba(79,70,229,0.4), 0 0 8px rgba(79,70,229,0.2); } 50% { box-shadow: 0 0 8px rgba(79,70,229,0.6), 0 0 20px rgba(79,70,229,0.3); } }
-        @keyframes earnGlow { 0%, 100% { text-shadow: 0 0 8px rgba(79,70,229,0.3); } 50% { text-shadow: 0 0 20px rgba(79,70,229,0.5), 0 0 40px rgba(79,70,229,0.2); } }
-        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-      ` }} />
+        <div className="relative z-10 mx-auto w-full max-w-5xl">
+          {/* ── Eyebrow ── */}
+          <motion.p
+            {...seq(0)}
+            className="mb-8 text-[11px] font-medium tracking-[0.3em] uppercase sm:text-xs"
+            style={{ color: "rgba(167,139,250,0.6)" }}
+          >
+            The only platform that diagnoses your life — then builds your path
+          </motion.p>
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl">
-        <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
-          {/* ── Left column: messaging ── */}
-          <div className="flex flex-col">
-            {/* ─ Eyebrow — animated gradient border with pulsing dot ─ */}
-            <motion.div {...fade(0.05)}>
-              <div className="relative inline-flex">
-                {/* Gradient border wrapper */}
-                <div
-                  className="relative inline-flex items-center gap-2.5 rounded-full px-4 py-2"
-                  style={{
-                    background: "rgba(79,70,229,0.04)",
-                    border: "1px solid transparent",
-                    backgroundClip: "padding-box",
-                  }}
+          {/* ── Headline — "Once." as monument ── */}
+          <motion.div {...seq(1)}>
+            <h1
+              className="text-[4.5rem] font-bold leading-[0.9] tracking-tight sm:text-[7rem] md:text-[9rem] lg:text-[11rem]"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#fff" }}
+            >
+              Once
+              {/* The dot as a glowing orb */}
+              <span className="relative inline-block">
+                <span
+                  className="inline-block"
+                  style={{ color: "#6366F1" }}
                 >
-                  {/* Animated gradient border behind */}
-                  <div
-                    className="pointer-events-none absolute -inset-px rounded-full"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(79,70,229,0.3), rgba(167,139,250,0.2), rgba(96,165,250,0.2), rgba(79,70,229,0.3))",
-                      backgroundSize: "300% 300%",
-                      animation: "gradientShift 4s ease-in-out infinite",
-                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                      WebkitMaskComposite: "xor",
-                      maskComposite: "exclude",
-                      padding: "1px",
-                      borderRadius: "9999px",
-                    }}
-                  />
-                  {/* Pulsing dot */}
-                  <span
-                    className="relative inline-block h-2 w-2 shrink-0 rounded-full"
-                    style={{
-                      background: "#4F46E5",
-                      animation: "pulseGlow 2s ease-in-out infinite",
-                    }}
-                  />
-                  <span className="text-[11px] font-medium tracking-wide text-muted-foreground sm:text-xs">
-                    The only platform that diagnoses your life — then builds your path
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ─ Headline — massive type contrast ─ */}
-            <motion.h1
-              {...fade(0.15)}
-              className="mt-8"
-            >
-              <span
-                className="block text-[3.5rem] font-bold leading-[1] tracking-tight sm:text-6xl md:text-7xl lg:text-[5rem]"
-              >
-                Once<span style={{ color: "#4F46E5" }}>.</span>
-              </span>
-              <span className="mt-3 block text-[1.35rem] font-medium leading-[1.3] text-muted-foreground sm:text-2xl md:text-[1.75rem]">
-                The decision that changes everything.
-              </span>
-            </motion.h1>
-
-            {/* ─ Value proposition — visual card treatment ─ */}
-            <motion.div
-              {...fade(0.35)}
-              className="mt-8"
-            >
-              {/* Main value statement */}
-              <div
-                className="relative rounded-2xl p-5 sm:p-6"
-                style={{
-                  background: "linear-gradient(135deg, rgba(79,70,229,0.03) 0%, rgba(167,139,250,0.02) 50%, rgba(96,165,250,0.02) 100%)",
-                  border: "1px solid rgba(79,70,229,0.08)",
-                }}
-              >
-                {/* Pillar color dots along top */}
-                <div className="mb-4 flex items-center gap-2">
-                  {pillars.map((p) => (
-                    <div key={p.label} className="flex items-center gap-1.5">
-                      <span
-                        className="inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ background: p.color, boxShadow: `0 0 6px ${p.color}40` }}
-                      />
-                      <span className="text-[10px] font-medium tracking-wide text-muted-foreground/60 uppercase">
-                        {p.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="text-[0.95rem] leading-[1.75] text-muted-foreground sm:text-base">
-                  We built{" "}
-                  <span className="font-semibold text-foreground">
-                    one personalized path
-                  </span>{" "}
-                  from the world&apos;s best minds&nbsp;&mdash; that takes you from
-                  knowledge to{" "}
-                  <span className="font-semibold text-foreground">
-                    real income
-                  </span>.
-                </p>
-
-                {/* Separator */}
-                <div className="my-4 h-px w-full" style={{ background: "linear-gradient(to right, transparent, rgba(79,70,229,0.1), transparent)" }} />
-
-                {/* Earn more — glowing highlight */}
-                <p className="text-[0.9rem] leading-[1.75] text-foreground/80 sm:text-[0.95rem]">
-                  At the end of your path you don&apos;t just know more &mdash; you{" "}
-                  <span
-                    className="inline-block font-bold"
-                    style={{
-                      color: "#4F46E5",
-                      animation: "earnGlow 3s ease-in-out infinite",
-                    }}
-                  >
-                    earn more
-                  </span>
                   .
-                  <br />
-                  <span className="text-muted-foreground">
-                    Real, practical income skills built for the Philippine market.
-                  </span>
-                </p>
-              </div>
-            </motion.div>
-
-            {/* ─ CTA row ─ */}
-            <motion.div
-              {...fade(0.55)}
-              className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
-            >
-              <Button
-                render={<Link href="/auth/signup" />}
-                size="lg"
-                className="relative h-[3.25rem] w-full cursor-pointer overflow-hidden px-8 text-[0.95rem] font-semibold shadow-lg shadow-primary/15 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/20 sm:w-auto"
-              >
-                Do It Once
-              </Button>
-              <span className="flex items-center gap-1.5 text-[0.8rem] text-muted-foreground sm:ml-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-50">
-                  <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2"/>
-                  <path d="M7 3.5V7L9.5 8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                </svg>
-                Free assessment&ensp;·&ensp;10 minutes
+                </span>
+                <span
+                  className="pointer-events-none absolute bottom-[0.15em] left-1/2 -translate-x-1/2 h-4 w-4 rounded-full sm:h-6 sm:w-6"
+                  style={{
+                    background: "#6366F1",
+                    filter: "blur(12px)",
+                    opacity: 0.7,
+                  }}
+                />
               </span>
-            </motion.div>
+            </h1>
+          </motion.div>
 
-            {/* ─ Credibility strip — refined ─ */}
-            <motion.div
+          {/* ── Subtitle ── */}
+          <motion.p
+            {...seq(2)}
+            className="mt-4 max-w-lg text-lg font-light leading-relaxed sm:mt-6 sm:text-xl md:text-2xl"
+            style={{ color: "rgba(255,255,255,0.45)" }}
+          >
+            The decision that changes everything.
+          </motion.p>
+
+          {/* ── Pillar visualization — the product IS the hero ── */}
+          <motion.div
+            {...seq(3)}
+            className="mt-10 max-w-md sm:mt-14"
+          >
+            <div className="space-y-3">
+              {pillars.map((p, i) => (
+                <div key={p.label} className="flex items-center gap-3">
+                  <span
+                    className="w-12 text-right text-[10px] font-semibold tracking-[0.15em] uppercase"
+                    style={{ color: `${p.color}99` }}
+                  >
+                    {p.label}
+                  </span>
+                  <div className="relative h-[6px] flex-1 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <motion.div
+                      className="absolute inset-y-0 left-0 rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${p.color}CC, ${p.color})` }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${p.pct}%` }}
+                      transition={{ duration: 1.2, delay: 1.0 + i * 0.15, ease: "easeOut" as const }}
+                    />
+                    <motion.span
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold tabular-nums"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.6 + i * 0.15 }}
+                    >
+                      {p.pct}
+                    </motion.span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <motion.p
+              className="mt-3 text-[11px] tracking-wide"
+              style={{ color: "rgba(255,255,255,0.2)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.85 }}
-              className="mt-12"
+              transition={{ delay: 2.2 }}
             >
-              <p className="mb-3 text-[10px] font-medium tracking-[0.18em] text-muted-foreground/50 uppercase">
-                Built from the principles of
-              </p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                {names.map((name, i) => (
-                  <span key={name} className="flex items-center">
-                    <span className="text-[0.8rem] font-medium tracking-tight text-muted-foreground/80 sm:text-[0.85rem]">
-                      {name}
-                    </span>
-                    {i < names.length - 1 && (
-                      <span
-                        className="ml-3 inline-block h-3 w-px"
-                        style={{ background: "rgba(79,70,229,0.15)" }}
-                      />
-                    )}
-                  </span>
-                ))}
-                <span className="text-[0.8rem] italic text-muted-foreground/40">
-                  &amp; hundreds more
-                </span>
-              </div>
-            </motion.div>
-          </div>
+              Your scores. Your path. Your results.
+            </motion.p>
+          </motion.div>
 
-          {/* ── Right column: PillarOrbs (desktop only) ── */}
+          {/* ── Value + income text ── */}
+          <motion.div {...seq(4)} className="mt-10 max-w-lg sm:mt-14">
+            <p
+              className="text-sm leading-[1.8] sm:text-[0.95rem]"
+              style={{ color: "rgba(255,255,255,0.5)" }}
+            >
+              We studied what the world&apos;s best minds actually do and distilled it
+              into{" "}
+              <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: 600 }}>
+                one personalized path
+              </span>
+              . Not just knowledge —{" "}
+              <span
+                style={{
+                  color: "#818CF8",
+                  fontWeight: 700,
+                  textShadow: "0 0 30px rgba(99,102,241,0.4)",
+                }}
+              >
+                real income skills
+              </span>{" "}
+              built for the Philippine market. You finish the path. You earn it back. And more.
+            </p>
+          </motion.div>
+
+          {/* ── CTA ── */}
           <motion.div
+            {...seq(5)}
+            className="mt-10 flex flex-col gap-4 sm:mt-12 sm:flex-row sm:items-center"
+          >
+            <Button
+              render={<Link href="/auth/signup" />}
+              size="lg"
+              className="relative h-14 w-full cursor-pointer overflow-hidden px-10 text-base font-semibold transition-all hover:scale-[1.03] sm:w-auto"
+              style={{
+                background: "linear-gradient(135deg, #4F46E5 0%, #6366F1 100%)",
+                boxShadow: "0 0 40px rgba(79,70,229,0.3), 0 4px 20px rgba(0,0,0,0.3)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              Do It Once
+            </Button>
+            <div className="flex flex-col gap-0.5 sm:ml-1">
+              <span className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Free assessment · 10 minutes
+              </span>
+              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+                No card required. Keep your results.
+              </span>
+            </div>
+          </motion.div>
+
+          {/* ── Credibility ── */}
+          <motion.div
+            className="mt-16 sm:mt-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="hidden items-center justify-center lg:flex"
+            transition={{ duration: 1, delay: 2.4 }}
           >
-            <PillarOrbs />
+            <p
+              className="mb-3 text-[9px] font-semibold tracking-[0.25em] uppercase"
+              style={{ color: "rgba(255,255,255,0.15)" }}
+            >
+              Built from the principles of
+            </p>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              {["Warren Buffett", "Kobe Bryant", "Elon Musk", "Dalai Lama"].map((name, i) => (
+                <span
+                  key={name}
+                  className="text-[13px] font-medium tracking-tight sm:text-sm"
+                  style={{
+                    color: "rgba(255,255,255,0.25)",
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {name}
+                  {i < 3 && (
+                    <span className="ml-5 inline-block text-[8px]" style={{ color: "rgba(255,255,255,0.1)" }}>
+                      ◆
+                    </span>
+                  )}
+                </span>
+              ))}
+              <span
+                className="text-[11px]"
+                style={{ color: "rgba(255,255,255,0.12)" }}
+              >
+                & hundreds more
+              </span>
+            </div>
           </motion.div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ── Transition gradient to light section ── */}
+      <div
+        className="h-24 sm:h-32"
+        style={{
+          background: "linear-gradient(to bottom, #08071a, var(--color-background, #FAFAFF))",
+        }}
+      />
+    </>
   );
 }
