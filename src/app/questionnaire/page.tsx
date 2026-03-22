@@ -18,16 +18,18 @@ export default async function QuestionnairePage() {
     redirect("/auth/signup");
   }
 
-  // If already completed, go to profile
+  // If already paid, go to dashboard
   const { data: profile } = await supabase
     .from("users")
-    .select("primary_path")
+    .select("primary_path, has_paid")
     .eq("id", user.id)
     .single();
 
-  if (profile?.primary_path) {
-    redirect("/profile");
+  if (profile?.has_paid) {
+    redirect("/dashboard");
   }
 
+  // Allow retaking the questionnaire even if primary_path exists
+  // (user might want to redo it before paying)
   return <QuestionnaireFlow />;
 }

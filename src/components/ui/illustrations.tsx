@@ -48,7 +48,8 @@ export function ModuleIllustration({ pillar, variant = 0, size = "md", className
       {pillar === "money" && (
         <>
           <circle cx="60" cy="60" r="50" fill={`url(#${id}-g)`} />
-          <path d="M60 25v70M45 40c0-8 30-8 30 0s-30 8-30 0M45 60c0 8 30 8 30 0M45 80c0 8 30 8 30 0" stroke={c.primary} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+          {/* Peso/Dollar sign */}
+          <text x="60" y="72" textAnchor="middle" fontSize="48" fontWeight="700" fontFamily="Georgia, serif" fill={c.primary} opacity="0.5">₱</text>
           <circle cx="85" cy="35" r="8" fill={c.primary} opacity="0.1" />
           <circle cx="35" cy="85" r="12" fill={c.primary} opacity="0.08" />
         </>
