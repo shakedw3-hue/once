@@ -40,6 +40,10 @@ interface TrackingEntry {
   metric_text: string | null;
 }
 
+interface TrackingHistoryEntry extends TrackingEntry {
+  entry_date: string;
+}
+
 interface DashboardViewProps {
   fullName: string;
   primaryPath: Pillar;
@@ -53,6 +57,7 @@ interface DashboardViewProps {
   streak: number;
   longestStreak: number;
   todayTracking: TrackingEntry[];
+  trackingHistory: TrackingHistoryEntry[];
   weeklyCompleted: number;
 }
 
@@ -112,6 +117,7 @@ export default function DashboardView({
   streak,
   longestStreak,
   todayTracking,
+  trackingHistory,
   weeklyCompleted,
 }: DashboardViewProps) {
   const primary = PILLARS[primaryPath];
@@ -242,8 +248,8 @@ export default function DashboardView({
           </div>
         )}
 
-        {/* Daily tracking input */}
-        <DailyTracker primaryPath={primaryPath} todayTracking={todayTracking} isDark={isDark} accent={t.accent} />
+        {/* Daily tracking + history */}
+        <DailyTracker primaryPath={primaryPath} todayTracking={todayTracking} trackingHistory={trackingHistory} isDark={isDark} accent={t.accent} />
 
         {/* Start here CTA */}
         {!hasStarted && firstLessonLink && (
@@ -538,27 +544,32 @@ function CollapsibleModule({ mod, allLessons, firstIncompleteIdx, defaultOpen, m
   );
 }
 
-// ─── Daily Tracker ───
+// ─── Daily Tracker with History ───
 
-const PILLAR_METRICS: Record<string, { type: string; label: string; placeholder: string; unit: string; isText?: boolean }[]> = {
+const PILLAR_METRICS: Record<string, { type: string; label: string; emoji: string; placeholder: string; unit: string; isText?: boolean }[]> = {
   money: [
-    { type: "savings", label: "How much did you save today?", placeholder: "0", unit: "₱" },
+    { type: "savings", label: "Saved today", emoji: "💰", placeholder: "500", unit: "₱" },
+    { type: "income", label: "Earned today", emoji: "📈", placeholder: "0", unit: "₱" },
   ],
   mind: [
-    { type: "reading_minutes", label: "Reading or learning today?", placeholder: "0", unit: "min" },
+    { type: "reading_minutes", label: "Learning time", emoji: "📖", placeholder: "15", unit: "min" },
+    { type: "focus_score", label: "Focus today (1-10)", emoji: "🎯", placeholder: "7", unit: "/10" },
   ],
   body: [
-    { type: "weight", label: "Current weight", placeholder: "0", unit: "kg" },
-    { type: "sleep_hours", label: "Sleep last night", placeholder: "0", unit: "hrs" },
+    { type: "sleep_hours", label: "Sleep last night", emoji: "😴", placeholder: "7", unit: "hrs" },
+    { type: "weight", label: "Weight", emoji: "⚖️", placeholder: "65", unit: "kg" },
+    { type: "water_glasses", label: "Water intake", emoji: "💧", placeholder: "8", unit: "glasses" },
   ],
   spirit: [
-    { type: "gratitude", label: "One thing you are grateful for today", placeholder: "Write something...", unit: "", isText: true },
+    { type: "gratitude", label: "Grateful for", emoji: "🙏", placeholder: "Something good today...", unit: "", isText: true },
+    { type: "mood_score", label: "Mood (1-10)", emoji: "😊", placeholder: "7", unit: "/10" },
   ],
 };
 
-function DailyTracker({ primaryPath, todayTracking, isDark, accent }: {
+function DailyTracker({ primaryPath, todayTracking, trackingHistory, isDark, accent }: {
   primaryPath: Pillar;
   todayTracking: TrackingEntry[];
+  trackingHistory: TrackingHistoryEntry[];
   isDark: boolean;
   accent: string;
 }) {
@@ -572,66 +583,118 @@ function DailyTracker({ primaryPath, todayTracking, isDark, accent }: {
     return init;
   });
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const alreadySaved = todayTracking.length > 0;
 
   async function handleSave() {
+    setSaving(true);
     const { saveTrackingEntry } = await import("@/app/dashboard/tracking-actions");
     for (const m of metrics) {
       const val = values[m.type];
       if (!val) continue;
       await saveTrackingEntry(m.type, m.isText ? null : Number(val), m.isText ? val : null);
     }
+    setSaving(false);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
   }
 
-  const allFilled = metrics.every(m => values[m.type]);
+  const anyFilled = metrics.some(m => values[m.type]);
+
+  // Build mini history for numeric metrics (last 7 entries)
+  const historyMetric = metrics.find(m => !m.isText);
+  const historyData = historyMetric
+    ? trackingHistory
+        .filter(h => h.metric_type === historyMetric.type && h.metric_value != null)
+        .sort((a, b) => a.entry_date.localeCompare(b.entry_date))
+        .slice(-7)
+    : [];
+  const maxVal = historyData.length > 0 ? Math.max(...historyData.map(h => h.metric_value!)) : 0;
 
   return (
-    <div className={`mb-6 rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "bg-card"}`}>
-      <p className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
-        Daily Check-in
-      </p>
-      <div className="space-y-3">
+    <div className={`mb-6 rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/[0.03]" : "bg-card border"}`}>
+      <div className="flex items-center justify-between mb-3">
+        <p className={`text-xs font-semibold uppercase tracking-wider ${isDark ? "text-white/40" : "text-muted-foreground"}`}>
+          Today&apos;s Check-in
+        </p>
+        {(alreadySaved || saved) && (
+          <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-medium">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            Saved
+          </span>
+        )}
+      </div>
+
+      <div className="grid gap-3 grid-cols-2">
         {metrics.map((m) => (
-          <div key={m.type}>
-            <label className={`mb-1 block text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
-              {m.label}
+          <div key={m.type} className={m.isText ? "col-span-2" : ""}>
+            <label className={`mb-1 flex items-center gap-1.5 text-xs ${isDark ? "text-white/60" : "text-muted-foreground"}`}>
+              <span>{m.emoji}</span>
+              <span>{m.label}</span>
             </label>
-            <div className="flex items-center gap-2">
-              {m.unit && !m.isText && (
-                <span className={`text-sm font-medium ${isDark ? "text-white/40" : "text-muted-foreground"}`}>{m.unit}</span>
-              )}
+            <div className="relative">
               <input
                 type={m.isText ? "text" : "number"}
                 value={values[m.type]}
-                onChange={(e) => setValues(prev => ({ ...prev, [m.type]: e.target.value }))}
+                onChange={(e) => { setValues(prev => ({ ...prev, [m.type]: e.target.value })); setSaved(false); }}
                 placeholder={m.placeholder}
-                className={`flex-1 rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${
+                className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
+                  m.unit && !m.isText ? "pr-12" : ""
+                } ${
                   isDark
                     ? "border-white/10 bg-white/[0.05] text-white placeholder:text-white/20 focus:border-white/20"
                     : "border-border bg-background focus:border-primary/30"
                 }`}
               />
               {m.unit && !m.isText && (
-                <span className={`text-xs ${isDark ? "text-white/30" : "text-muted-foreground"}`}>{m.unit}</span>
+                <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
+                  {m.unit}
+                </span>
               )}
             </div>
           </div>
         ))}
       </div>
+
       <button
         onClick={handleSave}
-        disabled={!allFilled}
-        className={`mt-3 w-full rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors ${
+        disabled={!anyFilled || saving}
+        className={`mt-3 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-all min-h-[44px] ${
           saved
-            ? "bg-emerald-500/20 text-emerald-400"
-            : allFilled
-              ? isDark ? "bg-white/10 text-white hover:bg-white/15" : "bg-primary/10 text-primary hover:bg-primary/15"
+            ? "bg-emerald-500/20 text-emerald-500"
+            : anyFilled
+              ? isDark ? "text-white hover:opacity-90" : "text-white hover:opacity-90"
               : isDark ? "bg-white/5 text-white/20 cursor-not-allowed" : "bg-muted text-muted-foreground cursor-not-allowed"
         }`}
+        style={anyFilled && !saved ? { backgroundColor: accent } : undefined}
       >
-        {saved ? "✓ Saved" : "Save Today's Check-in"}
+        {saving ? "Saving..." : saved ? "✓ Saved for today" : "Save Check-in"}
       </button>
+
+      {/* Mini history chart */}
+      {historyData.length >= 2 && historyMetric && (
+        <div className="mt-4 pt-3 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : undefined }}>
+          <p className={`mb-2 text-[10px] font-medium uppercase tracking-wider ${isDark ? "text-white/30" : "text-muted-foreground"}`}>
+            {historyMetric.emoji} {historyMetric.label} — Last {historyData.length} days
+          </p>
+          <div className="flex items-end gap-1 h-12">
+            {historyData.map((h, i) => {
+              const pct = maxVal > 0 ? (h.metric_value! / maxVal) * 100 : 0;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                  <div
+                    className="w-full rounded-sm min-h-[4px] transition-all"
+                    style={{ height: `${Math.max(pct, 8)}%`, backgroundColor: accent, opacity: i === historyData.length - 1 ? 1 : 0.4 }}
+                  />
+                  <span className={`text-[8px] ${isDark ? "text-white/20" : "text-muted-foreground/50"}`}>
+                    {new Date(h.entry_date).getDate()}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

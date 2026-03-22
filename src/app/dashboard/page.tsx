@@ -149,6 +149,15 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .eq("entry_date", today);
 
+  // Get last 14 days of tracking for history
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  const { data: trackingHistory } = await db
+    .from("user_tracking")
+    .select("entry_date, metric_type, metric_value, metric_text")
+    .eq("user_id", user.id)
+    .gte("entry_date", twoWeeksAgo.toISOString().split("T")[0]);
+
   // Weekly message
   const startOfWeek = new Date();
   startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
@@ -173,6 +182,7 @@ export default async function DashboardPage() {
       streak={profile.current_streak ?? 0}
       longestStreak={profile.longest_streak ?? 0}
       todayTracking={(todayTracking ?? []) as { metric_type: string; metric_value: number | null; metric_text: string | null }[]}
+      trackingHistory={(trackingHistory ?? []) as { entry_date: string; metric_type: string; metric_value: number | null; metric_text: string | null }[]}
       weeklyCompleted={weeklyCompleted ?? 0}
     />
   );
