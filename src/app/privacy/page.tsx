@@ -150,8 +150,8 @@ export default function PrivacyPage() {
           </ul>
           <p>
             To exercise any of these rights, please contact us at{" "}
-            <a href="mailto:hello@useonce.co" className="underline hover:text-foreground">
-              hello@useonce.co
+            <a href="mailto:hello@onceph.com" className="underline hover:text-foreground">
+              hello@onceph.com
             </a>
             . We will respond to your request within a reasonable timeframe, and no later than 30
             days from receipt.
@@ -212,8 +212,8 @@ export default function PrivacyPage() {
           <p>
             If you have questions or concerns about this Privacy Policy or your personal data,
             please contact us at{" "}
-            <a href="mailto:hello@useonce.co" className="underline hover:text-foreground">
-              hello@useonce.co
+            <a href="mailto:hello@onceph.com" className="underline hover:text-foreground">
+              hello@onceph.com
             </a>
             .
           </p>

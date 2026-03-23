@@ -15,10 +15,11 @@ export default function TermsPage() {
         <h2 className="mt-8 mb-3 text-section text-lg">1. Agreement to Terms</h2>
         <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
           <p>
-            By accessing or using the Once platform (&quot;Service&quot;), you agree to be bound by
+            By accessing or using the Once platform (&quot;Service&quot;), operated by Better
+            (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;), you agree to be bound by
             these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, you may
-            not access or use the Service. Once is a digital education platform operated in the
-            Republic of the Philippines.
+            not access or use the Service. Once is a digital education platform operated by Better
+            in the Republic of the Philippines.
           </p>
         </div>
       </section>
@@ -65,9 +66,9 @@ export default function TermsPage() {
           </ul>
           <p>
             Payments are accepted via GCash, Maya, credit card, and debit card. All transactions
-            are securely processed by Stripe. Once does not store your full payment details on its
-            servers. Prices are listed in Philippine Pesos (₱) and are inclusive of applicable
-            charges unless otherwise stated.
+            are securely processed by Paddle, our Merchant of Record. Once does not store your
+            full payment details on its servers. Prices are listed in Philippine Pesos (₱) and
+            are inclusive of applicable charges unless otherwise stated.
           </p>
         </div>
       </section>
@@ -166,8 +167,8 @@ export default function TermsPage() {
         <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
           <p>
             If you have any questions about these Terms, please contact us at{" "}
-            <a href="mailto:hello@useonce.co" className="underline hover:text-foreground">
-              hello@useonce.co
+            <a href="mailto:hello@onceph.com" className="underline hover:text-foreground">
+              hello@onceph.com
             </a>
             .
           </p>
