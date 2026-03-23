@@ -3,6 +3,7 @@ import { getStripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 function getSupabaseAdmin() {
   return createClient(
@@ -12,6 +13,15 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const { success, retryAfter } = rateLimit(ip, 100, 60 * 1000);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
 

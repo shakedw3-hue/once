@@ -23,57 +23,81 @@ async function requireAdmin() {
 // --- Module actions ---
 
 export async function createModule(pathId: string, title: string, description: string) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  // Get next order
-  const { data: existing } = await supabase
-    .from("modules")
-    .select("order")
-    .eq("path_id", pathId)
-    .order("order", { ascending: false })
-    .limit(1);
+    // Get next order
+    const { data: existing } = await supabase
+      .from("modules")
+      .select("order")
+      .eq("path_id", pathId)
+      .order("order", { ascending: false })
+      .limit(1);
 
-  const nextOrder = (existing?.[0]?.order ?? 0) + 1;
+    const nextOrder = (existing?.[0]?.order ?? 0) + 1;
 
-  const { error: insertError } = await supabase.from("modules").insert({
-    path_id: pathId,
-    title,
-    description,
-    order: nextOrder,
-  });
+    const { error: insertError } = await supabase.from("modules").insert({
+      path_id: pathId,
+      title,
+      description,
+      order: nextOrder,
+    });
 
-  if (insertError) return { error: insertError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (insertError) {
+      console.error("Create module error:", insertError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Create module error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 export async function updateModule(moduleId: string, title: string, description: string) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  const { error: updateError } = await supabase
-    .from("modules")
-    .update({ title, description })
-    .eq("id", moduleId);
+    const { error: updateError } = await supabase
+      .from("modules")
+      .update({ title, description })
+      .eq("id", moduleId);
 
-  if (updateError) return { error: updateError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (updateError) {
+      console.error("Update module error:", updateError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Update module error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 export async function deleteModule(moduleId: string) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  const { error: deleteError } = await supabase
-    .from("modules")
-    .delete()
-    .eq("id", moduleId);
+    const { error: deleteError } = await supabase
+      .from("modules")
+      .delete()
+      .eq("id", moduleId);
 
-  if (deleteError) return { error: deleteError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (deleteError) {
+      console.error("Delete module error:", deleteError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Delete module error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 // --- Lesson actions ---
@@ -82,64 +106,88 @@ export async function createLesson(
   moduleId: string,
   data: { title: string; description: string; actionStep: string; reflectionPrompt: string }
 ) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  const { data: existing } = await supabase
-    .from("lessons")
-    .select("order")
-    .eq("module_id", moduleId)
-    .order("order", { ascending: false })
-    .limit(1);
+    const { data: existing } = await supabase
+      .from("lessons")
+      .select("order")
+      .eq("module_id", moduleId)
+      .order("order", { ascending: false })
+      .limit(1);
 
-  const nextOrder = (existing?.[0]?.order ?? 0) + 1;
+    const nextOrder = (existing?.[0]?.order ?? 0) + 1;
 
-  const { error: insertError } = await supabase.from("lessons").insert({
-    module_id: moduleId,
-    title: data.title,
-    description: data.description,
-    action_step: data.actionStep,
-    reflection_prompt: data.reflectionPrompt,
-    order: nextOrder,
-  });
+    const { error: insertError } = await supabase.from("lessons").insert({
+      module_id: moduleId,
+      title: data.title,
+      description: data.description,
+      action_step: data.actionStep,
+      reflection_prompt: data.reflectionPrompt,
+      order: nextOrder,
+    });
 
-  if (insertError) return { error: insertError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (insertError) {
+      console.error("Create lesson error:", insertError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Create lesson error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 export async function updateLesson(
   lessonId: string,
   data: { title: string; description: string; actionStep: string; reflectionPrompt: string }
 ) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  const { error: updateError } = await supabase
-    .from("lessons")
-    .update({
-      title: data.title,
-      description: data.description,
-      action_step: data.actionStep,
-      reflection_prompt: data.reflectionPrompt,
-    })
-    .eq("id", lessonId);
+    const { error: updateError } = await supabase
+      .from("lessons")
+      .update({
+        title: data.title,
+        description: data.description,
+        action_step: data.actionStep,
+        reflection_prompt: data.reflectionPrompt,
+      })
+      .eq("id", lessonId);
 
-  if (updateError) return { error: updateError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (updateError) {
+      console.error("Update lesson error:", updateError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Update lesson error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
 
 export async function deleteLesson(lessonId: string) {
-  const { supabase, error } = await requireAdmin();
-  if (error || !supabase) return { error: error ?? "Unknown error" };
+  try {
+    const { supabase, error } = await requireAdmin();
+    if (error || !supabase) return { error: error ?? "Unknown error" };
 
-  const { error: deleteError } = await supabase
-    .from("lessons")
-    .delete()
-    .eq("id", lessonId);
+    const { error: deleteError } = await supabase
+      .from("lessons")
+      .delete()
+      .eq("id", lessonId);
 
-  if (deleteError) return { error: deleteError.message };
-  revalidatePath("/admin/content");
-  return { success: true };
+    if (deleteError) {
+      console.error("Delete lesson error:", deleteError.message);
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath("/admin/content");
+    return { success: true };
+  } catch (err) {
+    console.error("Delete lesson error:", err);
+    return { error: "Something went wrong. Please try again." };
+  }
 }
