@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import DashboardView from "@/components/dashboard/DashboardView";
+import InstallBanner from "@/components/ui/InstallBanner";
+import NotificationPrompt from "@/components/ui/NotificationPrompt";
 import type { Pillar, PillarScores } from "@/types/database";
 
 export const metadata: Metadata = {
@@ -170,6 +172,7 @@ export default async function DashboardPage() {
     .gte("completed_at", startOfWeek.toISOString());
 
   return (
+    <>
     <DashboardView
       fullName={profile.full_name}
       primaryPath={profile.primary_path as Pillar}
@@ -186,5 +189,8 @@ export default async function DashboardPage() {
       trackingHistory={(trackingHistory ?? []) as { entry_date: string; metric_type: string; metric_value: number | null; metric_text: string | null }[]}
       weeklyCompleted={weeklyCompleted ?? 0}
     />
+    <InstallBanner />
+    <NotificationPrompt />
+    </>
   );
 }
