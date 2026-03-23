@@ -331,7 +331,7 @@ export default function ProfileReveal({
                 </a>
 
                 <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                  GCash and Maya accepted. One payment. Lifetime access.
+                  Visa, Mastercard, GCash, Maya accepted. One payment. Lifetime access.
                 </p>
                 <p className="mt-1 text-center text-[11px] text-muted-foreground/70">
                   7-day money-back guarantee. No questions asked.

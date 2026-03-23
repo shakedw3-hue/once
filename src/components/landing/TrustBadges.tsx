@@ -7,7 +7,7 @@ const badges = [
       </svg>
     ),
     title: "Secure Payment",
-    sub: "GCash & Maya",
+    sub: "Visa, Mastercard, GCash, Maya",
   },
   {
     icon: (

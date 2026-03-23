@@ -65,7 +65,7 @@ export default function TermsPage() {
             <li>Once AI Careers: ₱3,950 (one-time payment)</li>
           </ul>
           <p>
-            Payments are accepted via GCash, Maya, credit card, and debit card. All transactions
+            Payments are accepted via Visa, Mastercard, GCash, Maya, and other local payment methods. All transactions
             are securely processed by Paddle, our Merchant of Record. Once does not store your
             full payment details on its servers. Prices are listed in Philippine Pesos (₱) and
             are inclusive of applicable charges unless otherwise stated.

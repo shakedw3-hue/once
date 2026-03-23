@@ -395,7 +395,7 @@ export default function Home() {
           </div>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            GCash and Maya accepted. No subscription. No upsells. Make your money back on your first client.
+            Visa, Mastercard, GCash, Maya accepted. No subscription. No upsells. Make your money back on your first client.
           </p>
 
           {/* Trust badges */}

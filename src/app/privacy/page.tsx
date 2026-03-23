@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Payment information:</strong> payment details processed securely through
-              Stripe (we do not store your full card number, GCash, or Maya account details on
+              Paddle, our Merchant of Record (we do not store your full card number, GCash, or Maya account details on
               our servers)
             </li>
             <li>
@@ -85,10 +85,10 @@ export default function PrivacyPage() {
           </p>
           <ul className="ml-5 list-disc space-y-1">
             <li>
-              <strong>Stripe:</strong> processes your payments securely. Stripe&apos;s use of
+              <strong>Paddle:</strong> our Merchant of Record, processes your payments securely. Paddle&apos;s use of
               your data is governed by their own{" "}
               <a
-                href="https://stripe.com/privacy"
+                href="https://www.paddle.com/legal/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-foreground"
