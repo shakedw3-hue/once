@@ -5,6 +5,7 @@ import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
 import Testimonials from "@/components/landing/Testimonials";
 import StickyCTA from "@/components/landing/StickyCTA";
+import InstallBanner from "@/components/ui/InstallBanner";
 import TrustBadges from "@/components/landing/TrustBadges";
 import SocialProofStrip from "@/components/landing/SocialProofStrip";
 import PhoneMockup from "@/components/landing/PhoneMockup";
@@ -489,6 +490,7 @@ export default function Home() {
       </main>
       <Footer />
       <StickyCTA />
+      <InstallBanner />
     </>
   );
 }

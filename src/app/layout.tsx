@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import ServiceWorkerRegistrar from "@/components/ui/ServiceWorkerRegistrar";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -36,7 +37,16 @@ export const metadata: Metadata = {
     description: "One assessment. One personalized path. One decision.",
     images: ["/opengraph-image"],
   },
-  other: { "theme-color": "#FAFAFF" },
+  icons: {
+    apple: [{ url: "/apple-icon", sizes: "180x180" }],
+  },
+  other: {
+    "theme-color": "#FAFAFF",
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "apple-mobile-web-app-title": "Once",
+  },
 };
 
 export default function RootLayout({
@@ -48,6 +58,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         {children}
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );
