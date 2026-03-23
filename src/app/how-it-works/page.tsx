@@ -6,18 +6,31 @@ import SiteLayout from "@/components/landing/SiteLayout";
 
 export const metadata: Metadata = { title: "How it works" };
 
+const playfair: React.CSSProperties = {
+  fontFamily: "'Playfair Display', Georgia, serif",
+};
+
 export default function HowItWorksPage() {
   return (
     <SiteLayout>
-      <h1 className="mb-4 text-display text-3xl sm:text-4xl">
-        How Once works
-      </h1>
-      <p className="mb-12 text-base leading-relaxed text-muted-foreground sm:text-lg">
-        Four steps. One path. The assessment is free.
-      </p>
+      {/* Hero */}
+      <div className="text-center mb-16">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500 mb-4">
+          The Process
+        </p>
+        <h1
+          className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6"
+          style={playfair}
+        >
+          How Once works
+        </h1>
+        <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Four steps. One path. The assessment is free.
+        </p>
+      </div>
 
-      <div className="mb-16 space-y-12">
-        <Step n="1" title="Diagnose" sub="We find exactly where you are." icon={<IconCompass />}>
+      <div className="mb-16 space-y-8 mx-auto max-w-3xl">
+        <Step n="01" title="Diagnose" sub="We find exactly where you are." icon={<IconCompass />}>
           <p>
             15 questions about your goals, daily life, and frustrations. Each answer
             adds weighted points to four pillars: Money, Mind, Body, Spirit. When you
@@ -31,7 +44,7 @@ export default function HowItWorksPage() {
           <p>Takes 10 minutes. You do not need to pay for this step.</p>
         </Step>
 
-        <Step n="2" title="Match" sub="We build one path. Yours." icon={<IconMatch />}>
+        <Step n="02" title="Match" sub="We build one path. Yours." icon={<IconMatch />}>
           <p>
             Your highest scoring pillar becomes your primary path. You get a full
             Once profile with scores, insights about what is holding you back, and
@@ -45,7 +58,7 @@ export default function HowItWorksPage() {
           <p>You see your profile before paying anything.</p>
         </Step>
 
-        <Step n="3" title="Learn" sub="Thousands of hours of research. In 10 minutes a day." icon={<IconLearn />}>
+        <Step n="03" title="Learn" sub="Thousands of hours of research. In 10 minutes a day." icon={<IconLearn />}>
           <p>
             Ray Dalio wrote 600 pages on principles. Andrew Huberman recorded 300
             hours of neuroscience podcasts. James Clear spent years studying habit
@@ -53,8 +66,8 @@ export default function HowItWorksPage() {
             insight into a 10-minute lesson you can act on today.
           </p>
           <p>Every lesson follows the same structure:</p>
-          <div className="rounded-lg border bg-card p-4">
-            <div className="space-y-2 text-xs">
+          <div className="rounded-xl bg-white p-5 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+            <div className="space-y-2.5 text-xs">
               <div><span className="font-semibold text-foreground">Teaching</span>: what the research says, explained simply</div>
               <div><span className="font-semibold text-foreground">Action step</span>: one specific thing to do within 24 hours</div>
               <div><span className="font-semibold text-foreground">Reflection</span>: a question that connects the insight to your life</div>
@@ -63,7 +76,7 @@ export default function HowItWorksPage() {
           <p>25 Core lessons. Each one sourced from a specific researcher or practitioner.</p>
         </Step>
 
-        <Step n="4" title="Launch" sub="Your first real income. Step by step." icon={<IconRocket />}>
+        <Step n="04" title="Launch" sub="Your first real income. Step by step." icon={<IconRocket />}>
           <p>
             Once Pro adds 100 additional lessons across four income tracks designed
             for the Philippine market: social media management, Shopee/Lazada
@@ -79,17 +92,18 @@ export default function HowItWorksPage() {
           </p>
           <p>Growing as a person is the foundation. Growing your income is the launch.</p>
         </Step>
+
         <p className="mt-8 text-center once-signature">This is how change happens. Once<span style={{color:"#4F46E5"}}>.</span></p>
       </div>
 
       <div className="mb-8 flex justify-end">
-        <Link href="/pillars" className="text-sm text-primary hover:underline">
+        <Link href="/pillars" className="text-sm text-indigo-500 hover:text-indigo-700 transition-colors">
           Next: The 4 pillars →
         </Link>
       </div>
 
-      <div className="rounded-xl border bg-card p-6 text-center">
-        <p className="mb-4 text-sm text-muted-foreground">
+      <div className="rounded-2xl bg-white p-10 text-center shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
+        <p className="mb-6 text-sm text-muted-foreground">
           Step 1 is free. See your scores first.
         </p>
         <Button render={<Link href="/auth/signup" />} size="lg" className="h-14 w-full px-8 text-base font-semibold sm:w-auto">
@@ -102,15 +116,20 @@ export default function HowItWorksPage() {
 
 function Step({ n, title, sub, icon, children }: { n: string; title: string; sub: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div>
-      <div className="mb-3 flex items-center gap-3">
-        {icon}
-        <div>
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <p className="text-xs text-primary">{sub}</p>
+    <div className="rounded-2xl bg-white p-8 shadow-[0_4px_24px_rgba(0,0,0,0.05)] transition-shadow hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+      <div className="mb-5 flex items-center gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-lg font-bold text-indigo-600" style={playfair}>
+          {n}
+        </div>
+        <div className="flex items-center gap-3">
+          {icon}
+          <div>
+            <h2 className="text-lg font-semibold" style={playfair}>{title}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-500">{sub}</p>
+          </div>
         </div>
       </div>
-      <div className="ml-[60px] space-y-3 text-sm leading-relaxed text-muted-foreground">
+      <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
         {children}
       </div>
     </div>

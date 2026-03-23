@@ -105,7 +105,7 @@ export default async function OGImage() {
           }}
         >
           <span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase" as const }}>
-            once.ph
+            onceph.com
           </span>
           <div style={{ width: 1, height: 16, backgroundColor: "rgba(255,255,255,0.15)" }} />
           <span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>

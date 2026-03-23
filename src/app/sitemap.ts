@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://once.ph";
+  const baseUrl = "https://onceph.com";
 
   return [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "monthly", priority: 1 },
