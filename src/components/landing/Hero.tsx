@@ -96,13 +96,13 @@ export default function Hero() {
                         animationDelay: `${0.6 + i * 0.1}s`,
                       }}
                     />
-                    <span
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold tabular-nums hero-fade-only"
-                      style={{ color: "rgba(255,255,255,0.3)", animationDelay: `${0.9 + i * 0.1}s` }}
-                    >
-                      {p.pct}
-                    </span>
                   </div>
+                  <span
+                    className="w-8 text-right text-[11px] font-bold tabular-nums hero-fade-only"
+                    style={{ color: p.color, animationDelay: `${0.9 + i * 0.1}s` }}
+                  >
+                    {p.pct}
+                  </span>
                 </div>
               ))}
             </div>
