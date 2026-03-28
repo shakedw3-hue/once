@@ -36,23 +36,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Protect admin routes
+  // Protect admin routes — cookie-based admin session (no Supabase auth needed)
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      return NextResponse.redirect(url);
-    }
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
+    const adminToken = request.cookies.get("admin_token")?.value;
+    if (adminToken !== process.env.ADMIN_SECRET) {
+      // Not /admin/login itself — redirect there
+      if (request.nextUrl.pathname !== "/admin/login") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin/login";
+        return NextResponse.redirect(url);
+      }
     }
   }
 
