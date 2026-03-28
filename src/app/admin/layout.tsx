@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import AdminShell from "@/components/admin/AdminShell";
 
 export default async function AdminLayout({
@@ -7,24 +6,17 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const cookieStore = await cookies();
+  const adminToken = cookieStore.get("admin_token")?.value;
+  const isAuthed = adminToken === process.env.ADMIN_SECRET;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/auth/login");
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role, full_name")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") redirect("/dashboard");
+  // Login page renders without AdminShell
+  if (!isAuthed) {
+    return <>{children}</>;
+  }
 
   return (
-    <AdminShell adminName={profile.full_name}>
+    <AdminShell adminName="Admin">
       {children}
     </AdminShell>
   );
