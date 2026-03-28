@@ -118,9 +118,14 @@ export async function login(formData: FormData) {
     if (user) {
       const { data: profile } = await supabase
         .from("users")
-        .select("primary_path, has_paid")
+        .select("primary_path, has_paid, role")
         .eq("id", user.id)
         .single();
+
+      // Admin always goes to admin dashboard
+      if (profile?.role === "admin") {
+        redirect("/admin");
+      }
 
       if (profile?.has_paid) {
         redirect("/dashboard");

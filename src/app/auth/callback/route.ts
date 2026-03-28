@@ -18,16 +18,20 @@ export async function GET(request: Request) {
       if (user) {
         const { data: profile } = await supabase
           .from("users")
-          .select("primary_path, has_paid")
+          .select("primary_path, has_paid, role")
           .eq("id", user.id)
           .single();
+
+        // Admin always goes to admin dashboard
+        if (profile?.role === "admin") {
+          return NextResponse.redirect(`${origin}/admin`);
+        }
 
         if (profile?.has_paid) {
           return NextResponse.redirect(`${origin}/dashboard`);
         }
 
         if (profile?.primary_path) {
-          // Has path but hasn't paid — send to profile/reveal
           return NextResponse.redirect(`${origin}/profile`);
         }
       }
