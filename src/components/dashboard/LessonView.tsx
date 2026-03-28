@@ -22,6 +22,7 @@ import {
   getRealNumbers,
   isModuleOpener,
 } from "@/lib/lesson-content";
+import LessonSlideView from "./LessonSlideView";
 
 interface LessonViewProps {
   lesson: {
@@ -40,6 +41,8 @@ interface LessonViewProps {
   userId: string;
   isPro: boolean;
   totalLessonsInModule: number;
+  pillarColor?: string;
+  pillarName?: string;
 }
 
 const BOOKMARK_KEY = "once_saved_insights";
@@ -55,6 +58,8 @@ function toggleInsight(insight: string): boolean {
   } catch { return false; }
 }
 
+const MODE_KEY = "once_lesson_mode";
+
 export default function LessonView({
   lesson,
   module: mod,
@@ -63,6 +68,8 @@ export default function LessonView({
   prevLessonId,
   isPro,
   totalLessonsInModule,
+  pillarColor = "#4F46E5",
+  pillarName = "Mind",
 }: LessonViewProps) {
   const router = useRouter();
   const [reflection, setReflection] = useState(progress?.reflection ?? "");
@@ -70,6 +77,20 @@ export default function LessonView({
   const [saving, setSaving] = useState(false);
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
   const [insightSaved, setInsightSaved] = useState(false);
+  const [mode, setMode] = useState<"slides" | "scroll">("slides");
+
+  // Load mode preference from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(MODE_KEY);
+      if (saved === "scroll" || saved === "slides") setMode(saved);
+    } catch { /* ignore */ }
+  }, []);
+
+  function switchMode(m: "slides" | "scroll") {
+    setMode(m);
+    try { localStorage.setItem(MODE_KEY, m); } catch { /* ignore */ }
+  }
 
   // Load bookmark state from localStorage once on mount
   useEffect(() => {
@@ -125,8 +146,78 @@ export default function LessonView({
     else router.push(`/dashboard/module/${mod.id}`);
   }
 
+  // Slide mode
+  if (mode === "slides") {
+    return (
+      <div className="relative">
+        {/* Tiny mode toggle floating top-right */}
+        <div className="absolute top-3 right-14 z-30 flex rounded-full border border-gray-200 bg-white/90 backdrop-blur-sm overflow-hidden">
+          <button
+            onClick={() => switchMode("slides")}
+            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
+            style={{
+              backgroundColor: pillarColor,
+              color: "#fff",
+            }}
+          >
+            Slides
+          </button>
+          <button
+            onClick={() => switchMode("scroll")}
+            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
+            style={{
+              backgroundColor: "transparent",
+              color: "#9ca3af",
+            }}
+          >
+            Scroll
+          </button>
+        </div>
+        <LessonSlideView
+          lesson={lesson}
+          isPro={isPro}
+          pillarColor={pillarColor}
+          pillarName={pillarName}
+          lessonNumber={lesson.order}
+          totalLessons={totalLessonsInModule}
+          moduleTitle={mod.title}
+          moduleId={mod.id}
+          progress={progress}
+          nextLessonId={nextLessonId}
+          onComplete={() => setCompleted(true)}
+        />
+      </div>
+    );
+  }
+
+  // Scroll mode (existing layout)
   return (
     <div className="min-h-screen bg-background">
+      {/* Mode toggle */}
+      <div className="flex justify-end px-5 pt-2">
+        <div className="flex rounded-full border border-gray-200 overflow-hidden">
+          <button
+            onClick={() => switchMode("slides")}
+            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
+            style={{
+              backgroundColor: "transparent",
+              color: "#9ca3af",
+            }}
+          >
+            Slides
+          </button>
+          <button
+            onClick={() => switchMode("scroll")}
+            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
+            style={{
+              backgroundColor: pillarColor,
+              color: "#fff",
+            }}
+          >
+            Scroll
+          </button>
+        </div>
+      </div>
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-3xl items-center gap-4 px-5">

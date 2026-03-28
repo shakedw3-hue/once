@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LessonView from "@/components/dashboard/LessonView";
+import { theme } from "@/lib/theme";
+import type { Pillar } from "@/types/database";
 
 interface Props {
   params: Promise<{ moduleId: string; lessonId: string }>;
@@ -42,6 +44,39 @@ export default async function LessonPage({ params }: Props) {
 
   if (!mod) redirect("/dashboard");
 
+  // Get the path to determine pillar color
+  const { data: pathData } = await supabase
+    .from("paths")
+    .select("pillar")
+    .eq("id", (mod as any).path_id ?? "")
+    .maybeSingle();
+
+  // Also try to get pillar from the module's path via a join
+  let pillarKey: Pillar = "mind"; // fallback
+  if (pathData?.pillar) {
+    pillarKey = pathData.pillar as Pillar;
+  } else {
+    // Fallback: query paths that contain this module
+    const { data: modWithPath } = await supabase
+      .from("modules")
+      .select("path_id")
+      .eq("id", moduleId)
+      .single();
+    if (modWithPath?.path_id) {
+      const { data: fallbackPath } = await supabase
+        .from("paths")
+        .select("pillar")
+        .eq("id", modWithPath.path_id)
+        .single();
+      if (fallbackPath?.pillar) {
+        pillarKey = fallbackPath.pillar as Pillar;
+      }
+    }
+  }
+
+  const pillarColor = theme.pillar[pillarKey]?.color ?? "#4F46E5";
+  const pillarName = pillarKey.charAt(0).toUpperCase() + pillarKey.slice(1);
+
   // Get progress
   const { data: progress } = await supabase
     .from("user_progress")
@@ -71,6 +106,8 @@ export default async function LessonPage({ params }: Props) {
       userId={user.id}
       isPro={isPro}
       totalLessonsInModule={(allLessons ?? []).length}
+      pillarColor={pillarColor}
+      pillarName={pillarName}
     />
   );
 }
