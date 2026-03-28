@@ -40,12 +40,9 @@ export async function updateSession(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/admin")) {
     const adminToken = request.cookies.get("admin_token")?.value;
     if (adminToken !== process.env.ADMIN_SECRET) {
-      // Not /admin/login itself — redirect there
-      if (request.nextUrl.pathname !== "/admin/login") {
-        const url = request.nextUrl.clone();
-        url.pathname = "/admin/login";
-        return NextResponse.redirect(url);
-      }
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin-login";
+      return NextResponse.redirect(url);
     }
   }
 

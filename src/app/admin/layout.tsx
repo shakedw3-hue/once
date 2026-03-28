@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 
 export default async function AdminLayout({
@@ -8,11 +9,9 @@ export default async function AdminLayout({
 }) {
   const cookieStore = await cookies();
   const adminToken = cookieStore.get("admin_token")?.value;
-  const isAuthed = adminToken === process.env.ADMIN_SECRET;
 
-  // Login page renders without AdminShell
-  if (!isAuthed) {
-    return <>{children}</>;
+  if (!adminToken || adminToken !== process.env.ADMIN_SECRET) {
+    redirect("/admin-login");
   }
 
   return (
