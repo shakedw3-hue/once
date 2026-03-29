@@ -67,6 +67,26 @@ export default function LessonSlideView({
   const totalSlides = slides.length;
   const progressPct = ((currentSlide + 1) / totalSlides) * 100;
 
+  // Navigation refs to avoid stale closures
+  const currentSlideRef = useRef(currentSlide);
+  const isTransitioningRef = useRef(isTransitioning);
+  currentSlideRef.current = currentSlide;
+  isTransitioningRef.current = isTransitioning;
+
+  const goNext = useCallback(() => {
+    if (isTransitioningRef.current || currentSlideRef.current >= totalSlides - 1) return;
+    setIsTransitioning(true);
+    setCurrentSlide((s) => s + 1);
+    setTimeout(() => setIsTransitioning(false), 380);
+  }, [totalSlides]);
+
+  const goPrev = useCallback(() => {
+    if (isTransitioningRef.current || currentSlideRef.current <= 0) return;
+    setIsTransitioning(true);
+    setCurrentSlide((s) => s - 1);
+    setTimeout(() => setIsTransitioning(false), 380);
+  }, []);
+
   // Keyboard navigation
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -80,22 +100,7 @@ export default function LessonSlideView({
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSlide, isTransitioning]);
-
-  const goNext = useCallback(() => {
-    if (isTransitioning || currentSlide >= totalSlides - 1) return;
-    setIsTransitioning(true);
-    setCurrentSlide((s) => s + 1);
-    setTimeout(() => setIsTransitioning(false), 380);
-  }, [currentSlide, totalSlides, isTransitioning]);
-
-  const goPrev = useCallback(() => {
-    if (isTransitioning || currentSlide <= 0) return;
-    setIsTransitioning(true);
-    setCurrentSlide((s) => s - 1);
-    setTimeout(() => setIsTransitioning(false), 380);
-  }, [currentSlide, isTransitioning]);
+  }, [goNext, goPrev]);
 
   function goToSlide(idx: number) {
     if (isTransitioning || idx === currentSlide) return;
@@ -258,7 +263,7 @@ export default function LessonSlideView({
     <div
       ref={containerRef}
       className="relative overflow-hidden bg-white select-none"
-      style={{ height: "100dvh", touchAction: "pan-y" }}
+      style={{ height: "100dvh", touchAction: "none" }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
