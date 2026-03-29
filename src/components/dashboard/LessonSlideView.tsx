@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { buildSlides, type Slide } from "@/lib/lesson-slides";
 import { completeLesson } from "@/app/dashboard/module/[moduleId]/lesson/actions";
@@ -53,85 +53,86 @@ export default function LessonSlideView({
 }: LessonSlideViewProps) {
   const router = useRouter();
   const slides = useRef<Slide[]>(buildSlides(lesson, isPro)).current;
+  const totalSlideCount = slides.length;
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchDelta, setTouchDelta] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [current, setCurrent] = useState(0);
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
   const [reflectionText, setReflectionText] = useState(progress?.reflection ?? "");
   const [completed, setCompleted] = useState(progress?.completed ?? false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Touch tracking
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
+  const isDragging = useRef(false);
+  const locked = useRef(false);
 
-  const totalSlides = slides.length;
-  const progressPct = ((currentSlide + 1) / totalSlides) * 100;
+  const currentRef = useRef(current);
+  currentRef.current = current;
 
-  // Navigation refs to avoid stale closures
-  const currentSlideRef = useRef(currentSlide);
-  const isTransitioningRef = useRef(isTransitioning);
-  currentSlideRef.current = currentSlide;
-  isTransitioningRef.current = isTransitioning;
+  const progressPct = ((current + 1) / totalSlideCount) * 100;
+  const isDark = slides[current]?.type === "hook" || slides[current]?.type === "quote";
 
-  const goNext = useCallback(() => {
-    if (isTransitioningRef.current || currentSlideRef.current >= totalSlides - 1) return;
-    setIsTransitioning(true);
-    setCurrentSlide((s) => s + 1);
-    setTimeout(() => setIsTransitioning(false), 380);
-  }, [totalSlides]);
+  // --- Navigation ---
+  const go = useCallback((dir: 1 | -1) => {
+    if (locked.current) return;
+    const next = currentRef.current + dir;
+    if (next < 0 || next >= totalSlideCount) return;
+    locked.current = true;
+    setCurrent(next);
+    setTimeout(() => { locked.current = false; }, 400);
+  }, [totalSlideCount]);
 
-  const goPrev = useCallback(() => {
-    if (isTransitioningRef.current || currentSlideRef.current <= 0) return;
-    setIsTransitioning(true);
-    setCurrentSlide((s) => s - 1);
-    setTimeout(() => setIsTransitioning(false), 380);
+  const goTo = useCallback((idx: number) => {
+    if (locked.current || idx === currentRef.current) return;
+    locked.current = true;
+    setCurrent(idx);
+    setTimeout(() => { locked.current = false; }, 400);
   }, []);
 
-  // Keyboard navigation
+  // --- Keyboard ---
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        goNext();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        goPrev();
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [goNext, goPrev]);
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(1); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(-1); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [go]);
 
-  function goToSlide(idx: number) {
-    if (isTransitioning || idx === currentSlide) return;
-    setIsTransitioning(true);
-    setCurrentSlide(idx);
-    setTimeout(() => setIsTransitioning(false), 380);
+  // --- Touch ---
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+    isDragging.current = true;
   }
 
-  // Touch handlers
-  function onTouchStart(e: React.TouchEvent) {
-    setTouchStart(e.touches[0].clientX);
-    setTouchDelta(0);
+  function handleTouchMove(e: React.TouchEvent) {
+    if (!isDragging.current) return;
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
   }
 
-  function onTouchMove(e: React.TouchEvent) {
-    if (touchStart === null) return;
-    const delta = e.touches[0].clientX - touchStart;
-    setTouchDelta(delta);
+  function handleTouchEnd() {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    if (touchDeltaX.current < -40) go(1);
+    else if (touchDeltaX.current > 40) go(-1);
+    touchDeltaX.current = 0;
   }
 
-  function onTouchEnd() {
-    if (touchStart === null) return;
-    if (touchDelta < -50) goNext();
-    else if (touchDelta > 50) goPrev();
-    setTouchStart(null);
-    setTouchDelta(0);
+  // --- Click to advance (tap right half = next, left half = prev) ---
+  function handleClick(e: React.MouseEvent) {
+    const target = e.target as HTMLElement;
+    // Don't navigate if clicking on interactive elements
+    if (target.closest("button") || target.closest("a") || target.closest("input") || target.closest("textarea") || target.closest("label")) return;
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x > rect.width * 0.65) go(1);
+    else if (x < rect.width * 0.35) go(-1);
   }
 
-  // Complete lesson on reaching final slide
+  // --- Auto-complete on final slide ---
   useEffect(() => {
-    if (slides[currentSlide]?.type === "complete" && !completed) {
+    if (slides[current]?.type === "complete" && !completed) {
       completeLesson(lesson.id, reflectionText.trim() || null).then((res) => {
         if (res.success) {
           setCompleted(true);
@@ -139,121 +140,41 @@ export default function LessonSlideView({
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSlide]);
+  }, [current]);
 
   function handleNextLesson() {
-    if (nextLessonId) {
-      router.push(`/dashboard/module/${moduleId}/lesson/${nextLessonId}`);
-    } else {
-      router.push(`/dashboard/module/${moduleId}`);
-    }
+    if (nextLessonId) router.push(`/dashboard/module/${moduleId}/lesson/${nextLessonId}`);
+    else router.push(`/dashboard/module/${moduleId}`);
   }
 
   const actionStepsDone = Object.values(checkedSteps).filter(Boolean).length;
-  const actionStepsTotal =
-    slides.find((s) => s.type === "action")?.data.steps?.length ?? 0;
-
-  // Determine drag offset only while touching
-  const dragOffset = touchStart !== null ? touchDelta : 0;
-
-  // Whether the current slide uses a dark background
-  const isDarkCurrentSlide =
-    slides[currentSlide]?.type === "hook" ||
-    slides[currentSlide]?.type === "quote";
+  const actionStepsTotal = slides.find((s) => s.type === "action")?.data.steps?.length ?? 0;
 
   function renderSlide(slide: Slide, index: number) {
-    const isActive = index === currentSlide;
-
+    const isActive = index === current;
     switch (slide.type) {
       case "hook":
-        return (
-          <HookSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            isActive={isActive}
-            moduleTitle={moduleTitle}
-            lessonNumber={lessonNumber}
-          />
-        );
+        return <HookSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} moduleTitle={moduleTitle} lessonNumber={lessonNumber} />;
       case "stat":
-        return (
-          <StatSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            isActive={isActive}
-          />
-        );
+        return <StatSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
       case "takeaways":
-        return (
-          <TakeawaySlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            isActive={isActive}
-          />
-        );
+        return <TakeawaySlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
       case "content":
-        return (
-          <ContentSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            isActive={isActive}
-          />
-        );
+        return <ContentSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
       case "quote":
-        return (
-          <QuoteSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            isActive={isActive}
-          />
-        );
+        return <QuoteSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
       case "insight":
-        return (
-          <InsightSlide data={slide.data as any} pillarColor={pillarColor} />
-        );
+        return <InsightSlide data={slide.data as any} pillarColor={pillarColor} />;
       case "tool":
-        return (
-          <ToolSlide data={slide.data as any} pillarColor={pillarColor} />
-        );
+        return <ToolSlide data={slide.data as any} pillarColor={pillarColor} />;
       case "realNumbers":
-        return (
-          <RealNumbersSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-          />
-        );
+        return <RealNumbersSlide data={slide.data as any} pillarColor={pillarColor} />;
       case "action":
-        return (
-          <ActionSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            initialChecked={checkedSteps}
-            onCheckedChange={setCheckedSteps}
-          />
-        );
+        return <ActionSlide data={slide.data as any} pillarColor={pillarColor} initialChecked={checkedSteps} onCheckedChange={setCheckedSteps} />;
       case "reflection":
-        return (
-          <ReflectionSlide
-            data={slide.data as any}
-            pillarColor={pillarColor}
-            initialText={reflectionText}
-            onReflectionChange={setReflectionText}
-          />
-        );
+        return <ReflectionSlide data={slide.data as any} pillarColor={pillarColor} initialText={reflectionText} onReflectionChange={setReflectionText} />;
       case "complete":
-        return (
-          <CompleteSlide
-            data={slide.data}
-            pillarColor={pillarColor}
-            actionStepsDone={actionStepsDone}
-            actionStepsTotal={actionStepsTotal}
-            hasReflection={reflectionText.trim().length > 0}
-            onNext={handleNextLesson}
-            isLastLesson={!nextLessonId}
-            isActive={isActive}
-          />
-        );
+        return <CompleteSlide data={slide.data} pillarColor={pillarColor} actionStepsDone={actionStepsDone} actionStepsTotal={actionStepsTotal} hasReflection={reflectionText.trim().length > 0} onNext={handleNextLesson} isLastLesson={!nextLessonId} isActive={isActive} />;
       default:
         return null;
     }
@@ -261,126 +182,81 @@ export default function LessonSlideView({
 
   return (
     <div
-      ref={containerRef}
-      className="relative overflow-hidden bg-white select-none"
-      style={{ height: "100dvh", touchAction: "none" }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      className="relative select-none"
+      style={{ height: "100dvh", overflow: "hidden" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onClick={handleClick}
     >
       {/* Progress bar */}
-      <div
-        className="absolute top-0 left-0 right-0 z-20 h-1"
-        style={{ backgroundColor: isDarkCurrentSlide ? "rgba(255,255,255,0.1)" : "#f3f4f6" }}
-      >
-        <div
-          className="h-full"
-          style={{
-            width: `${progressPct}%`,
-            backgroundColor: pillarColor,
-            transition: "width 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
-        />
+      <div className="absolute top-0 left-0 right-0 z-20 h-1" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "#f3f4f6" }}>
+        <div className="h-full" style={{ width: `${progressPct}%`, backgroundColor: pillarColor, transition: "width 0.4s ease-out" }} />
       </div>
 
       {/* Header */}
-      <header
-        className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 pb-2 transition-colors duration-300"
-      >
+      <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 pb-2">
         <button
-          onClick={() => router.push(`/dashboard/module/${moduleId}`)}
-          className="flex items-center gap-1 text-sm transition-colors"
-          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.5)" : "#9ca3af" }}
+          onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/module/${moduleId}`); }}
+          className="flex items-center gap-1 text-sm"
+          style={{ color: isDark ? "rgba(255,255,255,0.5)" : "#9ca3af" }}
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
           Back
         </button>
-
-        <p
-          className="text-xs truncate max-w-[50%] text-center"
-          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.4)" : "#9ca3af" }}
-          title={lesson.title}
-        >
-          {lesson.title}
-        </p>
-
-        <span
-          className="text-xs font-medium"
-          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.4)" : "#9ca3af" }}
-        >
-          {currentSlide + 1}/{totalSlides}
-        </span>
+        <p className="text-xs truncate max-w-[50%] text-center" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af" }}>{lesson.title}</p>
+        <span className="text-xs font-medium" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af" }}>{current + 1}/{totalSlideCount}</span>
       </header>
 
-      {/* Slides container */}
-      <div
-        className="relative h-full"
-        style={{
-          willChange: "transform",
-          transform: `translateX(calc(${-currentSlide * 100}% + ${dragOffset}px))`,
-          transition:
-            touchStart !== null
-              ? "none"
-              : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-          display: "flex",
-          width: `${totalSlides * 100}%`,
-        }}
-      >
-        {slides.map((slide, i) => {
-          const isActive = i === currentSlide;
-          const isDarkSlide = slide.type === "hook" || slide.type === "quote";
-          return (
-            <div
-              key={`${slide.type}-${i}`}
-              className="relative"
-              style={{
-                width: `${100 / totalSlides}%`,
-                height: "100dvh",
-                flexShrink: 0,
-                paddingTop: 48,
-                paddingBottom: 48,
-                background: isDarkSlide
-                  ? `linear-gradient(165deg, ${pillarColor}15 0%, #0c0a1a 50%, #08071a 100%)`
-                  : `linear-gradient(180deg, ${pillarColor}08 0%, #ffffff 40%, #ffffff 100%)`,
-              }}
-            >
-              {renderSlide(slide, i)}
-            </div>
-          );
-        })}
-      </div>
+      {/* Slides — only render current slide for performance */}
+      {slides.map((slide, i) => {
+        const isDarkSlide = slide.type === "hook" || slide.type === "quote";
+        const isVisible = Math.abs(i - current) <= 1; // render current + adjacent
+        return (
+          <div
+            key={`${slide.type}-${i}`}
+            className="absolute inset-0"
+            style={{
+              opacity: i === current ? 1 : 0,
+              pointerEvents: i === current ? "auto" : "none",
+              transition: "opacity 0.4s ease-out",
+              background: isDarkSlide
+                ? `linear-gradient(165deg, ${pillarColor}15 0%, #0c0a1a 50%, #08071a 100%)`
+                : `linear-gradient(180deg, ${pillarColor}08 0%, #ffffff 40%, #ffffff 100%)`,
+              paddingTop: 48,
+              paddingBottom: 56,
+              overflowY: "auto",
+            }}
+          >
+            {isVisible ? renderSlide(slide, i) : null}
+          </div>
+        );
+      })}
 
       {/* Dot indicators */}
-      <div className="absolute bottom-4 left-0 right-0 z-10 flex items-center justify-center gap-1.5">
+      <div className="absolute bottom-3 left-0 right-0 z-10 flex items-center justify-center gap-1.5">
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => goToSlide(i)}
+            onClick={(e) => { e.stopPropagation(); goTo(i); }}
             className="rounded-full transition-all duration-300"
             style={{
-              width: i === currentSlide ? 10 : 6,
-              height: i === currentSlide ? 10 : 6,
-              backgroundColor:
-                i === currentSlide
-                  ? pillarColor
-                  : isDarkCurrentSlide
-                    ? "rgba(255,255,255,0.3)"
-                    : "#d1d5db",
-              opacity: i === currentSlide ? 1 : 0.5,
+              width: i === current ? 10 : 6,
+              height: i === current ? 10 : 6,
+              backgroundColor: i === current ? pillarColor : isDark ? "rgba(255,255,255,0.3)" : "#d1d5db",
+              opacity: i === current ? 1 : 0.5,
             }}
-            aria-label={`Go to slide ${i + 1}`}
+            aria-label={`Slide ${i + 1}`}
           />
         ))}
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes slideHint {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(5px); }
+        }
+      `}} />
     </div>
   );
 }
