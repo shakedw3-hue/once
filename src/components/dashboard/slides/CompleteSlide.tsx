@@ -11,6 +11,7 @@ interface CompleteSlideProps {
   onNext: () => void;
   isLastLesson: boolean;
   isActive: boolean;
+  nextLessonTitle?: string;
 }
 
 // Generate confetti particles once
@@ -34,26 +35,43 @@ export default function CompleteSlide({
   onNext,
   isLastLesson,
   isActive,
+  nextLessonTitle,
 }: CompleteSlideProps) {
-  const [showContent, setShowContent] = useState(false);
+  const [phase, setPhase] = useState(0);
+  // phase 0: nothing, 1: title, 2: xp, 3: stats, 4: cta
 
   useEffect(() => {
     if (isActive) {
-      const t = setTimeout(() => setShowContent(true), 600);
-      return () => clearTimeout(t);
+      const t1 = setTimeout(() => setPhase(1), 1000);
+      const t2 = setTimeout(() => setPhase(2), 1300);
+      const t3 = setTimeout(() => setPhase(3), 1600);
+      const t4 = setTimeout(() => setPhase(4), 1900);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+        clearTimeout(t4);
+      };
     } else {
-      setShowContent(false);
+      setPhase(0);
     }
   }, [isActive]);
 
+  const stepsAllDone = actionStepsDone === actionStepsTotal && actionStepsTotal > 0;
+
   return (
-    <div className="flex h-full flex-col items-center justify-center px-6 overflow-hidden relative">
+    <div
+      className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6"
+      style={{
+        background: `linear-gradient(180deg, ${pillarColor}14 0%, #FFFFFF 100%)`,
+      }}
+    >
       {/* Confetti */}
       {isActive &&
         CONFETTI.map((c) => (
           <div
             key={c.id}
-            className="absolute rounded-sm pointer-events-none"
+            className="pointer-events-none absolute rounded-sm"
             style={{
               left: `${c.left}%`,
               top: -20,
@@ -70,12 +88,7 @@ export default function CompleteSlide({
         ))}
 
       {/* Animated checkmark */}
-      <svg
-        width="80"
-        height="80"
-        viewBox="0 0 80 80"
-        className="mb-6"
-      >
+      <svg width="80" height="80" viewBox="0 0 80 80" className="mb-6">
         <circle
           cx="40"
           cy="40"
@@ -99,7 +112,8 @@ export default function CompleteSlide({
             stroke: pillarColor,
             strokeDasharray: 60,
             strokeDashoffset: isActive ? 0 : 60,
-            transition: "stroke-dashoffset 0.6s 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            transition:
+              "stroke-dashoffset 0.6s 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         />
       </svg>
@@ -111,60 +125,141 @@ export default function CompleteSlide({
           fontFamily: "'Playfair Display', serif",
           fontSize: 28,
           fontWeight: 700,
-          opacity: showContent ? 1 : 0,
-          transform: showContent ? "translateY(0)" : "translateY(10px)",
-          transition: "all 0.4s ease",
+          color: "#1F2937",
+          opacity: phase >= 1 ? 1 : 0,
+          transform: phase >= 1 ? "translateY(0)" : "translateY(10px)",
+          transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        Lesson Complete!
+        Lesson Complete
       </h2>
 
-      {/* XP */}
+      {/* XP with scale pop */}
       <p
-        className="mb-6 text-lg font-bold"
+        className="mb-6 font-bold"
         style={{
           color: pillarColor,
-          opacity: showContent ? 1 : 0,
-          transform: showContent ? "scale(1)" : "scale(0.8)",
-          transition: "all 0.3s 0.15s ease",
+          fontSize: 32,
+          opacity: phase >= 2 ? 1 : 0,
+          transform:
+            phase >= 2 ? "scale(1)" : "scale(0)",
+          animation: phase >= 2 ? "xpPop 0.5s cubic-bezier(0.16, 1, 0.3, 1)" : "none",
+          transition: "opacity 0.3s ease",
         }}
       >
         +35 XP
       </p>
 
-      {/* Stats */}
+      {/* Stats row */}
       <div
-        className="mb-8 flex flex-col items-center gap-2 text-sm text-gray-500"
+        className="mb-6 flex items-center gap-4 text-sm"
         style={{
-          opacity: showContent ? 1 : 0,
-          transition: "opacity 0.3s 0.3s ease",
+          opacity: phase >= 3 ? 1 : 0,
+          transform: phase >= 3 ? "translateY(0)" : "translateY(8px)",
+          transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        <span>
-          Action steps: {actionStepsDone}/{actionStepsTotal}{" "}
-          {actionStepsDone === actionStepsTotal && actionStepsTotal > 0
-            ? "\u2713"
-            : ""}
+        <span className="flex items-center gap-1.5 text-gray-500">
+          Steps: {actionStepsDone}/{actionStepsTotal}
+          {stepsAllDone && (
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#10B981"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
         </span>
-        <span>Reflection: {hasReflection ? "\u2713" : "\u2014"}</span>
+        <span className="text-gray-300">|</span>
+        <span className="flex items-center gap-1.5 text-gray-500">
+          Reflection:
+          {hasReflection ? (
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#10B981"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <span className="text-gray-400">&mdash;</span>
+          )}
+        </span>
       </div>
 
-      {/* CTA */}
-      <button
-        onClick={onNext}
-        className="rounded-xl px-8 py-3 text-sm font-semibold text-white transition-transform active:scale-95"
+      {/* Divider */}
+      <div
+        className="mb-6 h-px w-16"
         style={{
-          backgroundColor: pillarColor,
-          opacity: showContent ? 1 : 0,
-          transition: "opacity 0.3s 0.4s ease",
+          backgroundColor: `${pillarColor}30`,
+          opacity: phase >= 3 ? 1 : 0,
+          transition: "opacity 0.3s 0.1s ease",
+        }}
+      />
+
+      {/* Next section + CTA */}
+      <div
+        className="flex flex-col items-center"
+        style={{
+          opacity: phase >= 4 ? 1 : 0,
+          transform: phase >= 4 ? "translateY(0)" : "translateY(8px)",
+          transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        {isLastLesson ? "Back to Module" : "Next Lesson \u2192"}
-      </button>
+        {isLastLesson ? (
+          <>
+            <p
+              className="mb-4 text-center text-sm font-semibold"
+              style={{ color: pillarColor }}
+            >
+              Module complete!
+            </p>
+            <button
+              onClick={onNext}
+              className="rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-transform active:scale-95"
+              style={{ backgroundColor: pillarColor }}
+            >
+              Back to Dashboard
+            </button>
+          </>
+        ) : (
+          <>
+            {nextLessonTitle && (
+              <div className="mb-4 text-center">
+                <p className="mb-1 text-xs text-gray-400">Up next:</p>
+                <p className="text-sm font-bold text-gray-700">
+                  {nextLessonTitle}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={onNext}
+              className="rounded-xl px-10 py-3.5 text-sm font-semibold text-white transition-transform active:scale-95"
+              style={{
+                backgroundColor: pillarColor,
+                boxShadow: `0 4px 14px ${pillarColor}40`,
+              }}
+            >
+              Continue &rarr;
+            </button>
+          </>
+        )}
+      </div>
 
-      {/* Signature */}
+      {/* Once. signature */}
       <p
-        className="absolute bottom-6 text-sm text-gray-300"
+        className="absolute bottom-6 text-xs text-gray-300"
         style={{ fontFamily: "'Playfair Display', serif" }}
       >
         Once<span style={{ color: "#4F46E5" }}>.</span>
@@ -179,6 +274,17 @@ export default function CompleteSlide({
           100% {
             opacity: 0;
             transform: translateY(calc(100dvh + 20px)) rotate(720deg);
+          }
+        }
+        @keyframes xpPop {
+          0% {
+            transform: scale(0);
+          }
+          60% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
           }
         }
       `}</style>

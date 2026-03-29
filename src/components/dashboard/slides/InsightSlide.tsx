@@ -7,10 +7,12 @@ const BOOKMARK_KEY = "once_saved_insights";
 interface InsightSlideProps {
   data: { text: string };
   pillarColor: string;
+  isActive?: boolean;
 }
 
-export default function InsightSlide({ data, pillarColor }: InsightSlideProps) {
+export default function InsightSlide({ data, pillarColor, isActive = true }: InsightSlideProps) {
   const [saved, setSaved] = useState(false);
+  const [showSavedPop, setShowSavedPop] = useState(false);
 
   useEffect(() => {
     try {
@@ -31,6 +33,8 @@ export default function InsightSlide({ data, pillarColor }: InsightSlideProps) {
       } else {
         list.push(data.text);
         setSaved(true);
+        setShowSavedPop(true);
+        setTimeout(() => setShowSavedPop(false), 800);
       }
       localStorage.setItem(BOOKMARK_KEY, JSON.stringify(list));
     } catch {
@@ -39,56 +43,94 @@ export default function InsightSlide({ data, pillarColor }: InsightSlideProps) {
   }
 
   return (
-    <div className="flex h-full flex-col justify-center px-6">
-      <div className="flex items-center gap-2 mb-4">
+    <div
+      className="flex h-full flex-col items-center justify-center px-6 text-center relative"
+      style={{
+        background: `linear-gradient(180deg, ${pillarColor}1F 0%, #ffffff 70%)`,
+      }}
+    >
+      {/* Lightbulb icon — appears first */}
+      <div
+        style={{
+          opacity: isActive ? 1 : 0,
+          transform: isActive ? "translateY(0)" : "translateY(-10px)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+        }}
+      >
         <svg
-          width="16"
-          height="16"
+          width="48"
+          height="48"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           style={{ color: pillarColor }}
         >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          <path d="M9 18h6" />
+          <path d="M10 22h4" />
+          <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" />
         </svg>
+      </div>
+
+      {/* Insight text — fades in after icon */}
+      <div
+        className="mt-6 max-w-md"
+        style={{
+          opacity: isActive ? 1 : 0,
+          transform: isActive ? "translateY(0)" : "translateY(10px)",
+          transition: "opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s",
+        }}
+      >
         <p
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: pillarColor }}
+          style={{
+            fontSize: 20,
+            fontFamily: "Playfair Display, serif",
+            fontWeight: 700,
+            color: "#1a1a2e",
+            lineHeight: 1.5,
+          }}
         >
-          Key Insight
+          {data.text}
         </p>
       </div>
 
-      <div className="flex items-start gap-0 overflow-hidden rounded-xl border">
-        <div
-          className="w-1 shrink-0 self-stretch"
-          style={{ backgroundColor: pillarColor }}
-        />
-        <div className="flex-1 p-5">
-          <p className="text-lg font-semibold leading-relaxed text-gray-800">
-            {data.text}
-          </p>
-        </div>
-      </div>
-
-      <button
-        onClick={toggle}
-        className="mt-5 flex items-center gap-2 self-start rounded-lg border px-4 py-2 text-sm transition-colors hover:bg-gray-50"
-        style={{ color: saved ? pillarColor : "#9ca3af" }}
+      {/* Bookmark pill */}
+      <div
+        className="mt-8"
+        style={{
+          opacity: isActive ? 1 : 0,
+          transition: "opacity 0.5s ease 0.4s",
+        }}
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill={saved ? "currentColor" : "none"}
-          stroke="currentColor"
-          strokeWidth="2"
+        <button
+          onClick={toggle}
+          className="flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all"
+          style={{
+            backgroundColor: saved ? pillarColor : "white",
+            color: saved ? "white" : "#6b7280",
+            boxShadow: saved
+              ? `0 2px 8px ${pillarColor}40`
+              : "0 1px 4px rgba(0,0,0,0.08)",
+            transform: showSavedPop ? "scale(1.08)" : "scale(1)",
+            transition: "all 0.25s ease",
+          }}
         >
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-        </svg>
-        {saved ? "Saved" : "Save this insight"}
-      </button>
+          {/* Heart icon */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill={saved ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          {showSavedPop ? "Saved!" : saved ? "Saved" : "Save this insight"}
+        </button>
+      </div>
     </div>
   );
 }

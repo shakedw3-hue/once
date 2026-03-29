@@ -16,11 +16,22 @@ export default function ReflectionSlide({
   initialText,
 }: ReflectionSlideProps) {
   const [text, setText] = useState(initialText || "");
+  const [mounted, setMounted] = useState(false);
+  const [textareaVisible, setTextareaVisible] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (initialText !== undefined) setText(initialText);
   }, [initialText]);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setMounted(true), 50);
+    const t2 = setTimeout(() => setTextareaVisible(true), 350);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   function handleChange(value: string) {
     setText(value);
@@ -32,44 +43,119 @@ export default function ReflectionSlide({
     }
   }
 
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const reachedGoal = wordCount >= 50;
+
   return (
-    <div className="flex h-full flex-col justify-center px-6">
-      <div className="flex items-center gap-2 mb-5">
+    <div
+      className="flex h-full flex-col justify-center px-6 py-8"
+      style={{
+        background: "linear-gradient(180deg, #FDFBF7 0%, #F8F5EE 100%)",
+      }}
+    >
+      {/* Header */}
+      <div className="mb-6 flex items-center gap-2.5">
+        {/* Feather pen icon */}
         <svg
-          width="18"
-          height="18"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          style={{ color: pillarColor }}
+          stroke={pillarColor}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ opacity: 0.6 }}
         >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
+          <line x1="16" y1="8" x2="2" y2="22" />
+          <line x1="17.5" y1="15" x2="9" y2="15" />
         </svg>
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 24,
+            fontWeight: 700,
+            fontStyle: "italic",
+            color: "#1F2937",
+          }}
+        >
           Reflect
-        </p>
+        </h2>
       </div>
 
-      <div className="mb-5 rounded-xl bg-gray-50 p-4">
-        <p className="text-sm italic leading-relaxed text-gray-600">
+      {/* Prompt card */}
+      <div
+        className="mb-6 rounded-2xl p-5"
+        style={{
+          backgroundColor: "white",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          borderLeft: `2px solid ${pillarColor}`,
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateY(0)" : "translateY(8px)",
+          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        <p
+          className="leading-relaxed"
+          style={{
+            fontStyle: "italic",
+            fontSize: 16,
+            color: "#4B5563",
+          }}
+        >
           &ldquo;{data.prompt}&rdquo;
         </p>
       </div>
 
-      <div className="relative">
+      {/* Textarea */}
+      <div
+        className="relative"
+        style={{
+          opacity: textareaVisible ? 1 : 0,
+          transform: textareaVisible ? "translateY(0)" : "translateY(12px)",
+          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
         <textarea
           ref={textareaRef}
           value={text}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Write your thoughts here..."
-          rows={3}
-          className="w-full resize-none rounded-xl border border-gray-200 bg-white p-4 text-sm leading-relaxed text-gray-700 placeholder-gray-400 outline-none transition-colors focus:border-gray-300"
-          style={{ minHeight: 96 }}
+          rows={5}
+          className="w-full resize-none rounded-xl p-4 leading-relaxed text-gray-700 placeholder-gray-400 outline-none"
+          style={{
+            minHeight: 150,
+            fontSize: 16,
+            backgroundColor: "#FEFDFB",
+            boxShadow: "inset 0 1px 3px rgba(0,0,0,0.06)",
+            border: "none",
+          }}
         />
-        <span className="absolute bottom-3 right-3 text-[10px] text-gray-300">
-          {text.length}
-        </span>
+
+        {/* Word count section */}
+        <div className="mt-2.5 flex items-center justify-between px-1">
+          <span className="text-[11px] text-gray-400">
+            Aim for 50+ words
+          </span>
+          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            {wordCount} {wordCount === 1 ? "word" : "words"}
+            {reachedGoal && (
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#10B981"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+          </span>
+        </div>
       </div>
     </div>
   );

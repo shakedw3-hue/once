@@ -152,12 +152,25 @@ export default function LessonSlideView({
   // Determine drag offset only while touching
   const dragOffset = touchStart !== null ? touchDelta : 0;
 
+  // Whether the current slide uses a dark background
+  const isDarkCurrentSlide =
+    slides[currentSlide]?.type === "hook" ||
+    slides[currentSlide]?.type === "quote";
+
   function renderSlide(slide: Slide, index: number) {
     const isActive = index === currentSlide;
 
     switch (slide.type) {
       case "hook":
-        return <HookSlide data={slide.data as any} pillarColor={pillarColor} />;
+        return (
+          <HookSlide
+            data={slide.data as any}
+            pillarColor={pillarColor}
+            isActive={isActive}
+            moduleTitle={moduleTitle}
+            lessonNumber={lessonNumber}
+          />
+        );
       case "stat":
         return (
           <StatSlide
@@ -175,10 +188,20 @@ export default function LessonSlideView({
           />
         );
       case "content":
-        return <ContentSlide data={slide.data as any} />;
+        return (
+          <ContentSlide
+            data={slide.data as any}
+            pillarColor={pillarColor}
+            isActive={isActive}
+          />
+        );
       case "quote":
         return (
-          <QuoteSlide data={slide.data as any} pillarColor={pillarColor} />
+          <QuoteSlide
+            data={slide.data as any}
+            pillarColor={pillarColor}
+            isActive={isActive}
+          />
         );
       case "insight":
         return (
@@ -241,7 +264,10 @@ export default function LessonSlideView({
       onTouchEnd={onTouchEnd}
     >
       {/* Progress bar */}
-      <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-gray-100">
+      <div
+        className="absolute top-0 left-0 right-0 z-20 h-1"
+        style={{ backgroundColor: isDarkCurrentSlide ? "rgba(255,255,255,0.1)" : "#f3f4f6" }}
+      >
         <div
           className="h-full"
           style={{
@@ -253,10 +279,13 @@ export default function LessonSlideView({
       </div>
 
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 pb-2">
+      <header
+        className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 pb-2 transition-colors duration-300"
+      >
         <button
           onClick={() => router.push(`/dashboard/module/${moduleId}`)}
-          className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="flex items-center gap-1 text-sm transition-colors"
+          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.5)" : "#9ca3af" }}
         >
           <svg
             width="18"
@@ -272,13 +301,17 @@ export default function LessonSlideView({
         </button>
 
         <p
-          className="text-xs text-gray-400 truncate max-w-[50%] text-center"
+          className="text-xs truncate max-w-[50%] text-center"
+          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.4)" : "#9ca3af" }}
           title={lesson.title}
         >
           {lesson.title}
         </p>
 
-        <span className="text-xs font-medium text-gray-400">
+        <span
+          className="text-xs font-medium"
+          style={{ color: isDarkCurrentSlide ? "rgba(255,255,255,0.4)" : "#9ca3af" }}
+        >
           {currentSlide + 1}/{totalSlides}
         </span>
       </header>
@@ -297,21 +330,28 @@ export default function LessonSlideView({
           width: `${totalSlides * 100}%`,
         }}
       >
-        {slides.map((slide, i) => (
-          <div
-            key={`${slide.type}-${i}`}
-            className="relative"
-            style={{
-              width: `${100 / totalSlides}%`,
-              height: "100dvh",
-              flexShrink: 0,
-              paddingTop: 48,
-              paddingBottom: 48,
-            }}
-          >
-            {renderSlide(slide, i)}
-          </div>
-        ))}
+        {slides.map((slide, i) => {
+          const isActive = i === currentSlide;
+          const isDarkSlide = slide.type === "hook" || slide.type === "quote";
+          return (
+            <div
+              key={`${slide.type}-${i}`}
+              className="relative"
+              style={{
+                width: `${100 / totalSlides}%`,
+                height: "100dvh",
+                flexShrink: 0,
+                paddingTop: 48,
+                paddingBottom: 48,
+                background: isDarkSlide
+                  ? `linear-gradient(165deg, ${pillarColor}15 0%, #0c0a1a 50%, #08071a 100%)`
+                  : `linear-gradient(180deg, ${pillarColor}08 0%, #ffffff 40%, #ffffff 100%)`,
+              }}
+            >
+              {renderSlide(slide, i)}
+            </div>
+          );
+        })}
       </div>
 
       {/* Dot indicators */}
@@ -325,7 +365,11 @@ export default function LessonSlideView({
               width: i === currentSlide ? 10 : 6,
               height: i === currentSlide ? 10 : 6,
               backgroundColor:
-                i === currentSlide ? pillarColor : "#d1d5db",
+                i === currentSlide
+                  ? pillarColor
+                  : isDarkCurrentSlide
+                    ? "rgba(255,255,255,0.3)"
+                    : "#d1d5db",
               opacity: i === currentSlide ? 1 : 0.5,
             }}
             aria-label={`Go to slide ${i + 1}`}

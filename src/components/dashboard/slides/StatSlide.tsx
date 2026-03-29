@@ -8,11 +8,19 @@ interface StatSlideProps {
   isActive: boolean;
 }
 
-export default function StatSlide({ data, pillarColor, isActive }: StatSlideProps) {
+export default function StatSlide({
+  data,
+  pillarColor,
+  isActive,
+}: StatSlideProps) {
   const [displayNum, setDisplayNum] = useState(0);
   const rafRef = useRef<number>(0);
-  const targetNum = data.number ? parseFloat(data.number.replace(/,/g, "")) : 0;
+  const targetNum = data.number
+    ? parseFloat(data.number.replace(/,/g, ""))
+    : 0;
   const hasNumber = data.number && !isNaN(targetNum);
+  const isPercent = data.suffix === "%";
+  const barWidth = isPercent ? Math.min(targetNum, 100) : 0;
 
   useEffect(() => {
     if (!isActive || !hasNumber) return;
@@ -35,57 +43,113 @@ export default function StatSlide({ data, pillarColor, isActive }: StatSlideProp
     return () => cancelAnimationFrame(rafRef.current);
   }, [isActive, hasNumber, targetNum]);
 
-  const circumference = 2 * Math.PI * 52;
-  const strokeOffset = isActive ? circumference * 0.2 : circumference;
-
   return (
-    <div className="flex h-full flex-col items-center justify-center px-6">
+    <div className="relative flex h-full flex-col items-center justify-center px-6 overflow-hidden">
+      {/* Subtle grid dot pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          opacity: 0.02,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23000'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "24px 24px",
+        }}
+      />
+
       {hasNumber ? (
-        <div className="relative flex items-center justify-center">
-          {/* SVG ring */}
-          <svg width="140" height="140" className="absolute">
-            <circle
-              cx="70"
-              cy="70"
-              r="52"
-              fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="6"
-            />
-            <circle
-              cx="70"
-              cy="70"
-              r="52"
-              fill="none"
-              strokeWidth="6"
-              strokeLinecap="round"
-              style={{
-                stroke: pillarColor,
-                strokeDasharray: circumference,
-                strokeDashoffset: strokeOffset,
-                transition: "stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                transform: "rotate(-90deg)",
-                transformOrigin: "center",
-              }}
-            />
-          </svg>
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Large number */}
           <span
-            className="text-center font-bold"
-            style={{ fontSize: 48, color: pillarColor }}
+            style={{
+              fontSize: 56,
+              fontWeight: 700,
+              color: pillarColor,
+              fontFamily: "Inter, sans-serif",
+              lineHeight: 1,
+              opacity: isActive ? 1 : 0,
+              transform: isActive ? "translateY(0)" : "translateY(12px)",
+              transition: "opacity 0.5s ease, transform 0.5s ease",
+            }}
           >
             {displayNum.toLocaleString()}
             {data.suffix}
           </span>
+
+          {/* Percentage bar */}
+          {isPercent && (
+            <div
+              className="relative mt-5"
+              style={{
+                width: "100%",
+                maxWidth: 280,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: `${pillarColor}15`,
+                overflow: "hidden",
+                opacity: isActive ? 1 : 0,
+                transition: "opacity 0.4s ease 0.3s",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  borderRadius: 3,
+                  backgroundColor: pillarColor,
+                  width: isActive ? `${barWidth}%` : "0%",
+                  transition: "width 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s",
+                }}
+              />
+            </div>
+          )}
+
+          {/* Context line */}
+          <p
+            className="mt-5 max-w-md text-center leading-relaxed"
+            style={{
+              fontSize: 16,
+              color: "#4b5563",
+              fontFamily: "Inter, sans-serif",
+              opacity: isActive ? 1 : 0,
+              transform: isActive ? "translateY(0)" : "translateY(8px)",
+              transition: "opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s",
+            }}
+          >
+            {data.text}
+          </p>
+
+          {/* Source attribution */}
+          <p
+            className="mt-3"
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: "rgba(156,163,175,0.6)",
+              fontFamily: "Inter, sans-serif",
+              opacity: isActive ? 1 : 0,
+              transition: "opacity 0.4s ease 0.7s",
+            }}
+          >
+            Source: Research Data
+          </p>
         </div>
-      ) : null}
-
-      <p className="mt-6 max-w-md text-center text-base text-gray-600 leading-relaxed">
-        {data.text}
-      </p>
-
-      <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Did You Know
-      </p>
+      ) : (
+        <div className="relative z-10 flex flex-col items-center">
+          <p
+            className="max-w-md text-center leading-relaxed"
+            style={{
+              fontSize: 16,
+              color: "#4b5563",
+              fontFamily: "Inter, sans-serif",
+              opacity: isActive ? 1 : 0,
+              transition: "opacity 0.5s ease",
+            }}
+          >
+            {data.text}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
