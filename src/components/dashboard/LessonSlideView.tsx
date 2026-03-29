@@ -15,6 +15,8 @@ import RealNumbersSlide from "./slides/RealNumbersSlide";
 import ActionSlide from "./slides/ActionSlide";
 import ReflectionSlide from "./slides/ReflectionSlide";
 import CompleteSlide from "./slides/CompleteSlide";
+import TemplateSlide from "./slides/TemplateSlide";
+import QuizSlide from "./slides/QuizSlide";
 
 interface LessonSlideViewProps {
   lesson: {
@@ -52,7 +54,8 @@ export default function LessonSlideView({
   onComplete,
 }: LessonSlideViewProps) {
   const router = useRouter();
-  const slides = useRef<Slide[]>(buildSlides(lesson, isPro)).current;
+  const isLastLesson = !nextLessonId;
+  const slides = useRef<Slide[]>(buildSlides(lesson, isPro, isLastLesson, moduleTitle)).current;
   const totalSlideCount = slides.length;
 
   const [current, setCurrent] = useState(0);
@@ -169,6 +172,10 @@ export default function LessonSlideView({
         return <ToolSlide data={slide.data as any} pillarColor={pillarColor} />;
       case "realNumbers":
         return <RealNumbersSlide data={slide.data as any} pillarColor={pillarColor} />;
+      case "template":
+        return <TemplateSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
+      case "quiz":
+        return <QuizSlide data={slide.data as any} pillarColor={pillarColor} isActive={isActive} />;
       case "action":
         return <ActionSlide data={slide.data as any} pillarColor={pillarColor} initialChecked={checkedSteps} onCheckedChange={setCheckedSteps} />;
       case "reflection":

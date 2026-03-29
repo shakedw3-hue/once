@@ -13,6 +13,8 @@ import {
   getToolSpotlight,
   getRealNumbers,
   extractSourceInfo,
+  getTemplate,
+  getQuiz,
 } from "@/lib/lesson-content";
 
 export type SlideType =
@@ -24,6 +26,8 @@ export type SlideType =
   | "insight"
   | "tool"
   | "realNumbers"
+  | "template"
+  | "quiz"
   | "action"
   | "reflection"
   | "complete"
@@ -75,7 +79,9 @@ export function buildSlides(
     reflection_prompt: string;
     order: number;
   },
-  isPro: boolean
+  isPro: boolean,
+  isLastLesson: boolean = false,
+  moduleTitle: string = ""
 ): Slide[] {
   const slides: Slide[] = [];
 
@@ -149,7 +155,21 @@ export function buildSlides(
     }
   }
 
-  // 9. Action steps
+  // 9. Template (last lesson of module only)
+  if (isLastLesson && moduleTitle) {
+    const template = getTemplate(moduleTitle);
+    if (template) {
+      slides.push({ type: "template", data: template });
+    }
+  }
+
+  // 10. Quiz (if available for this lesson)
+  const quiz = getQuiz(lesson.title);
+  if (quiz) {
+    slides.push({ type: "quiz", data: quiz });
+  }
+
+  // 11. Action steps
   const actionSteps = splitActionSteps(lesson.action_step);
   slides.push({ type: "action", data: { steps: actionSteps } });
 
