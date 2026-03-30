@@ -1,40 +1,300 @@
-# דונה — עוזרת קולית אישית
+# DONA — העוזרת האולטימטיבית
 
-> "היי דונה" — שליטה מלאה במחשב, באפליקציות, ובחיים — דרך הקול.
+> "היי דונה" — עוזרת על. לומדת, יוזמת, מבצעת, ומשתפרת כל יום.
 
 ---
 
 ## מה זה
 
-אפליקציית דסקטופ שרצה תמיד ברקע על המק. מזהה את מילת ההפעלה "היי דונה", מקליטה פקודה קולית בעברית, מבינה מה צריך לעשות, מבצעת, ועונה בקול + טקסט על המסך.
+דונה היא עוזרת אישית שרצה תמיד ברקע על המק. היא מקשיבה כשקוראים לה, מבינה עברית טבעית, מבצעת כל פעולה על המחשב ומחוצה לו, ועונה בקול אלגנטי + טקסט על המסך.
+
+דונה היא לא כלי שמבצע פקודות. היא עוזרת על — יש לה מייל משלה, היא מתקשרת עם אנשים בשמך, היא זוכרת הכל, ומשתפרת מפעולה לפעולה.
 
 ---
 
 ## חוויית משתמש
 
 1. המק נדלק — דונה עולה אוטומטית
-2. אייקון סגול קטן ב-menubar (ליד השעון)
-3. המשתמש אומר **"היי דונה"** — האייקון נדלק, דונה מקשיבה
-4. המשתמש אומר פקודה בעברית:
-   - "תשלחי מייל לגולן שהפגישה מחר ב-3"
-   - "תפתחי וואטסאפ לאבי ותגידי לו שאני מאחר"
-   - "תוסיפי פגישה ביום רביעי ב-10 בבוקר עם עו״ד כהן"
-   - "יש לי רעיון לעסק חדש — תקליטי"
-   - "תפתחי כרום"
-   - "תזכירי לי בשש להתקשר לספק"
-5. דונה מבצעת את הפעולה
-6. דונה עונה בקול (TTS) + מציגה טקסט בחלון קטן על המסך
-7. החלון נעלם אחרי כמה שניות — דונה חוזרת להאזנה
+2. אייקון קטן ב-menubar (ליד השעון)
+3. אומר **"היי דונה"** — האייקון נדלק, דונה מקשיבה
+4. מדבר בעברית טבעית — פקודה, שיחה, רעיון, מה שצריך
+5. דונה מבצעת, עונה בקול נעים + מציגה טקסט בחלון צף
+6. החלון נעלם — דונה חוזרת להאזנה
 
-### מצבים ויזואליים
+### דוגמאות שיחה
 
-| מצב | אייקון menubar | חלון |
-|-----|----------------|------|
-| שינה (ממתינה ל-wake word) | סגול כהה, שקט | מוסתר |
-| מקשיבה (אחרי "היי דונה") | סגול בוהק, פועם | "מקשיבה..." |
-| מעבדת (שלחה ל-Whisper/Claude) | סגול מסתובב | "מעבדת..." |
-| מגיבה (מבצעת + עונה) | ירוק | תוצאה + קול |
-| שגיאה | אדום | הודעת שגיאה |
+**פקודה פשוטה:**
+> "היי דונה, תשלחי מייל לגולן שהפגישה מחר ב-3"
+> דונה: "כתבתי לגולן: 'היי גולן, הפגישה שלנו מחר ב-15:00. נתראה.' — לשלוח?"
+> "שלחי"
+> דונה: "נשלח."
+
+**שרשרת פעולות:**
+> "היי דונה, תקבעי פגישה עם גולן מחר ב-3, תשלחי לו הזמנה, ותזכירי לי חצי שעה לפני"
+> דונה: "נקבעה פגישה מחר ב-15:00 עם גולן. שלחתי לו הזמנה ליומן. תזכורת ב-14:30 מוגדרת."
+
+**שיחה עם הקשר:**
+> "היי דונה, תשלחי מייל לגולן"
+> דונה: "מה לכתוב לו?"
+> "שהפגישה מחר ב-3 ושיביא את החוזה"
+> דונה: "כתבתי: 'היי גולן, הפגישה מחר ב-15:00. תביא את החוזה בבקשה.' — לשלוח?"
+> "תוסיפי גם את אבי"
+> דונה: "הוספתי את אבי כנמען. לשלוח לשניהם?"
+> "כן"
+
+**שיחה חופשית:**
+> "היי דונה, מה דעתך — עדיף להתרכז ב-ALAALA או להשקיע עכשיו ב-LEVER?"
+> דונה: (מגיבה כשותפה לחשיבה, עם ידע על שני העסקים, נתונים שהיא זוכרת, שאלות חכמות)
+
+**הקלטת רעיון:**
+> "היי דונה, יש לי רעיון — תקליטי"
+> דונה: "מקליטה."
+> (מדבר 3 דקות חופשי)
+> "זהו"
+> דונה: "תפסתי. סיכום: רעיון לשירות מנויים שמנהל חשבוניות אוטומטית לעסקים קטנים. תייגתי כ-business/saas. שמור."
+
+**שבירת פרוטוקול (דונה יוזמת בלי שקראו לה):**
+> דונה: "שייקד, יש לך פגישה עם עו״ד כהן עוד 10 דקות ואתה לא יצאת. רציתי לוודא שאתה זוכר."
+> דונה: "שייקד, נכנס מייל דחוף מגולן — הוא מבקש לדחות את הפגישה של מחר. רוצה שאענה לו?"
+
+---
+
+## מצבי עבודה
+
+דונה מזהה אוטומטית באיזה מצב היא לפי מה שנאמר:
+
+| מצב | מתי | מה דונה עושה |
+|-----|-----|-------------|
+| **פקודה** (execute) | "תשלחי..." / "תפתחי..." / "תוסיפי..." | מבצעת פעולה |
+| **שיחה** (chat) | "מה דעתך..." / "תעזרי לי לחשוב על..." | שותפה לחשיבה, כמו קלוד |
+| **הקלטה** (capture) | "יש לי רעיון" / "תקליטי" / "תזכרי ש..." | מקליטה, מתמללת, מסכמת, שומרת |
+| **שאילתה** (query) | "מה יש לי היום?" / "מה כתב לי אבי?" | שולפת מידע ומסכמת |
+
+---
+
+## שבירת פרוטוקול — דונה יוזמת
+
+ברירת מחדל: דונה שקטה עד ש"היי דונה" נאמר.
+
+**חריגים** — דונה שוברת פרוטוקול ומדברת בעצמה כשזה חשוב:
+
+| טריגר | דוגמה |
+|-------|-------|
+| פגישה עוד 15 דקות | "שייקד, פגישה עם כהן עוד 15 דקות" |
+| מייל דחוף (מסומן urgent / מאיש קשר חשוב) | "נכנס מייל דחוף מגולן. רוצה שאקריא?" |
+| משימה שפג תוקפה | "המשימה 'לסגור חוזה' הייתה אמורה להיסגר אתמול" |
+| דפוס שהיא למדה | "בדרך כלל אתה שולח סיכום ללקוח אחרי פגישה. רוצה שאכין טיוטה?" |
+
+דונה לא מציקה. היא שוברת פרוטוקול רק כשזה באמת חשוב.
+
+---
+
+## למידה ושיפור מתמיד
+
+דונה משתפרת מכל אינטראקציה:
+
+### מה היא לומדת
+
+| מה | דוגמה | איך משתמשת |
+|----|-------|-----------|
+| **העדפות ניסוח** | שייקד תמיד כותב "היי" ולא "שלום" במיילים | מתאימה טיוטות |
+| **אנשי קשר תכופים** | גולן = 8 אינטראקציות בשבוע | יודעת שזה איש קשר מרכזי |
+| **שעות פעילות** | שייקד לא עונה לפני 9 בבוקר | לא שוברת פרוטוקול לפני 9 |
+| **דפוסי עבודה** | אחרי כל פגישה שייקד שולח סיכום | מציעה: "תרצה שאכין סיכום?" |
+| **תיקונים** | "לא ככה, תשני ל..." | זוכרת ולא חוזרת על הטעות |
+| **עסקים** | ALAALA, ROSAYO, ONCE, LEVER | יודעת לאיזה עסק מתייחסים |
+
+### איך הלמידה עובדת
+
+1. **אחרי כל אינטראקציה** — דונה שומרת insight קצר: מה ביקשת, מה תיקנת, מה העדפת
+2. **כל ערב** — דונה מעבדת את ה-insights של היום ומעדכנת את הפרופיל שלך
+3. **כל שבוע** — דונה מזהה דפוסים חדשים ומציעה שיפורים
+4. **Confidence score** — כל למידה מתחילה ב-60%. אם חוזרת 3 פעמים עולה ל-90%. אם תוקנה יורדת ל-30%.
+
+### הקדמה — דונה צופה מה תצטרך
+
+| דפוס שדונה זיהתה | מה היא עושה |
+|-------------------|-----------|
+| כל יום ראשון שייקד שולח סיכום שבועי | ביום ראשון בבוקר: "הכנתי טיוטת סיכום שבועי. רוצה לעבור עליו?" |
+| אחרי פגישה תמיד יש follow-up מייל | אחרי פגישה: "רוצה שאכין מייל follow-up?" |
+| בכל חודש יש דוח ל-LEVER | "מחר ראשון לחודש. רוצה שאתחיל להכין את הדוח?" |
+
+---
+
+## המייל של דונה
+
+לדונה יש כתובת מייל משלה (למשל dona@onceph.com או dona@shaked.co.il — תבחר).
+
+### מה היא עושה עם המייל
+
+- **שולחת בשמך** — כשאתה אומר "תשלחי מייל לגולן", המייל יוצא מהכתובת של דונה עם חתימה:
+  > *נשלח על ידי דונה, העוזרת האישית של שייקד וינקלר*
+- **מקבלת תשובות** — אם גולן עונה למייל, דונה קוראת ומסכמת לך
+- **מנהלת התכתבות** — יכולה לנהל שרשרת מיילים: "תעקבי מול גולן על החוזה עד שיחזור"
+- **מפרידה מהמייל האישי** — המייל האישי שלך נשאר נקי. דונה עובדת מהמייל שלה
+
+### חתימה
+
+```
+---
+דונה | העוזרת האישית של שייקד וינקלר
+dona@[domain] | מופעלת על ידי AI
+```
+
+---
+
+## סגנון תקשורת
+
+דונה מדברת **בעברית נקייה, נעימה ואלגנטית**. לא רובוטית, לא מתרפסת.
+
+### כללים
+
+- **קצרה וברורה** — לא מסבירה יותר מדי
+- **פונה בגוף ראשון** — "שלחתי", "הוספתי", "הכנתי"
+- **לא משתמשת בסימני קריאה** — אלגנטית, לא נלהבת
+- **מסכמת ברמה גבוהה** — מציגה את העיקר, פרטים רק אם שואלים
+- **יודעת להגיד "לא יודעת"** — "אני לא בטוחה לגבי זה. רוצה שאבדוק?"
+
+### דוגמאות סגנון
+
+| רע | טוב |
+|----|-----|
+| "בוצע! המייל נשלח בהצלחה!" | "נשלח." |
+| "אני ממש שמחה לעזור!" | "בבקשה." |
+| "מצאתי את התוצאות הבאות:" | "הנה מה שמצאתי." |
+| "לא הצלחתי לבצע את הפעולה" | "לא הצלחתי. הבעיה: גולן לא באנשי הקשר. מה המייל שלו?" |
+
+### סיכום רעיונות — רמה גבוהה
+
+כשדונה מסכמת רעיון או שיחה, היא:
+1. **פותחת בשורה אחת** שתופסת את הלב של הרעיון
+2. **3-5 נקודות מפתח** — לא יותר
+3. **שאלה פתוחה אחת** — "שווה לחשוב גם על..." (ערך מוסף, לא סתם שאלה)
+4. **תיוג חכם** — מתייגת אוטומטית לפי עסק, נושא, דחיפות
+
+---
+
+## מודעות עסקית
+
+דונה מכירה את העסקים:
+
+| עסק | תחום | מה דונה יודעת |
+|-----|------|---------------|
+| **ALAALA** | QR memorial plates, Philippines | Supabase dashboard, הזמנות, לקוחות |
+| **ROSAYO** | Olive wood rosaries, Philippines | WooCommerce, מכירות, מלאי |
+| **ONCE** | Life improvement SaaS, Philippines | Supabase, משתמשים, תשלומים |
+| **LEVER** | Business growth engine, Israel | לקוחות, BHS scores, חיובים |
+
+כשאומרים "כמה הזמנות נכנסו היום?" — דונה שואלת "באיזה עסק?" או מזהה לפי הקשר.
+
+אפשר להרחיב בעתיד: חיבור ל-Supabase/WooCommerce APIs לשליפת נתונים בזמן אמת.
+
+---
+
+## פעולות יזומות — סדר יום
+
+### תקציר בוקר (אוטומטי, כל יום ב-9:00)
+
+דונה שוברת פרוטוקול ומדברת:
+
+> "בוקר טוב שייקד.
+> היום יש לך 3 פגישות — הראשונה ב-10 עם עו״ד כהן.
+> 5 מיילים חדשים, אחד דחוף מגולן על החוזה.
+> משימה אחת שפג תוקפה אתמול: לסגור הצעת מחיר ל-LEVER.
+> רוצה שאקריא את המייל מגולן?"
+
+### תזכורות לפני פגישות (15 דקות לפני)
+
+> "שייקד, פגישה עם עו״ד כהן עוד 15 דקות."
+
+### סיכום ערב (אוטומטי, כל יום ב-20:00)
+
+> "סיכום היום:
+> שלחת 6 מיילים, קיבלת 12.
+> סגרת 3 משימות, נוספו 2 חדשות.
+> מחר יום עמוס — 4 פגישות מ-9 עד 16."
+
+---
+
+## אינטגרציות — רשימה מלאה
+
+### תקשורת
+
+| שירות | יכולות | איך |
+|-------|--------|-----|
+| **Gmail (מייל דונה)** | שליחה, קריאה, תשובה, ניהול שרשרות, חיפוש | Gmail API מהמייל של דונה |
+| **Gmail (מייל אישי)** | קריאה, סיכום, התראות על דחוף | Gmail API (readonly) |
+| **WhatsApp** | שליחה + קריאת הודעות | WhatsApp Desktop + AppleScript |
+| **Google Contacts** | חיפוש, הוספה, עדכון | People API |
+
+### יומן ומשימות
+
+| שירות | יכולות | איך |
+|-------|--------|-----|
+| **Google Calendar** | יצירה, עדכון, מחיקה, שליפה, תזכורות | Calendar API |
+| **Google Tasks** | יצירה, רשימה, סיכום, סימון כבוצע | Tasks API |
+
+### מחשב
+
+| יכולת | איך |
+|-------|-----|
+| פתיחת אפליקציות | `open -a` / AppleScript |
+| חיפוש קבצים | `mdfind` (Spotlight) |
+| צילום מסך | `screencapture` |
+| העתקה ל-clipboard | `pbcopy` |
+| שליטה בווליום | AppleScript / `osascript` |
+| שליטה במדיה (play/pause) | AppleScript → Music/Spotify |
+| שליטה בבהירות | AppleScript |
+
+### מידע
+
+| יכולת | איך |
+|-------|-----|
+| חיפוש באינטרנט | Web search API |
+| מזג אוויר | OpenWeather API / web search |
+| תרגום | Claude (מובנה) |
+| מטבע/מחשבון | Claude (מובנה) + exchange rate API |
+| ניווט/זמן נסיעה | Google Maps API |
+
+### מסמכים
+
+| יכולת | איך |
+|-------|-----|
+| יצירת Google Doc | Google Docs API |
+| עריכת Google Doc | Google Docs API |
+| יצירת Google Sheet | Google Sheets API |
+
+---
+
+## שרשרת פעולות
+
+פקודה אחת יכולה להכיל כמה actions. דונה מפרקת אוטומטית:
+
+**קלט:** "תקבעי פגישה עם גולן מחר ב-3, תשלחי לו הזמנה, ותזכירי לי חצי שעה לפני"
+
+**Claude מפרק ל:**
+```json
+{
+  "chain": [
+    { "action": "create_event", "params": { "title": "פגישה עם גולן", "date": "2026-03-31", "time": "15:00" } },
+    { "action": "send_email", "params": { "to": "golan", "subject": "הזמנה לפגישה", "body": "..." } },
+    { "action": "create_reminder", "params": { "title": "פגישה עם גולן", "remind_at": "2026-03-31T14:30" } }
+  ],
+  "response_text": "נקבעה פגישה מחר ב-15:00 עם גולן. שלחתי לו הזמנה. תזכורת ב-14:30 מוגדרת."
+}
+```
+
+---
+
+## הקשר שיחה
+
+דונה זוכרת את השיחה הנוכחית (עד 5 דקות מהפעולה האחרונה):
+
+- "תשלחי מייל לגולן" → "מה לכתוב?" → "שהפגישה מחר" → **דונה יודעת שמדובר בגולן**
+- "תוסיפי גם את אבי" → **דונה יודעת שמדובר באותו מייל**
+- "בעצם תשני את השעה ל-4" → **דונה יודעת שמדובר באותו אירוע**
+
+אחרי 5 דקות ללא אינטראקציה — ההקשר מתאפס. אינטראקציה חדשה מתחילה נקייה.
 
 ---
 
@@ -45,167 +305,47 @@
 | רכיב | טכנולוגיה | תפקיד |
 |-------|----------|--------|
 | UI | Electron | menubar app + חלון תגובה צף |
-| Wake word listener | Python + Porcupine (Picovoice) | זיהוי "היי דונה" — רץ מקומי, בלי אינטרנט |
+| Wake word | Python + Porcupine (Picovoice) | זיהוי "Hey Dona" — מקומי, בלי אינטרנט |
 | תמלול | OpenAI Whisper API | speech-to-text בעברית |
-| הבנת כוונה + ביצוע | Claude API (Anthropic) | מפרש פקודה, מחזיר structured JSON |
-| קול חזרה | OpenAI TTS API | text-to-speech — תגובה קולית |
-| פעולות macOS | AppleScript / osascript | שליטה באפליקציות מקומיות |
-| Google APIs | Gmail, Calendar, Tasks | מייל, יומן, משימות |
-| WhatsApp | WhatsApp Desktop + AppleScript | הודעות |
+| מוח | Claude API (Anthropic) | הבנת כוונה, שיחה, סיכום, למידה |
+| קול | OpenAI TTS API | תגובה קולית נעימה |
+| פעולות | AppleScript + Google APIs | ביצוע על המחשב ובענן |
 
 ### זרימת נתונים
 
 ```
-[מיקרופון] → Porcupine (מקומי)
-    ↓ wake word detected
+[מיקרופון] → Porcupine (מקומי, תמיד פועל)
+    ↓ "Hey Dona" detected
 [הקלטת פקודה] → OpenAI Whisper API
     ↓ טקסט בעברית
-[Claude API] → הבנת כוונה → structured JSON
-    ↓ { action: "send_email", to: "golan", subject: "...", body: "..." }
-[Action Executor] → Gmail API / Calendar API / AppleScript / etc.
+[Claude API] → הבנת כוונה + הקשר שיחה + זיכרון + למידה
+    ↓ structured JSON (פעולה בודדת או שרשרת)
+[Action Executor] → Gmail / Calendar / AppleScript / Web Search / etc.
     ↓ תוצאה
-[OpenAI TTS API] → קול חזרה
+[Claude API] → ניסוח תגובה אלגנטית + שמירת insight ללמידה
+    ↓ טקסט תגובה
+[OpenAI TTS API] → קול
 [Electron UI] → טקסט על המסך
 ```
 
 ### מבנה תהליכים
 
 ```
-┌─────────────────────────────────────┐
-│  Electron Main Process              │
-│  ├── Menubar tray icon              │
-│  ├── Floating response window       │
-│  ├── IPC bridge to Python           │
-│  └── Action executor (AppleScript)  │
-├─────────────────────────────────────┤
-│  Python Background Process          │
-│  ├── Porcupine wake word listener   │
-│  ├── Audio recorder (after wake)    │
-│  └── Sends audio to Electron via IPC│
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│  Electron Main Process                  │
+│  ├── Menubar tray icon + states         │
+│  ├── Floating response window           │
+│  ├── IPC bridge to Python               │
+│  ├── Action executor                    │
+│  ├── Scheduled tasks (briefs, reminders)│
+│  └── Learning engine (insights store)   │
+├─────────────────────────────────────────┤
+│  Python Background Process              │
+│  ├── Porcupine wake word listener       │
+│  ├── Audio recorder (after wake)        │
+│  └── Protocol-break monitor             │
+└─────────────────────────────────────────┘
 ```
-
-Electron ו-Python מתקשרים דרך IPC (stdin/stdout pipe). Python שולח אירועים: `wake_detected`, `audio_ready`. Electron שולח: `start_listening`, `stop`.
-
----
-
-## אינטגרציות — פירוט
-
-### Gmail API
-
-- **שליחת מייל:** `"תשלחי מייל ל-X על Y"` → Claude מזהה נמען, נושא, גוף → Gmail API sends
-- **קריאת מייל:** `"יש לי מיילים חדשים?"` → Gmail API list → Claude מסכם → TTS
-- **OAuth2:** פעם אחת — המשתמש מאשר גישה לחשבון Google. Token נשמר מקומית
-
-### Google Calendar API
-
-- **יצירת אירוע:** `"פגישה מחר ב-3 עם עו״ד כהן"` → Claude מפרש תאריך/שעה/משתתפים → Calendar API creates
-- **שליפת אירועים:** `"מה יש לי היום?"` → Calendar API list → Claude מסכם → TTS
-- **עדכון/מחיקה:** `"תבטלי את הפגישה של מחר"` → Calendar API delete
-
-### Google Tasks API
-
-- **יצירת משימה:** `"תוסיפי משימה: לסגור חוזה עד חמישי"` → Tasks API creates
-- **רשימת משימות:** `"מה המשימות שלי?"` → Tasks API list → Claude מסכם
-
-### WhatsApp Desktop
-
-- **שליחת הודעה:** AppleScript פותח WhatsApp Desktop → מנווט לאיש קשר → מדביק הודעה → שולח
-- **מגבלה:** WhatsApp Desktop חייב להיות פתוח ומחובר
-
-### macOS Native
-
-- **פתיחת אפליקציות:** `open -a "Google Chrome"` דרך shell
-- **חיפוש קבצים:** `mdfind` (Spotlight CLI) → Claude מסנן תוצאות
-- **העתקה ללוח:** `pbcopy` — דונה יכולה להעתיק תוצאות ל-clipboard
-
----
-
-## Claude — הבנת כוונה
-
-Claude מקבל את הטקסט המתומלל ומחזיר structured JSON:
-
-```json
-{
-  "intent": "send_email",
-  "confidence": 0.95,
-  "params": {
-    "to": "golan",
-    "subject": "פגישה מחר",
-    "body": "היי גולן, הפגישה מחר ב-3. נתראה."
-  },
-  "response_text": "שלחתי מייל לגולן על הפגישה מחר ב-3",
-  "needs_confirmation": true
-}
-```
-
-### Intent types
-
-| Intent | פרמטרים | דורש אישור? |
-|--------|---------|-------------|
-| `send_email` | to, subject, body | כן — מציג לפני שליחה |
-| `send_whatsapp` | to, message | כן |
-| `create_event` | title, date, time, attendees | לא |
-| `create_task` | title, due_date | לא |
-| `create_reminder` | title, remind_at | לא |
-| `open_app` | app_name | לא |
-| `search_files` | query | לא |
-| `save_idea` | content, tags | לא |
-| `read_email` | query/filter | לא |
-| `list_events` | date_range | לא |
-| `list_tasks` | filter | לא |
-| `general_question` | question | לא |
-
-### אישור לפני ביצוע
-
-הודעות (מייל, WhatsApp) דורשות אישור. דונה אומרת:
-> "אני עומדת לשלוח מייל לגולן: 'הפגישה מחר ב-3. נתראה.' — לשלוח?"
-
-המשתמש אומר "כן" / "שלחי" → דונה שולחת.
-המשתמש אומר "לא" / "בטלי" → דונה מבטלת.
-
----
-
-## Claude Memory — רעיונות ומחשבות
-
-כשהמשתמש אומר "יש לי רעיון" / "תקליטי" / "תזכרי ש...", דונה:
-
-1. מתמללת את כל מה שנאמר (Whisper)
-2. שולחת לקלוד עם הוראה: סכם, תייג, ושמור ב-memory
-3. קלוד שומר כקובץ memory עם metadata:
-   - תאריך ושעה
-   - תגיות (עסק, מוצר, אישי, פיתוח, וכו')
-   - סיכום קצר
-   - התמלול המלא
-4. ניתן לשליפה: "מה הרעיונות שהיו לי על X?" → Claude מחפש ב-memory ומסכם
-
-### מבנה קובץ memory
-
-```markdown
----
-name: רעיון — שירות מנויים לעסקים קטנים
-description: רעיון לשירות SaaS חודשי שמנהל חשבוניות אוטומטית לעסקים קטנים
-type: idea
-tags: [business, saas, billing]
-source: voice
-date: 2026-03-30T14:22:00+03:00
----
-
-## סיכום
-רעיון לפלטפורמה שמנהלת חשבוניות אוטומטית לעסקים קטנים...
-
-## תמלול מלא
-"אני חושב שיש פה הזדמנות ענקית בעסקים קטנים שמנהלים חשבוניות ידנית..."
-```
-
----
-
-## אנשי קשר
-
-דונה צריכה לדעת מי זה "גולן", "אבי" וכו'. מקורות:
-
-1. **Google Contacts API** — סנכרון אנשי קשר (שם, מייל, טלפון)
-2. **למידה מתמשכת** — אם המשתמש אומר "תשלחי לגולן" ואין גולן באנשי קשר, דונה שואלת: "מי זה גולן? מה המייל שלו?" ושומרת
 
 ---
 
@@ -213,87 +353,128 @@ date: 2026-03-30T14:22:00+03:00
 
 ```
 dona/
-├── package.json              # Electron app
+├── package.json
 ├── electron/
-│   ├── main.ts               # Electron main process
-│   ├── tray.ts               # Menubar tray icon + states
-│   ├── window.ts             # Floating response window
-│   ├── ipc-bridge.ts         # Communication with Python
-│   └── preload.ts            # Secure bridge to renderer
+│   ├── main.ts                # Electron main process
+│   ├── tray.ts                # Menubar tray icon + states
+│   ├── window.ts              # Floating response window
+│   ├── ipc-bridge.ts          # Communication with Python
+│   ├── scheduler.ts           # Morning brief, reminders, evening summary
+│   └── preload.ts             # Secure bridge to renderer
 ├── renderer/
-│   ├── index.html            # Response window HTML
-│   ├── styles.css            # Minimal floating window styles
-│   └── renderer.ts           # UI logic
+│   ├── index.html
+│   ├── styles.css
+│   └── renderer.ts
 ├── python/
-│   ├── requirements.txt      # porcupine, pyaudio, websocket
-│   ├── listener.py           # Wake word detection (Porcupine)
-│   ├── recorder.py           # Audio recording after wake
-│   └── main.py               # Entry point — runs listener loop
+│   ├── requirements.txt
+│   ├── listener.py            # Wake word detection (Porcupine)
+│   ├── recorder.py            # Audio recording after wake
+│   └── main.py                # Entry point
 ├── src/
+│   ├── brain/
+│   │   ├── claude.ts          # Claude API — intent, chat, summarize
+│   │   ├── context.ts         # Conversation context (5-min window)
+│   │   ├── chain.ts           # Multi-action chain executor
+│   │   └── learning.ts        # Learning engine — insights, patterns, predictions
+│   ├── voice/
+│   │   ├── whisper.ts         # OpenAI Whisper API
+│   │   └── tts.ts             # OpenAI TTS API
 │   ├── actions/
-│   │   ├── executor.ts       # Routes intent → action handler
-│   │   ├── gmail.ts          # Gmail API integration
-│   │   ├── calendar.ts       # Google Calendar API integration
-│   │   ├── tasks.ts          # Google Tasks API integration
-│   │   ├── whatsapp.ts       # WhatsApp Desktop AppleScript
-│   │   ├── macos.ts          # Open apps, Spotlight, clipboard
-│   │   └── memory.ts         # Save/retrieve ideas via Claude
-│   ├── services/
-│   │   ├── whisper.ts        # OpenAI Whisper API call
-│   │   ├── claude.ts         # Claude API — intent parsing
-│   │   ├── tts.ts            # OpenAI TTS API call
-│   │   └── google-auth.ts    # Google OAuth2 flow + token storage
+│   │   ├── executor.ts        # Routes intent → action handler
+│   │   ├── gmail.ts           # Gmail API (dona's email)
+│   │   ├── gmail-personal.ts  # Gmail API (personal, readonly)
+│   │   ├── calendar.ts        # Google Calendar API
+│   │   ├── tasks.ts           # Google Tasks API
+│   │   ├── contacts.ts        # Google Contacts API
+│   │   ├── whatsapp.ts        # WhatsApp Desktop (AppleScript)
+│   │   ├── macos.ts           # Apps, Spotlight, volume, media, screenshot
+│   │   ├── docs.ts            # Google Docs/Sheets API
+│   │   ├── web-search.ts      # Web search
+│   │   ├── maps.ts            # Google Maps (travel time)
+│   │   └── weather.ts         # Weather API
+│   ├── memory/
+│   │   ├── store.ts           # Save/retrieve memories (ideas, facts, patterns)
+│   │   ├── insights.ts        # Daily insight processing
+│   │   └── profile.ts         # User profile (preferences, patterns, contacts)
+│   ├── proactive/
+│   │   ├── morning-brief.ts   # Morning summary generator
+│   │   ├── evening-summary.ts # Evening summary generator
+│   │   ├── reminders.ts       # Pre-meeting reminders
+│   │   └── protocol-break.ts  # Logic for when to break protocol
 │   └── config/
-│       ├── intents.ts        # Intent definitions + schemas
-│       └── contacts.ts       # Contact resolution logic
+│       ├── intents.ts         # Intent definitions
+│       ├── businesses.ts      # ALAALA, ROSAYO, ONCE, LEVER config
+│       └── style.ts           # Response style rules
+├── data/
+│   ├── memory/                # Stored memories (ideas, conversations)
+│   ├── insights/              # Daily insights from interactions
+│   ├── profile.json           # Learned preferences + patterns
+│   └── contacts-cache.json    # Local contacts cache
 ├── assets/
-│   ├── tray-idle.png         # Menubar icon — sleeping
-│   ├── tray-listening.png    # Menubar icon — listening
-│   ├── tray-processing.png   # Menubar icon — processing
-│   └── tray-error.png        # Menubar icon — error
+│   ├── tray-idle.png
+│   ├── tray-listening.png
+│   ├── tray-processing.png
+│   └── tray-error.png
 └── scripts/
-    ├── setup.sh              # One-time setup (Python venv, deps, Porcupine key)
-    └── build.sh              # Package Electron app for macOS
+    ├── setup.sh               # One-time setup
+    └── build.sh               # Package for macOS
 ```
 
 ---
 
 ## הגדרה ראשונית (פעם אחת)
 
-1. התקנת האפליקציה (drag to Applications)
-2. דונה מבקשת הרשאת מיקרופון (macOS permission)
-3. דונה מבקשת הרשאת Accessibility (לשליטה באפליקציות)
-4. הכנסת API keys: OpenAI + Anthropic (Claude)
-5. התחברות לחשבון Google (OAuth — מאשר Gmail + Calendar + Tasks + Contacts)
-6. דונה מוכנה
+1. התקנת האפליקציה
+2. הרשאת מיקרופון (macOS)
+3. הרשאת Accessibility (לשליטה באפליקציות)
+4. הכנסת API keys: OpenAI + Anthropic + Picovoice
+5. התחברות לחשבון Google (OAuth — Gmail, Calendar, Tasks, Contacts, Docs)
+6. הגדרת המייל של דונה (dona@domain)
+7. דונה מוכנה
 
 ---
 
-## API Keys נדרשים
+## API Keys
 
 | שירות | משתנה | שימוש |
 |-------|-------|-------|
-| OpenAI | `OPENAI_API_KEY` | Whisper (תמלול) + TTS (קול) |
-| Anthropic | `ANTHROPIC_API_KEY` | Claude (הבנת כוונה + memory) |
-| Picovoice | `PICOVOICE_ACCESS_KEY` | Porcupine wake word (חינם עד 3 מכשירים) |
-| Google | `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` | Gmail, Calendar, Tasks, Contacts |
+| OpenAI | `OPENAI_API_KEY` | Whisper + TTS |
+| Anthropic | `ANTHROPIC_API_KEY` | Claude (מוח) |
+| Picovoice | `PICOVOICE_ACCESS_KEY` | Wake word |
+| Google | `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` | כל שירותי Google |
+| Google (דונה) | `DONA_GMAIL_CREDENTIALS` | המייל של דונה |
 
 ---
 
 ## אבטחה
 
-- API keys נשמרים ב-macOS Keychain (לא בקובץ טקסט)
-- Google OAuth tokens נשמרים מוצפנים מקומית
-- הקלטות אודיו לא נשמרות — נמחקות אחרי תמלול
-- כל התקשורת עם APIs דרך HTTPS
+- API keys ב-macOS Keychain
+- Google OAuth tokens מוצפנים מקומית
+- הקלטות אודיו נמחקות אחרי תמלול
+- HTTPS בלבד
 - אישור לפני שליחת הודעות (מייל/WhatsApp)
+- המייל של דונה מסומן בבירור כ-AI ("מופעלת על ידי AI")
+
+---
+
+## מצבים ויזואליים
+
+| מצב | אייקון menubar | חלון |
+|-----|----------------|------|
+| שינה | סגול כהה, שקט | מוסתר |
+| מקשיבה | סגול בוהק, פועם | "מקשיבה..." |
+| מעבדת | סגול מסתובב | "מעבדת..." |
+| מגיבה | ירוק | תוצאה + קול |
+| שבירת פרוטוקול | כתום פועם | התראה + קול |
+| שגיאה | אדום | הודעת שגיאה |
 
 ---
 
 ## מגבלות ידועות (v1)
 
-- Wake word באנגלית בלבד ("Hey Dona") — Porcupine לא תומך בעברית ל-custom wake words
-- WhatsApp דרוש פתוח ומחובר על המק
-- אין תמיכה ב-SMS (אין API פשוט ל-SMS בישראל)
-- קול TTS באנגלית/ניטרלי — OpenAI TTS עברית סבירה אבל לא מושלמת
-- דורש חיבור אינטרנט (חוץ מ-wake word detection)
+- Wake word באנגלית ("Hey Dona") — Porcupine לא תומך בעברית ל-custom wake words
+- WhatsApp Desktop חייב להיות פתוח ומחובר
+- אין תמיכה ב-SMS
+- קול TTS — OpenAI TTS עברית סבירה, לא מושלמת
+- דורש חיבור אינטרנט (חוץ מ-wake word)
+- למידה מתחילה ממאפס — דונה תשתפר עם הזמן
