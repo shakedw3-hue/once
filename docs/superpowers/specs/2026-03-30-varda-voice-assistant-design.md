@@ -207,6 +207,82 @@
 4. **Confidence score** — כל למידה מתחילה ב-60%. חוזרת 3 פעמים → 90%. תוקנה → 30%
 5. **כל חודש** — דונה מציגה: "הנה מה שלמדתי עליך החודש. משהו לא מדויק?"
 
+### MEMORY.md — הזיכרון לטווח ארוך
+
+דונה זוכרת **הכל**, **לתמיד**. לא משנה אם עבר יום או שנה.
+
+**איך זה עובד:**
+
+הזיכרון בנוי כמו ארכיון מסודר:
+
+```
+data/
+├── MEMORY.md                              ← אינדקס ראשי, שורה לכל זיכרון
+├── memory/
+│   ├── ideas/
+│   │   └── idea_2026-03-31_invoicing.md   ← רעיון אחד, מתויג, מסוכם
+│   ├── people/
+│   │   └── person_golan.md               ← מי זה, מה היחס, מייל, העדפות
+│   ├── preferences/
+│   │   └── pref_email-style.md           ← "היי" לשותפים, "שלום" ללקוחות
+│   ├── patterns/
+│   │   └── pattern_weekly-report.md      ← כל יום ראשון שקד שולח סיכום
+│   ├── business/
+│   │   └── biz_alaala-trends.md          ← מגמות, תובנות, אירועים חשובים
+│   └── conversations/
+│       └── conv_2026-03-31_14-22.md      ← שיחה שלמה מתומללת + סיכום
+```
+
+**MEMORY.md** הוא האינדקס — שורה אחת לכל זיכרון, עם לינק לקובץ:
+
+```markdown
+- [רעיון: שירות חשבוניות SaaS](memory/ideas/idea_2026-03-31_invoicing.md) — ₪99/חודש, עוסקים פטורים, קשור ל-LEVER
+- [גולן — שותף LEVER](memory/people/person_golan.md) — dr.golan@ramot-dental.co.il
+- [דפוס: סיכום שבועי ביום ראשון](memory/patterns/pattern_weekly-report.md) — confidence: 90%
+- [העדפה: סגנון מיילים](memory/preferences/pref_email-style.md) — "היי" לשותפים, "שלום" ללקוחות
+```
+
+**כל קובץ זיכרון** נראה ככה:
+
+```markdown
+---
+type: idea
+created: 2026-03-31T14:22:00+03:00
+updated: 2026-03-31T14:22:00+03:00
+tags: [business, saas, lever-adjacent]
+urgency: לחשוב עוד
+confidence: 70
+---
+
+## סיכום
+שירות מנויים לניהול חשבוניות אוטומטי — SaaS, ₪99/חודש, עוסקים פטורים.
+
+## נקודות מפתח
+- מחליף אקסל ידני
+- אינטגרציה עם חשבשבת/חשבונית ירוקה
+- onboarding ב-5 דקות
+
+## קשרים
+- קשור לרעיון מ-15.3 על כלי אוטומציה ל-LEVER
+
+## תמלול מלא
+"אני חושב שיש פה הזדמנות ענקית..."
+```
+
+**כשדונה צריכה זיכרון**, היא:
+1. קוראת את `MEMORY.md` (האינדקס — קל, כמה KB)
+2. מחפשת שורות רלוונטיות לפי tags, שמות, תאריכים
+3. קוראת רק את הקבצים הרלוונטיים
+4. שולחת לקלוד את ההקשר המדויק — לא הכל, רק מה שצריך
+
+**דונה גם מעדכנת:**
+- אחרי כל אינטראקציה — בודקת אם צריך לעדכן קובץ קיים או ליצור חדש
+- אם למדה משהו חדש על גולן — מעדכנת `person_golan.md`
+- אם הרעיון מ-31.3 התפתח — מעדכנת את הקובץ ומוסיפה "עודכן"
+- אם דפוס לא נכון יותר — מורידה confidence או מוחקת
+
+**התוצאה:** אתה יכול לשאול "מה הרעיונות שהיו לי על LEVER?" אחרי חצי שנה — ודונה שולפת הכל.
+
 ### סיכום רעיונות — רמת על
 
 כשאתה מדבר 10 דקות בחופשיות, דונה לא עושה transcript dump. היא עושה מה שדונה פאולסן עושה — **מבינה מה חשוב ומה רעש**.
@@ -589,7 +665,14 @@ dona/
 │       ├── businesses.ts      # ALAALA, ROSAYO, ONCE, LEVER config
 │       └── style.ts           # Response style rules
 ├── data/
-│   ├── memory/                # Stored memories (ideas, conversations)
+│   ├── MEMORY.md              # Master index — every memory, one line each
+│   ├── memory/
+│   │   ├── ideas/             # idea_2026-03-31_invoicing-saas.md
+│   │   ├── people/            # person_golan.md, person_avi.md
+│   │   ├── preferences/       # pref_email-style.md, pref_schedule.md
+│   │   ├── patterns/          # pattern_weekly-report.md
+│   │   ├── business/          # biz_alaala-trends.md, biz_lever-clients.md
+│   │   └── conversations/     # conv_2026-03-31_14-22.md
 │   ├── insights/              # Daily insights from interactions
 │   ├── profile.json           # Learned preferences + patterns
 │   └── contacts-cache.json    # Local contacts cache
