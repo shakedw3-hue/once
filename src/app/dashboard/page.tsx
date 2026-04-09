@@ -6,6 +6,7 @@ import DashboardView from "@/components/dashboard/DashboardView";
 import InstallBanner from "@/components/ui/InstallBanner";
 import NotificationPrompt from "@/components/ui/NotificationPrompt";
 import type { Pillar, PillarScores } from "@/types/database";
+import { tracksForPlan, ALL_TRACK_MODULE_TITLES, findTrackById, type TrackMeta } from "@/lib/tracks";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -171,6 +172,100 @@ export default async function DashboardPage() {
     .eq("completed", true)
     .gte("completed_at", startOfWeek.toISOString());
 
+  // ───── Income & AI tracks data (Pro/AI plans only) ─────
+  // Loads modules + lessons for all tracks the user's plan unlocks,
+  // groups them by track using src/lib/tracks.ts metadata.
+  type TrackData = {
+    meta: TrackMeta;
+    modules: {
+      id: string;
+      title: string;
+      lessons: { id: string; title: string; order: number; completed: boolean; moduleId: string }[];
+    }[];
+    totalLessons: number;
+    completedLessons: number;
+    nextLessonLink: string | null;
+  };
+
+  let incomeTracksData: TrackData[] = [];
+  const planTracks = tracksForPlan(profile.plan);
+
+  // Active track id: stored in `recommendation_track` column.
+  // Only consider it valid if it matches a track in the current plan tier.
+  let activeTrackId: string | null = null;
+  if (profile.recommendation_track) {
+    const candidate = findTrackById(profile.recommendation_track);
+    if (candidate && planTracks.find((t) => t.id === candidate.id)) {
+      activeTrackId = candidate.id;
+    }
+  }
+
+  if (planTracks.length > 0) {
+    // Find money path id (income tracks all live under money)
+    const moneyPath = (pathRows ?? []).find((p) => p.pillar === "money");
+    let moneyPathId = moneyPath?.id;
+
+    if (!moneyPathId) {
+      const { data: mp } = await db
+        .from("paths")
+        .select("id")
+        .eq("pillar", "money")
+        .maybeSingle();
+      moneyPathId = mp?.id;
+    }
+
+    if (moneyPathId) {
+      // Fetch all track modules by title (in case order slots collide between seed migrations)
+      const { data: trackMods } = await db
+        .from("modules")
+        .select("id, title, order, path_id")
+        .eq("path_id", moneyPathId)
+        .in("title", ALL_TRACK_MODULE_TITLES);
+
+      const trackModuleIds = (trackMods ?? []).map((m) => m.id);
+
+      let trackLessons: { id: string; title: string; order: number; module_id: string }[] = [];
+      if (trackModuleIds.length > 0) {
+        const { data: lns } = await db
+          .from("lessons")
+          .select("id, title, order, module_id")
+          .in("module_id", trackModuleIds);
+        trackLessons = (lns ?? []).sort((a, b) => a.order - b.order);
+      }
+
+      incomeTracksData = planTracks.map((trackMeta) => {
+        const modules = trackMeta.moduleTitles
+          .map((title) => {
+            const mod = (trackMods ?? []).find((m) => m.title === title);
+            if (!mod) return null;
+            const lessons = trackLessons
+              .filter((l) => l.module_id === mod.id)
+              .map((l) => ({
+                id: l.id,
+                title: l.title,
+                order: l.order,
+                moduleId: mod.id,
+                completed: completedLessonIds.has(l.id),
+              }));
+            return { id: mod.id, title: mod.title, lessons };
+          })
+          .filter(Boolean) as TrackData["modules"];
+
+        const flat = modules.flatMap((m) => m.lessons);
+        const completed = flat.filter((l) => l.completed).length;
+        const next = flat.find((l) => !l.completed);
+
+        return {
+          meta: trackMeta,
+          modules,
+          totalLessons: flat.length,
+          completedLessons: completed,
+          nextLessonLink: next ? `/dashboard/module/${next.moduleId}/lesson/${next.id}` : null,
+        };
+      });
+    }
+  }
+
   return (
     <>
     <DashboardView
@@ -188,6 +283,8 @@ export default async function DashboardPage() {
       todayTracking={(todayTracking ?? []) as { metric_type: string; metric_value: number | null; metric_text: string | null }[]}
       trackingHistory={(trackingHistory ?? []) as { entry_date: string; metric_type: string; metric_value: number | null; metric_text: string | null }[]}
       weeklyCompleted={weeklyCompleted ?? 0}
+      incomeTracks={incomeTracksData}
+      activeTrackId={activeTrackId}
     />
     <InstallBanner />
     <NotificationPrompt />

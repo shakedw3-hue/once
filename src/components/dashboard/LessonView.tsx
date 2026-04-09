@@ -190,51 +190,72 @@ export default function LessonView({
     );
   }
 
-  // Scroll mode (existing layout)
+  // Scroll mode (existing layout) — chrome rebuilt to match dashboard visual language
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mode toggle */}
-      <div className="flex justify-end px-5 pt-2">
-        <div className="flex rounded-full border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => switchMode("slides")}
-            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
-            style={{
-              backgroundColor: "transparent",
-              color: "#9ca3af",
-            }}
-          >
-            Slides
-          </button>
-          <button
-            onClick={() => switchMode("scroll")}
-            className="px-2.5 py-1 text-[10px] font-medium transition-colors"
-            style={{
-              backgroundColor: pillarColor,
-              color: "#fff",
-            }}
-          >
-            Scroll
-          </button>
-        </div>
-      </div>
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-3xl items-center gap-4 px-5">
-          <a href={`/dashboard`} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
-            Dashboard
-          </a>
-          <div className="ml-auto flex items-center gap-2">
-            <Badge variant="secondary" className="text-[10px]">
-              {lesson.order}/{totalLessonsInModule}
-            </Badge>
-            <span className="text-xs text-muted-foreground">{readTime} min</span>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "#FAFAF7",
+        color: "#0A0A0F",
+        fontFamily: "var(--font-sans), Inter, system-ui, sans-serif",
+      }}
+    >
+      {/* ===== HEADER ===== */}
+      <header
+        className="sticky top-0 z-10 backdrop-blur-md"
+        style={{
+          backgroundColor: "rgba(250,250,247,0.92)",
+          borderBottom: "1px solid #E2DFD4",
+        }}
+      >
+        <div className="max-w-3xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6">
+            <Link href="/dashboard" className="font-display text-2xl font-semibold tracking-tight">
+              Once<span style={{ color: "#4F46E5" }}>.</span>
+            </Link>
+            <a
+              href={`/dashboard/module/${mod.id}`}
+              className="hidden sm:flex items-center gap-1.5 text-sm hover:opacity-100 opacity-70 transition"
+              style={{ color: "#48433A" }}
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              {mod.title}
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs tabular-nums" style={{ color: "#6B6452" }}>
+              Lesson {lesson.order} / {totalLessonsInModule} · {readTime} min
+            </span>
+            {/* Mode toggle */}
+            <div
+              className="flex rounded-full overflow-hidden"
+              style={{ border: "1px solid #E2DFD4" }}
+            >
+              <button
+                onClick={() => switchMode("slides")}
+                className="px-3 py-1 text-[10px] font-medium uppercase tracking-wider transition"
+                style={{ color: "#9A937D", backgroundColor: "transparent" }}
+              >
+                Slides
+              </button>
+              <button
+                onClick={() => switchMode("scroll")}
+                className="px-3 py-1 text-[10px] font-medium uppercase tracking-wider transition"
+                style={{ color: "#FAFAF7", backgroundColor: "#0A0A0F" }}
+              >
+                Scroll
+              </button>
+            </div>
           </div>
         </div>
         {/* Lesson progress bar */}
-        <div className="h-0.5 bg-muted">
-          <div className="h-full bg-primary transition-all" style={{ width: `${lessonProgress}%` }} />
+        <div className="h-0.5" style={{ backgroundColor: "#EFEDE6" }}>
+          <div
+            className="h-full transition-all"
+            style={{ width: `${lessonProgress}%`, backgroundColor: pillarColor }}
+          />
         </div>
       </header>
 
