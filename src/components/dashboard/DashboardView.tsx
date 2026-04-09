@@ -280,6 +280,18 @@ export default function DashboardView({
   const lockedTracks = activeTrack
     ? incomeTracks.filter((t) => t.meta.id !== activeTrack.meta.id)
     : [];
+
+  // Income tracks unlock gate: user must finish ≥50% of their primary path's Core lessons
+  const primaryDataForGate = pathData.find((p) => p.pillar === primaryPath);
+  const primaryTotalForGate = primaryDataForGate?.totalLessons ?? 0;
+  const primaryCompletedForGate = primaryDataForGate?.completedLessons ?? 0;
+  const primaryProgressPct =
+    primaryTotalForGate > 0 ? primaryCompletedForGate / primaryTotalForGate : 0;
+  const incomeUnlocked = primaryProgressPct >= 0.5;
+  const lessonsToUnlock = Math.max(
+    0,
+    Math.ceil(primaryTotalForGate * 0.5) - primaryCompletedForGate
+  );
   // In preview mode, swallow link clicks so the design can be explored without auth
   const safeHref = (href: string | null | undefined) => {
     if (!href) return "#";
@@ -927,14 +939,20 @@ export default function DashboardView({
               <SectionHeader
                 eyebrow={pk === "ai" ? "Your career library" : "Your income paths"}
                 title={
-                  activeTrack
+                  !incomeUnlocked
+                    ? pk === "ai"
+                      ? "AI careers — locked"
+                      : "Income tracks — locked"
+                    : activeTrack
                     ? "Your track"
                     : pk === "ai"
                     ? "Choose your AI career"
                     : "Choose your income path"
                 }
                 subtitle={
-                  activeTrack
+                  !incomeUnlocked
+                    ? `Finish at least 50% of your ${PILLARS[primaryPath].title} core lessons to unlock the ${pk === "ai" ? "AI career" : "income"} library.`
+                    : activeTrack
                     ? "This is the track you committed to. Stay focused — finishing one beats starting many."
                     : pk === "ai"
                     ? `Six AI career tracks built for the Filipino market. Pick the one that matches your strengths — you can add more later.`
@@ -942,13 +960,24 @@ export default function DashboardView({
                 }
               />
 
+              {/* LOCKED STATE — under 50% Core progress */}
+              {!incomeUnlocked && (
+                <IncomeLockedTeaser
+                  tracks={incomeTracks}
+                  lessonsToUnlock={lessonsToUnlock}
+                  primaryProgress={primaryProgressPct}
+                  pillarTitle={PILLARS[primaryPath].title}
+                  tier={pk}
+                />
+              )}
+
               {/* CHOSEN TRACK — full hero card */}
-              {activeTrack && (
+              {incomeUnlocked && activeTrack && (
                 <ActiveTrackHero track={activeTrack} previewMode={previewMode} />
               )}
 
               {/* LOCKED TRACKS — small cards with "available as add-on" */}
-              {activeTrack && lockedTracks.length > 0 && (
+              {incomeUnlocked && activeTrack && lockedTracks.length > 0 && (
                 <div className="mt-8">
                   <div className="text-xs font-medium uppercase tracking-widest mb-3" style={{ color: C.stone400 }}>
                     Other tracks · available as add-on
@@ -962,7 +991,7 @@ export default function DashboardView({
               )}
 
               {/* NO ACTIVE TRACK — "choose your path" grid */}
-              {!activeTrack && (
+              {incomeUnlocked && !activeTrack && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
                   {incomeTracks.map((tr) => {
                   const progress = tr.totalLessons > 0 ? tr.completedLessons / tr.totalLessons : 0;
@@ -1468,6 +1497,123 @@ function ActiveTrackHero({ track, previewMode }: { track: IncomeTrackData; previ
                 </Link>
               );
             })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function IncomeLockedTeaser({
+  tracks,
+  lessonsToUnlock,
+  primaryProgress,
+  pillarTitle,
+  tier,
+}: {
+  tracks: IncomeTrackData[];
+  lessonsToUnlock: number;
+  primaryProgress: number;
+  pillarTitle: string;
+  tier: PlanKey;
+}) {
+  return (
+    <div className="mt-5 space-y-5">
+      {/* Lock card with progress + CTA */}
+      <div
+        className="relative overflow-hidden p-7 lg:p-8"
+        style={{
+          backgroundColor: "#FFFFFF",
+          border: `1px dashed ${C.stone300}`,
+          borderRadius: 22,
+        }}
+      >
+        <div
+          className="absolute -right-16 -top-16 w-56 h-56 rounded-full pointer-events-none"
+          style={{ backgroundColor: C.indigo, opacity: 0.06, filter: "blur(50px)" }}
+        />
+        <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: C.stone100 }}
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={C.stone500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-widest font-medium" style={{ color: C.stone500 }}>
+                  Locked · finish core first
+                </div>
+                <div className="font-display text-xl font-medium mt-0.5">
+                  {tier === "ai" ? "AI career library" : "Income library"}
+                </div>
+              </div>
+            </div>
+            <p className="text-sm leading-relaxed mb-5 max-w-md" style={{ color: C.stone600 }}>
+              {lessonsToUnlock === 0 ? (
+                <>You&apos;re right at the threshold. One more {pillarTitle} lesson and the {tier === "ai" ? "AI careers" : "income tracks"} unlock.</>
+              ) : (
+                <>
+                  Complete <span style={{ color: C.ink, fontWeight: 600 }}>{lessonsToUnlock} more {pillarTitle} {lessonsToUnlock === 1 ? "lesson" : "lessons"}</span> to unlock {tier === "ai" ? "the AI career library" : "your income tracks"}. The foundation comes first — then the income skills make sense.
+                </>
+              )}
+            </p>
+
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-[10px] font-medium uppercase tracking-widest" style={{ color: C.stone500 }}>
+                {pillarTitle} progress
+              </div>
+              <div className="text-xs font-semibold lining-nums tabular-nums">
+                {Math.round(primaryProgress * 100)}% / 50%
+              </div>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden relative" style={{ backgroundColor: C.stone100 }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${Math.min(100, primaryProgress * 100)}%`, backgroundColor: C.ink }}
+              />
+              {/* 50% marker */}
+              <div
+                className="absolute top-0 bottom-0 w-px"
+                style={{ left: "50%", backgroundColor: C.indigo, opacity: 0.6 }}
+              />
+            </div>
+            <div className="mt-1 text-[10px]" style={{ color: C.stone400 }}>
+              ↑ Unlock threshold
+            </div>
+          </div>
+
+          {/* Right — small icon stack of locked tracks */}
+          <div className="lg:col-span-1">
+            <div className="text-[10px] uppercase tracking-widest font-medium mb-3" style={{ color: C.stone500 }}>
+              Waiting for you
+            </div>
+            <div className="space-y-2">
+              {tracks.slice(0, 5).map((tr) => (
+                <div key={tr.meta.id} className="flex items-center gap-2.5 opacity-60">
+                  <div
+                    className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${tr.meta.color}15` }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={tr.meta.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                  </div>
+                  <div className="text-xs truncate" style={{ color: C.stone600 }}>
+                    {tr.meta.name}
+                  </div>
+                </div>
+              ))}
+              {tracks.length > 5 && (
+                <div className="text-[10px] pl-8" style={{ color: C.stone400 }}>
+                  + {tracks.length - 5} more
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
